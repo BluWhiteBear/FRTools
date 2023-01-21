@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
+      crossorigin="anonymous"
+    />
+    <link
+      id="theme"
+      rel="stylesheet"
+      type="text/css"
+      href="CSS/stylesheet.css"
+    />
+    <script src="Scripts/styleshift.js" defer></script>
+
+    <title>Livestrong's | Home</title>
+    <link rel="icon" href="Images/icon.png" />
+  </head>
+
+  <body>
+    <main>
+      <div class="container">
+        <!--Navigation Bar at top of page-->
+        <nav class="navbar navbar-expand-lg navbar-dark">
+          <div class="container-fluid">
+            <a class="navbar-brand" href="Index.html">
+              <img
+                class="img-fluid"
+                id="IntroIcon"
+                src="Images/site_logo.png"
+                alt="Website logo"
+              />
+            </a>
+
+            <button
+              class="navbar-toggler custom-toggler"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#navbarSupportedContent"
+              aria-controls="navbarSupportedContent"
+              aria-expanded="false"
+              aria-label="Toggle navigation"
+            >
+              <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                  <a
+                    class="nav-link active"
+                    aria-current="page"
+                    href="Index.html"
+                    >Home</a
+                  >
+                </li>
+
+                <li class="nav-item">
+                  <a class="nav-link" href="Europe-tour.html">Europe Tour</a>
+                </li>
+
+                <li class="nav-item">
+                  <a class="nav-link" href="America-tour.html">America Tour</a>
+                </li>
+
+                <li class="nav-item">
+                  <a class="nav-link" href="Links.html">Products</a>
+                </li>
+
+                <li class="nav-item">
+                  <a class="nav-link" href="Register.html">Register</a>
+                </li>
+
+                <li class="nav-item">
+                  <a class="nav-link" href="Exercise.html">Calorie Calculator</a>
+                </li>
+
+                <li class="nav-item">
+                  <div class="form-group">
+                      <select
+                      id="displayMode"
+                      name="selectedTheme"
+                      aria-labelledby="theme"
+                      >
+                      <option value="dark">&#127769;</option>
+                      <option value="light">&#9728;</option>
+                      <option value="mint">&#127811;</option>
+                      </select>
+                  </div>
+              </li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+      </div>
+
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <header>
+              <img
+                class="img-fluid"
+                id="MastheadImage"
+                src="Images/banner.png"
+                alt="Website banner"
+              />
+            </header>
+          </div>
+
+          <div class="col-12 d-flex justify-content-center">
+            <p id="PageName">Home</p>
+          </div>
+
+          <div class="MainContentWrapper">
+            <div class="row">
+              <div class="col-md-12 text-left">
+                <figure class="figure" id="Short">
+                  <img
+                    class="figure-img img-fluid ContentLogoMoving spin"
+                    id="ContentLogo"
+                    src="Images/site_logo_Spokes.png"
+                    alt="Spinning bike wheel"
+                  />
+                  <p id="Name">Livestrong's Cycling Tours</p>
+                  <figcaption class="figure-caption" id="ShortDescription">
+                    is the leader in professional led tours for amateur
+                    cyclists.<br />
+                    Our fully supported tours traverse historic, beautiful, and
+                    cycling friendly areas of<br />
+                    the United States and Europe. With over 15 years of
+                    experience, we are uniquely<br />
+                    prepared to provide an unforgettable cycling vacation.<br />
+                  </figcaption>
+                </figure>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="container">
+          <div class="col-md-12 SecondaryContentWrapper">
+            <div class="row">
+              <img
+                class="img-fluid"
+                id="CurrentProjectScreenshot"
+                src="Images/leaders.png"
+                alt="Styleized image of bike with caption"
+              />
+              <ul id="LeaderList">
+                <li>
+                  Lance Livestrong: The first and only 7 time winner of the Tour
+                  de France.
+                </li>
+                <li>
+                  Greg LeMond: The first American winner of the Tour de France.
+                </li>
+                <li>
+                  John Tomac: Mountain bike icon and repeat winner of the NORBA
+                  and UCI world championships.
+                </li>
+                <li>
+                  Rebecca Twigg: Two-time Olympic Medalist and 6 time winner of
+                  the World Track Cycling Champioship.
+                </li>
+                <li>
+                  Ned Overend: Mountain bike legend. Has raced professionally
+                  from 1980 to 2007, winning events every year.
+                </li>
+                <li>
+                  Missy Giove: Aka the Missile. All time win leader in NORBA
+                  downhill events, winning 14.
+                </li>
+                <li>
+                    Chris Froome: Winner of the 2017 Tour de France.
+                </li>
+              </ul>
+
+              <div id="ProjectContentWrapper">
+                <div class="row">
+                  <div class="col-md-3 justify-content-center">
+                    <div>
+                      <img
+                        class="img-fluid TourLeaders"
+                        src="Media/tl_Lance.png"
+                        alt="Image of tour leader"
+                      />
+                      <p>Lance Armstrong</p>
+                    </div>
+                  </div>
+
+                  <div class="col-md-3 justify-content-center">
+                    <div>
+                      <img
+                        class="img-fluid TourLeaders"
+                        src="Media/tl_Greg.png"
+                        alt="Image of tour leader"
+                      />
+                      <p>Greg LeMond</p>
+                    </div>
+                  </div>
+
+                  <div class="col-md-3 justify-content-center">
+                    <div>
+                      <img
+                        class="img-fluid TourLeaders"
+                        src="Media/tl_John.png"
+                        alt="Image of tour leader"
+                      />
+                      <p>John Tomac</p>
+                    </div>
+                  </div>
+
+                  <div class="col-md-3 justify-content-center">
+                    <div>
+                      <img
+                        class="img-fluid TourLeaders"
+                        src="Media/tl_Rebecca.png"
+                        alt="Image of tour leader"
+                      />
+                      <p>Rebecca Twigg</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-3 justify-content-center">
+                    <div>
+                      <img
+                        class="img-fluid TourLeaders"
+                        src="Media/tl_Ned.png"
+                        alt="Image of tour leader"
+                      />
+                      <p>Ned Overend</p>
+                    </div>
+                  </div>
+
+                  <div class="col-md-3 justify-content-center">
+                    <div>
+                      <img
+                        class="img-fluid TourLeaders"
+                        src="Media/tl_Missy.png"
+                        alt="Image of tour leader"
+                      />
+                      <p>Missy Giove</p>
+                    </div>
+                  </div>
+
+                  <div class="col-md-3 justify-content-center">
+                    <div>
+                      <img
+                        class="img-fluid TourLeaders"
+                        src="Media/tl_Chris.png"
+                        alt="Image of tour leader"
+                      />
+                      <p>Chris Froome</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-12" id="FooterWrapper">
+            <div class="row">
+              <div class="SecondaryContentWrapper">
+                <br />
+                Unlike other tour companies, our company is a non-profit
+                organization.<br />
+                We donate every cent of our profits to the Livestrong
+                Foundation.<br />
+                If you would like to visit our headquarters, we are located in
+                Austin TX.<br />
+                <br />
+                1221 S Mo PAC<br />
+                Expy Ste 320<br />
+                Austin, TX 78746<br />
+              </div>
+            </div>
+
+            <div class="row">
+              <footer>
+                <p>
+                  © 2021 Livestrong, a registered trademark of the Livestrong
+                  Foundation.<br />
+                  The Livestrong Foundation is a 501(c)(3) under federal tax
+                  guidelines.<br />
+                  Last Updated: 1/15/2022<br />
+                </p>
+              </footer>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Option 1: Bootstrap Bundle with Popper -->
+      <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous">
+      </script>
+    </main>
+  </body>
+</html>

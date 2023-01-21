@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
+      crossorigin="anonymous"
+    />
+    <link
+      id="theme"
+      rel="stylesheet"
+      type="text/css"
+      href="CSS/stylesheet.css"
+    />
+    <script src="Scripts/styleshift_Other.js" defer></script>
+    <script src="Scripts/changeBikeImage.js" defer></script>
+
+    <title>Livestrong's | Register</title>
+    <link rel="icon" href="Images/icon.png" />
+  </head>
+
+  <body>
+    <main>
+      <div class="container">
+        <!--Navigation Bar at top of page-->
+        <nav class="navbar navbar-expand-lg navbar-dark">
+          <div class="container-fluid">
+            <a class="navbar-brand" href="Index.html">
+              <img
+                class="img-fluid"
+                id="IntroIcon"
+                src="Images/site_logo.png"
+                alt="Website"
+              />
+            </a>
+
+            <button
+              class="navbar-toggler custom-toggler"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#navbarSupportedContent"
+              aria-controls="navbarSupportedContent"
+              aria-expanded="false"
+              aria-label="Toggle navigation"
+            >
+              <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                  <a class="nav-link" href="Index.html">Home</a>
+                </li>
+
+                <li class="nav-item">
+                  <a class="nav-link" href="Europe-tour.html">Europe Tour</a>
+                </li>
+
+                <li class="nav-item">
+                  <a class="nav-link" href="America-tour.html">America Tour</a>
+                </li>
+
+                <li class="nav-item">
+                  <a class="nav-link" href="Links.html">Products</a>
+                </li>
+
+                <li class="nav-item">
+                  <a
+                    class="nav-link active"
+                    aria-current="page"
+                    href="Register.html"
+                    >Register</a
+                  >
+                </li>
+
+                <li class="nav-item">
+                  <a class="nav-link" href="Exercise.html"
+                    >Calorie Calculator</a
+                  >
+                </li>
+
+                <li class="nav-item">
+                  <div class="form-group">
+                    <select
+                      id="displayMode"
+                      name="selectedTheme"
+                      aria-labelledby="theme"
+                    >
+                      <option value="dark">&#127769;</option>
+                      <option value="light">&#9728;</option>
+                      <option value="mint">&#127811;</option>
+                    </select>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+      </div>
+
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <header>
+              <img
+                class="img-fluid"
+                id="MastheadImage"
+                src="Images/banner.png"
+                alt="Website banner"
+              />
+            </header>
+          </div>
+
+          <div class="col-12 d-flex justify-content-center">
+            <p id="PageName">Contact Info</p>
+          </div>
+
+          <div id="MailContentWrapper">
+            <div class="container">
+              <div class="col-md-12 justify-content-center">
+                <div class="row">
+                  <h2>Subscribe to get updates about upcoming projects!</h2>
+                  <h6>Elements Labeled * are Required</h6>
+
+                  <form action="process.html" method="get">
+                    <!-- A TEXT INPUT FIELD lets the user type in anything -->
+                    <div class="form-group">
+                      <label for="input-firstname">First Name*</label>
+                      <br />
+                      <input
+                        type="text"
+                        id="input-firstname"
+                        name="firstName"
+                        required
+                      />
+                    </div>
+
+                    <!-- a TEXTAREA can show multiple lines of typed-in input -->
+                    <div class="form-group">
+                      <label for="input-lastname">Last Name*</label>
+                      <br />
+                      <input
+                        type="text"
+                        id="input-lastname"
+                        name="lastName"
+                        required
+                      />
+                    </div>
+
+                    <!-- a TEXTAREA can show multiple lines of typed-in input -->
+                    <div class="form-group">
+                      <label for="input-email">Email Address*</label>
+                      <br />
+                      <input
+                        type="email"
+                        id="input-email"
+                        name="userEmail"
+                        placeholder="abc12@email.com"
+                        required
+                      />
+                    </div>
+
+                    <!-- A DROPDOWN (SELECT) lets the user choose from a set of predetermined responses -->
+                    <div class="form-group">
+                      <label for="input-bike"
+                        >Please describe your bike access</label
+                      >
+                      <br />
+                      <select id="input-bike" name="bike">
+                        <option value="bike_own">I own a bike</option>
+                        <option value="bike_rent">I rent a bike</option>
+                        <option value="bike_loanProg">
+                          I am interested in your loan-a-bike program
+                        </option>
+                      </select>
+                    </div>
+
+                    <img
+                      class="img-fluid"
+                      id="bikeSelection"
+                      src="Images/bike.png"
+                      alt="Bike selection Indicatior"
+                    />
+
+                    <!-- RADIO BUTTONS lets the user choose from a set of predetermined responses -->
+                    <div class="form-group">
+                      America or Europe Tour?
+
+                      <div class="radio-set">
+                        <input
+                          id="input-email1"
+                          type="radio"
+                          value="promoEmails"
+                          name="emailType"
+                          checked
+                        />
+                        <label for="input-email1">America</label>
+                        <br />
+                        <input
+                          id="input-email2"
+                          type="radio"
+                          value="updateEmails"
+                          name="emailType"
+                        />
+                        <label for="input-email2">Europe</label>
+                      </div>
+                    </div>
+
+                    <!-- A set of CHECKBOXES lets user choose MORE THAN ONE from a set of predetermined responses -->
+                    <div class="form-group">
+                      Europe Tour locations you are interested in
+
+                      <div class="checkbox-set">
+                        <input
+                          id="input-type1"
+                          type="checkbox"
+                          value="Tour de France"
+                          name="europe-tour[]"
+                        />
+                        <label for="input-type1">Tour de France</label>
+                        <br />
+                        <input
+                          id="input-type2"
+                          type="checkbox"
+                          value="Italian Wines Tour"
+                          name="europe-tour[]"
+                        />
+                        <label for="input-type2">Italian Wines Tour</label>
+                        <br />
+                        <input
+                          id="input-type3"
+                          type="checkbox"
+                          value="English Channel"
+                          name="europe-tour[]"
+                        />
+                        <label for="input-type3">English Channel</label>
+                        <br />
+                        <input
+                          id="input-type4"
+                          type="checkbox"
+                          value="Roman Antiquities"
+                          name="europe-tour[]"
+                        />
+                        <label for="input-type4">Roman Antiquities</label>
+                        <br />
+                        <input
+                          id="input-type5"
+                          type="checkbox"
+                          value="Swiss Alps"
+                          name="europe-tour[]"
+                        />
+                        <label for="input-type5">Swiss Alps</label>
+                      </div>
+                    </div>
+
+                    <!-- A set of CHECKBOXES lets user choose MORE THAN ONE from a set of predetermined responses -->
+                    <div class="form-group">
+                      American Tour locations you are interested in
+
+                      <div class="checkbox-set">
+                        <input
+                          id="input-type6"
+                          type="checkbox"
+                          value="Route 66"
+                          name="america-tour[]"
+                        />
+                        <label for="input-type6">Route 66</label>
+                        <br />
+                        <input
+                          id="input-type7"
+                          type="checkbox"
+                          value="Chesapeake Bay"
+                          name="america-tour[]"
+                        />
+                        <label for="input-type7">Chesapeake Bay</label>
+                        <br />
+                        <input
+                          id="input-type8"
+                          type="checkbox"
+                          value="Blue Ridge Parkway"
+                          name="america-tour[]"
+                        />
+                        <label for="input-type8">Blue Ridge Parkway</label>
+                        <br />
+                        <input
+                          id="input-type9"
+                          type="checkbox"
+                          value="Civil War Campaign"
+                          name="america-tour[]"
+                        />
+                        <label for="input-type9">Civil War Campaign</label>
+                        <br />
+                        <input
+                          id="input-type10"
+                          type="checkbox"
+                          value="Alaskan Adventure"
+                          name="america-tour[]"
+                        />
+                        <label for="input-type10">Alaskan Adventure</label>
+                        <br />
+                        <input
+                          id="input-type11"
+                          type="checkbox"
+                          value="Moab Slick Rock"
+                          name="america-tour[]"
+                        />
+                        <label for="input-type11">Moab Slick Rock</label>
+                      </div>
+                    </div>
+
+                    <!-- A submit button allowing the user to submit their answers -->
+                    <div class="form-group">
+                      <button type="submit">Submit</button>
+                      <button type="reset">Clear</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-12" id="FooterWrapper">
+          <div class="row">
+            <footer>
+              <p>
+                © 2021 Livestrong, a registered trademark of the Livestrong
+                Foundation.<br />
+                The Livestrong Foundation is a 501(c)(3) under federal tax
+                guidelines.<br />
+                Last Updated: 1/15/2022<br />
+              </p>
+            </footer>
+          </div>
+        </div>
+      </div>
+
+      <!-- Option 1: Bootstrap Bundle with Popper -->
+      <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous"
+      ></script>
+    </main>
+  </body>
+</html>

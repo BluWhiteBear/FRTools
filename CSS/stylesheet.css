@@ -1,0 +1,369 @@
+/*GLOBAL CSS*/
+
+:root {
+    --primary-background-color: #292d45;
+    --primary-background-color2: #161929;
+    --secondary-background-color: #5f6986;
+    --secondary-background-color2: #1d2232;
+    --nav-color: #ffffff;
+    --accent-color: #db415b;
+    --primary-text-color: #eaeaf0;
+    --secondary-text-color: #333333;
+  }
+  
+  html {
+    overflow: scroll;
+    overflow-x: hidden;
+  }
+  
+  @keyframes spinning {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  .spin {
+    animation-name: spinning;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+    /* linear | ease | ease-in | ease-out | ease-in-out */
+    animation-timing-function: linear;
+  }
+  
+  option {
+    /* Whatever color  you want */
+    background-color: var(--secondary-background-color);
+  }
+  
+  /*Scrollbar*/
+  /* Width */
+  ::-webkit-scrollbar {
+    width: 5px;
+  }
+  
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0);
+  }
+  
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: var(--accent-color);
+  }
+  
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(133, 133, 133);
+  }
+  
+  /*Nav-Bar*/
+  #IntroIcon {
+    /*Image Styles*/
+    height: 70px;
+    width: 70px;
+  }
+  
+  .navbar-toggler {
+    color: var(--accent-color) !important;
+  }
+  
+  .custom-toggler .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(0,0,0, 1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E") !important;
+  }
+  
+  .container-fluid {
+    padding: 0% !important;
+  }
+  
+  .navbar {
+    background-color: rgba(255, 0, 0, 0);
+  }
+  
+  .navbar-collapse {
+    /*Font Styles*/
+    font-size: 20px;
+    font-weight: 100;
+  }
+  
+  #navbarSupportedContent {
+    /*Container Styles*/
+    justify-content: right;
+    text-align: right;
+    background-color: rgba(0, 0, 0, 0);
+  }
+  
+  .nav-item a:hover {
+    color: var(--accent-color) !important;
+  }
+  
+  .active {
+    font-weight: 500;
+  }
+  
+  .nav-item a {
+    color: var(--nav-color) !important;
+  }
+  
+  #displayMode {
+    background-color: rgba(0, 0, 0, 0);
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    text-indent: 1px;
+    border: none;
+  }
+  
+  /*Content*/
+  #PageName {
+    /*Font Styles*/
+    font-weight: bold;
+    color: var(--primary-text-color);
+  }
+  
+  .container {
+    /*Container Styles*/
+    padding: 0px;
+  }
+  
+  .MainContentWrapper {
+    /*Font Styles*/
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    color: var(--primary-text-color);
+  
+    /*Container Styles*/
+    padding: 20px;
+    height: auto;
+    width: 100%;
+    background-image: linear-gradient(
+      to bottom right,
+      var(--primary-background-color),
+      var(--primary-background-color2)
+    );
+    box-shadow: -16px 10px 20px rgba(1, 1, 1, 0.6);
+    border-radius: 10px;
+  }
+  
+  .SecondaryContentWrapper {
+    /*Font Styles*/
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    color: var(--primary-text-color);
+  
+    /*Container Styles*/
+    height: auto;
+    width: 100%;
+    padding-top: 20px;
+    background-color: rgba(0, 0, 0, 0);
+  }
+  
+  #MastheadImage {
+    /*Image Styles*/
+    height: auto;
+    width: 100%;
+  
+    /*Container Styles*/
+    padding: 0px;
+  }
+  
+  .col-md-12 {
+    padding: 0%;
+  }
+  
+  body {
+    background-image: linear-gradient(
+      to bottom right,
+      var(--secondary-background-color),
+      var(--secondary-background-color2)
+    );
+    padding: 5vh;
+  }
+  
+  footer {
+    color: var(--primary-text-color);
+    font-size: calc(5px + 0.6vw);
+    padding: 0%;
+  }
+  
+  /*Index CSS*/
+  #Name {
+    /*Font Styles*/
+    font-size: 40px;
+    font-weight: bold;
+    line-height: 0.8;
+  }
+  
+  #Short {
+    /*Container Styles*/
+    margin-top: 50px;
+  }
+  
+  #ShortDescription {
+    /*Font Styles*/
+    color: var(--primary-text-color);
+    font-size: calc(7px + 0.5vw);
+  
+    /*Container Styles*/
+    padding: 2vw;
+  }
+  
+  #LeaderList {
+    font-size: calc(10px + 0.5vw);
+    text-align: left;
+    padding: calc(20px - 0.5vw);
+  }
+  
+  .TourLeaders {
+    /*Image Styles*/
+    width: 200px;
+    height: auto;
+    padding: 10px;
+    border-radius: 20%;
+    box-shadow: -2px 5px 10px rgba(1, 1, 1, 0.6);
+  }
+  
+  #ContentLogo {
+    /*Image Styles*/
+    height: 150px;
+    width: 150px;
+  }
+  
+  #CurrentProjectScreenshot {
+    /*Container Styles*/
+    padding: 0px;
+  }
+  
+  .figure {
+    /*Font Styles*/
+    line-height: 1.25;
+  
+    /*Container Styles*/
+    margin: 0px;
+    border: 0px;
+    padding: 0px;
+  }
+  
+  /*Portfolio CSS*/
+  #ProjectContentWrapper {
+    /*Font Styles*/
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    color: var(--primary-text-color);
+  
+    /*Container Styles*/
+    height: auto;
+    width: 100%;
+    background-image: linear-gradient(
+      to bottom right,
+      var(--primary-background-color),
+      var(--primary-background-color2)
+    );
+    box-shadow: -16px 10px 20px rgba(1, 1, 1, 0.6);
+    border-radius: 10px;
+  }
+  
+  .projectThumbnail {
+    /*Image Styles*/
+    width: auto;
+    height: auto;
+    padding: 20px;
+    border-radius: 5%;
+    box-shadow: -2px 5px 10px rgba(1, 1, 1, 0.6);
+  }
+  
+  /*ContactMe CSS*/
+  #SocialIcon {
+    /*Image Styles*/
+    width: 75px;
+    height: auto;
+  }
+  
+  #MailContentWrapper {
+    /*Font Styles*/
+    font-size: 15px;
+    font-weight: bold;
+    text-align: left;
+    color: var(--primary-text-color);
+    line-height: 25px;
+  
+    /*Container Styles*/
+    height: auto;
+    width: 100%;
+    padding: 20px;
+    background-image: linear-gradient(
+      to bottom right,
+      var(--primary-background-color),
+      var(--primary-background-color2)
+    );
+    box-shadow: -16px 10px 20px rgba(1, 1, 1, 0.6);
+    border-radius: 10px;
+  }
+  
+  .form-group {
+    /*Container Styles*/
+    padding: 10px;
+  }
+  
+  /*Process*/
+  #registeredMessageWrapper {
+    text-align: center;
+    font-size: calc(10px + 5vw);
+    height: 100%;
+    padding: 100px;
+  }
+  
+  table {
+    border: solid 2px #000000;
+    background-color: var(--accent-color);
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0 auto;
+  }
+  
+  th {
+    background-color: var(--nav-color);
+    color: var(--accent-color);
+  }
+  
+  td {
+    border: solid 1px #000000;
+    padding: 0.25em 0.5em;
+  }
+  
+  tr:nth-child(even) {
+    background-color: var(--primary-background-color);
+  }
+  
+  .special-cell {
+    text-align: right;
+    color: var(--accent-color);
+    width: 70px;
+  }
+  
+  #bikeSelection {
+    height: 100px;
+    width: auto;
+  }
+  
+  footer {
+    padding-top: 100px;
+  }
+
+  .Calculator {
+      padding: 50px;
+  }
+
+  .hidden {
+      display: none;
+  }
+
+  button {
+    color: var(--primary-text-color);
+    background-color: var(--accent-color);
+  }
+  
