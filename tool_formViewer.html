@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form.io Viewer</title>
+    
+    <!-- Stylesheets -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="styles/style.css" rel="stylesheet">
+
+    <!-- Prism.js -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-clike.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-basic.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-vbnet.min.js"></script>
+</head>
+<body>
+    <!-- Nav Bar -->
+    <div id="navbar-placeholder" class="fixed-top"></div>
+
+    <!-- Main Container -->
+    <div class="container my-5" style="padding-top: 4rem;">
+        <!-- Header Section -->
+        <header class="text-center mb-5">
+            <h1 class="display-4 fw-bold mb-2">Form.io Viewer</h1>
+            <p class="text-light">Preview Form.io JSON configurations</p>
+        </header>
+
+        <!-- Card Section -->
+        <div class="card shadow-sm mx-auto">
+            <!-- Navigation Tabs -->
+            <div class="card-header pt-4" style="background: none; border: none;">
+                <ul class="nav nav-tabs card-header-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="upload-tab" data-bs-toggle="tab" href="#upload">Upload</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="viewer-tab" data-bs-toggle="tab" href="#viewer">Form Preview</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="clientscript-tab" data-bs-toggle="tab" href="#clientscript">Client Script</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="serverscript-tab" data-bs-toggle="tab" href="#serverscript">Server Script</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="card-body p-4">
+                <div class="tab-content">
+                    <!-- Upload Tab -->
+                    <div class="tab-pane fade show active" id="upload" role="tabpanel">
+                        <!-- Form Preview -->
+                        <div class="upload-area d-flex flex-column align-items-center justify-content-center p-5 rounded-3 text-center mb-4">
+                            <label for="fileUpload" class="form-label h5 mb-3 text-light">Upload Form.io JSON File</label>
+                            <input type="file" id="fileUpload" class="form-control form-control-lg" accept=".json" style="max-width: 400px;">
+                        </div>
+                    </div>
+
+                    <!-- Form Viewer Tab -->
+                    <div class="tab-pane fade show" id="viewer" role="tabpanel">
+                        <!-- Form Preview -->
+                        <div class="preview-container p-4 border rounded-3 bg-white" style="display: none;">
+                            <div id="formio-rendered"></div>
+                        </div>
+                    </div>
+            
+                    <!-- Client Script Tab -->
+                    <div class="tab-pane fade" id="clientscript" role="tabpanel">
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="mb-0 text-light">Client-side Script</h5>
+                                <button id="copyClientScriptBtn" class="btn btn-sm btn-primary">Copy Script</button>
+                            </div>
+                            <pre class="code-editor"><code id="clientScriptEditor" class="language-javascript" contenteditable="true" spellcheck="false"></code></pre>
+                        </div>
+                    </div>
+            
+                    <!-- Server Script Tab -->
+                    <div class="tab-pane fade" id="serverscript" role="tabpanel">
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="mb-0 text-light">Server-side Script</h5>
+                                <button id="copyServerScriptBtn" class="btn btn-sm btn-primary">Copy Script</button>
+                            </div>
+                            <pre class="code-editor"><code id="serverScriptEditor" class="language-vbnet" contenteditable="true" spellcheck="false"></code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="scripts/scripts.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.form.io/formiojs/formio.full.min.js"></script>
+    <script>
+        document.getElementById('fileUpload').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const formioData = JSON.parse(e.target.result);
+                    
+                    // Load client script
+                    const clientScript = formioData.ClientSideScript || '';
+                    document.getElementById('clientScriptEditor').textContent = clientScript;
+                    
+                    // Load server script 
+                    const serverScript = formioData.ServerSideScript || '';
+                    document.getElementById('serverScriptEditor').textContent = serverScript;
+
+                    // Apply syntax highlighting
+                    Prism.highlightElement(document.getElementById('clientScriptEditor'));
+                    Prism.highlightElement(document.getElementById('serverScriptEditor'));
+
+
+                    // Enable copy buttons
+                    setupCopyButton('copyClientScriptBtn', 'clientScriptEditor');
+                    setupCopyButton('copyServerScriptBtn', 'serverScriptEditor');
+
+                    
+                    // Get the form definition, handling both formats
+                    let formDefinition = formioData.FormioTemplate ? 
+                        JSON.parse(formioData.FormioTemplate) : 
+                        formioData;
+    
+                    // Clean up problematic conditional logic
+                    const cleanComponent = (comp) => {
+                        if (comp.conditional) {
+                            delete comp.conditional;
+                        }
+                        if (comp.customConditional) {
+                            delete comp.customConditional;
+                        }
+                        if (comp.components) {
+                            comp.components = comp.components.map(c => cleanComponent(c));
+                        }
+                        return comp;
+                    };
+    
+                    // Clean up form definition
+                    formDefinition.components = formDefinition.components.map(c => cleanComponent(c));
+                    
+                    // Show preview container
+                    const previewContainer = document.querySelector('.preview-container');
+                    previewContainer.style.display = 'block';
+                    
+                    // Clear any existing form
+                    const formContainer = document.getElementById('formio-rendered');
+                    formContainer.innerHTML = '';
+                    
+                    // Create Form.io form with options
+                    const options = {
+                        sanitize: true,
+                        noAlerts: false,
+                        readOnly: false,
+                        hooks: {
+                            beforeSubmit: (submission, next) => {
+                                console.log('Form submission:', submission);
+                                next();
+                            }
+                        }
+                    };
+    
+                    Formio.createForm(formContainer, formDefinition, options)
+                        .then(form => {
+                            console.log('Form created successfully');
+                            form.on('change', () => {
+                                console.log('Form data:', form.data);
+                            });
+                            form.on('error', (errors) => {
+                                console.error('Form errors:', errors);
+                            });
+                        })
+                        .catch(err => {
+                            console.error('Error creating form:', err);
+                            formContainer.innerHTML = `
+                                <div class="alert alert-danger">
+                                    Error creating form: ${err.message}
+                                </div>`;
+                        });
+
+                    document.getElementById('viewer-tab').click();
+    
+                } catch (error) {
+                    console.error('Error parsing form definition:', error);
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        function setupCopyButton(buttonId, editorId) {
+            document.getElementById(buttonId).onclick = async () => {
+                try {
+                    const content = document.getElementById(editorId).value;
+                    await navigator.clipboard.writeText(content);
+                    const btn = document.getElementById(buttonId);
+                    btn.textContent = 'Copied!';
+                    btn.classList.add('btn-success');
+                    setTimeout(() => {
+                        btn.textContent = 'Copy Script';
+                        btn.classList.remove('btn-success');
+                    }, 2000);
+                } catch (err) {
+                    console.error('Failed to copy:', err);
+                }
+            };
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Meta Information -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form.io to DevExpress Converter</title>
+
+    <!-- Stylesheets -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles/style.css">
+
+    <!-- Scripts for Code Highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+</head>
+<body>
+    <!-- Nav Bar -->
+    <div id="navbar-placeholder" class="fixed-top"></div>
+
+    <!-- Main Container -->
+    <div class="container my-5" style="padding-top: 4rem;">
+        <!-- Header Section -->
+        <header class="text-center mb-5">
+            <h1 class="display-4 fw-bold mb-2">New Form Table Generator</h1>
+            <p>Pulls fields from Form.io JSON and returns table alter statements</p>
+        </header>
+
+        <!-- Card Section -->
+        <div class="card shadow-sm mx-auto">
+            <!-- Navigation Tabs -->
+
+            <!-- Tab Content -->
+            <div class="card-body p-4">
+                <div class="tab-content">
+                    <!-- JSON Converter Tab -->
+                    <div class="tab-pane fade show active" id="converter" role="tabpanel">
+                        <div class="upload-area d-flex flex-column align-items-center justify-content-center p-5 rounded-3 text-center mb-4">
+                            <label for="fileUpload" class="form-label h5 mb-3 text-light">Upload Form.io JSON File</label>
+                            <input type="file" id="fileUpload" class="form-control form-control-lg" accept=".json" style="max-width: 400px;">
+                        </div>
+            
+                        <!-- Conversion Info -->
+                        <div id="conversion-info" class="alert alert-success mb-4" style="display: none;">
+                            <div class="conversion-timestamp"></div>
+                            <div class="conversion-duration"></div>
+                        </div>
+            
+                        <div id="output-wrapper" style="display: none;">
+                            <div class="row g-4">
+                                <!-- Component Type Selection -->
+                                <div class="col-12 mb-4">
+                                    <div class="card">
+                                        <div class="col-12 mb-4">
+                                            <div class="card mb-4" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);">
+                                                <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                                    <h5 class="mb-0" style="color: rgba(255,255,255,0.9);">SQL Statement Options</h5>
+                                                </div>
+                                                <div class="card-body" style="color: rgba(255,255,255,0.8);">
+                                                    <div class="form-group">
+                                                        <label for="statementType" class="form-label">Statement Type</label>
+                                                        <select id="statementType" class="form-control" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.9);">
+                                                            <option value="create">CREATE TABLE Statement</option>
+                                                            <option value="alter">ALTER TABLE Statement</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-header">
+                                            <h5 class="mb-0 text-light">Select Component Types to Include</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row g-3">
+                                                <div class="col-md-3">
+                                                    <input type="checkbox" id="textfield" checked>
+                                                    <label class="form-check-label text-light" for="textfield">Text Fields</label>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <input type="checkbox" id="textarea" checked>
+                                                    <label class="form-check-label text-light" for="textarea">Text Areas</label>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <input type="checkbox" id="select" checked>
+                                                    <label class="form-check-label text-light" for="select">Select Fields</label>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <input type="checkbox" id="number" checked>
+                                                    <label class="form-check-label text-light" for="number">Number Fields</label>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <input type="checkbox" id="datetime" checked>
+                                                    <label class="form-check-label text-light" for="datetime">Date/Time Fields</label>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <input type="checkbox" id="checkbox" checked>
+                                                    <label class="form-check-label text-light" for="checkbox">Checkboxes</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                        
+                                <!-- SQL Output -->
+                                <div class="col-12">
+                                    <div class="output-section" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h5 class="mb-0 text-light">SQL Statement</h5>
+                                            <div class="btn-group">
+                                                <button id="copySqlBtn" class="btn btn-sm btn-primary">Copy SQL</button>
+                                            </div>
+                                        </div>
+                                        <div id="outputSQL" class="p-4 rounded-3 output-container" style="display: none; background: rgba(255,255,255,0.05);">
+                                            <pre id="sqlOutput" class="m-0"></pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <script src="scripts/tool_tableFromForm.js"></script>
+    <script src="scripts/scripts.js"></script>
+</body>
+</html>

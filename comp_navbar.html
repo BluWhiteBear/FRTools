@@ -1,0 +1,107 @@
+<!-- NAV Bar -->
+<head>
+    <style>
+        .nav-item.dropdown:hover .dropdown-menu {
+            display: block;
+        }
+
+        .form-check {
+            position: relative;
+            width: 50px;
+            height: 10px;
+        }
+    
+        .form-check-input {
+            background-color: #495057 !important;
+            border-color: transparent !important;
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            border-radius: 12px;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+            outline: none !important;  /* Remove focus outline */
+        }
+
+        .form-check-input:focus {
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2) !important;  /* Keep consistent outline */
+        }
+    
+    
+        .form-check-input:checked + .theme-icon {
+            left: 10px;
+        }
+
+        .dropdown-menu {
+            background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 100%) !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+            border-radius: 12px !important;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            padding: 0.5rem;
+        }
+
+        .dropdown-item {
+            color: rgba(255,255,255,0.75) !important;
+            border-radius: 8px;
+            padding: 0.2rem 1rem;
+            transition: all 0.2s ease;
+        }
+
+    </style>
+</head>
+<div>
+    <div class="d-none d-lg-block container px-4 px-lg-5 my-2">
+        <nav class="navbar navbar-expand-lg navbar-dark rounded" style="backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); background: linear-gradient(180deg, #2a2a2a9c 0%, #1a1a1ae7 100%); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; margin-top: 1rem;">
+            <div class="container px-5">
+                <a class="navbar-brand" href="index.html"><img src="img/faviconLarge.png" alt="Logo" style="width: 50px; height: 50px;" class="me-2">FormReport Tools</a>
+                
+                <div class="navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-2 mb-2 mb-lg-0">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" aria-expanded="false">
+                                Viewers
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="tool_formViewer.html">Form Viewer</a></li>
+                                <li><a class="dropdown-item" href="tool_reportViewer.html">Report Viewer</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" aria-expanded="false">
+                                Generators
+                            </a>                            <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="tool_printoutFromForm.html">Printout From Form</a></li>
+                                <li><a class="dropdown-item" href="tool_stringPrintoutFromForm.html">Markdown Printout From Form</a></li>
+                                <li><a class="dropdown-item" href="tool_tableFromForm.html">Table From Form</a></li>
+                                <li><a class="dropdown-item" href="tool_formFromTable.html">From From Table</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" aria-expanded="false">
+                                Utilities
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="tool_codeFormatter.html">Code Formatter</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" aria-expanded="false">
+                                Resources
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="guidCheatSheet.html">Form.io GUID Cheat Sheet</a></li>
+                                <li><a class="dropdown-item" href="#">Screensteps</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </div>
+</div>

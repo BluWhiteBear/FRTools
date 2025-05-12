@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FormIO Field Detection Tester</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        textarea { width: 100%; height: 300px; font-family: monospace; margin-bottom: 20px; }
+        button { padding: 10px; background: #4CAF50; color: white; border: none; cursor: pointer; }
+        .result { padding: 10px; border: 1px solid #ddd; margin: 20px 0; white-space: pre-wrap; font-family: monospace; max-height: 500px; overflow-y: auto; }
+        .fieldlist { list-style-type: none; padding: 0; }
+        .fieldlist li { padding: 5px; border-bottom: 1px solid #eee; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>FormIO Field Detection Tester</h1>
+        <p>Paste your FormIO template object here (or leave default test data):</p>        <div style="margin-bottom: 10px;">
+            <button id="loadRealForm" style="background-color: #007bff; margin-right: 10px;">Load Test Form</button>
+            <button id="loadSessionNote" style="background-color: #28a745; margin-right: 10px;">Load Session Note</button>
+            <button id="loadComplexForm" style="background-color: #6610f2; margin-right: 10px;">Load Complex Example</button>
+            <button id="runFullConversion" style="background-color: #dc3545; margin-right: 10px;">Run Complete Report Generation</button>
+        </div>
+        <div id="debugOptions" style="margin-bottom: 10px; padding: 8px; background-color: #f8f9fa; border-radius: 4px;">
+            <strong>Debug Options:</strong>
+            <label><input type="checkbox" id="verboseLog" checked> Enable Verbose Logging</label>
+            <label style="margin-left: 15px;"><input type="checkbox" id="showXmlPreview" checked> Show XML Preview</label>
+            <label style="margin-left: 15px;"><input type="checkbox" id="useDirectFields" checked> Force Direct Fields Approach</label>
+            <select id="debugMode" style="margin-left: 15px;">
+                <option value="normal">Normal Mode</option>
+                <option value="component">Component Detection Debug</option>
+                <option value="xml">XML Generation Debug</option>
+                <option value="all" selected>Full Debug</option>
+            </select>
+        </div>
+        <textarea id="formioTemplate">
+{
+  "FormName": "Test Form",
+  "DepartmentName": "Testing",
+  "FormioTemplate": {
+    "Grid": {},
+    "components": [
+      {
+        "label": "Test Field 1",
+        "key": "testField1",
+        "type": "textfield",
+        "input": true
+      },
+      {
+        "label": "Test Textarea",
+        "key": "testTextarea",
+        "type": "textarea",
+        "input": true,
+        "rows": 3
+      },
+      {
+        "label": "Test Number",
+        "key": "testNumber",
+        "type": "number",
+        "input": true,
+        "decimalLimit": 2
+      },
+      {
+        "label": "Panel",
+        "key": "panel",
+        "type": "panel",
+        "components": [
+          {
+            "label": "Panel Field",
+            "key": "panelField",
+            "type": "textfield",
+            "input": true
+          }
+        ]
+      },
+      {
+        "label": "Columns",
+        "type": "columns",
+        "columns": [
+          {
+            "components": [
+              {
+                "label": "Column 1 Field",
+                "key": "column1Field",
+                "type": "textfield",
+                "input": true
+              }
+            ],
+            "width": 6
+          },
+          {
+            "components": [
+              {
+                "label": "Column 2 Field",
+                "key": "column2Field",
+                "type": "checkbox",
+                "input": true
+              }
+            ],
+            "width": 6
+          }
+        ]
+      }
+    ]
+  }
+}
+        </textarea>
+        <button id="analyzeBtn">Analyze Fields</button>
+        <h2>Field Analysis Results:</h2>
+        <div class="result" id="result">Results will appear here...</div>
+    </div>    <script>        document.getElementById('analyzeBtn').addEventListener('click', analyzeForm);
+        document.getElementById('loadRealForm').addEventListener('click', loadRealForm);
+        document.getElementById('loadSessionNote').addEventListener('click', loadSessionNote);
+        document.getElementById('loadComplexForm').addEventListener('click', loadComplexForm);
+        document.getElementById('runFullConversion').addEventListener('click', runFullReportConversion);
+        
+        // We'll attach the generateFullXml handler after the element is created in the analyzeForm function
+          // Global variables
+        const debugSettings = {
+            verboseLog: true,
+            showXmlPreview: true,
+            useDirectFields: true,
+            debugMode: 'all'
+        };
+        
+        // Global variable to store detected fields
+        let allFields = [];
+        
+        // Update debug settings when controls change
+        document.getElementById('verboseLog').addEventListener('change', (e) => {
+            debugSettings.verboseLog = e.target.checked;
+        });
+        
+        document.getElementById('showXmlPreview').addEventListener('change', (e) => {
+            debugSettings.showXmlPreview = e.target.checked;
+        });
+        
+        document.getElementById('useDirectFields').addEventListener('change', (e) => {
+            debugSettings.useDirectFields = e.target.checked;
+        });
+        
+        document.getElementById('debugMode').addEventListener('change', (e) => {
+            debugSettings.debugMode = e.target.value;
+        });
+          // Load real test form from Examples
+        async function loadRealForm() {
+            try {
+                debugLog = ["Loading Test Form..."];
+                const response = await fetch('./Examples/formio/formio_TestForm_REAL.json');
+                if (!response.ok) {
+                    alert('Failed to load test form');
+                    return;
+                }
+                const formData = await response.text();
+                document.getElementById('formioTemplate').value = formData;
+                debugLog.push("Real test form loaded successfully");
+                alert('Real test form loaded. Click "Analyze Fields" to process it.');
+            } catch (error) {
+                alert(`Error loading form: ${error.message}`);
+                console.error(error);
+                debugLog.push(`Error loading form: ${error.message}`);
+            }
+        }
+        
+        // Load Session Note form from Examples
+        async function loadSessionNote() {
+            try {
+                debugLog = ["Loading Session Note Form..."];
+                const response = await fetch('./Examples/formio/formio_SessionNote_MINE.json');
+                if (!response.ok) {
+                    // Try the REAL version if MINE fails
+                    const realResponse = await fetch('./Examples/formio/formio_SessionNote_REAL.json');
+                    if (!realResponse.ok) {
+                        alert('Failed to load Session Note form');
+                        return;
+                    }
+                    const formData = await realResponse.text();
+                    document.getElementById('formioTemplate').value = formData;
+                    debugLog.push("Session Note REAL form loaded successfully");
+                } else {
+                    const formData = await response.text();
+                    document.getElementById('formioTemplate').value = formData;
+                    debugLog.push("Session Note MINE form loaded successfully");
+                }
+                alert('Session Note form loaded. Click "Analyze Fields" to process it.');
+            } catch (error) {
+                alert(`Error loading form: ${error.message}`);
+                console.error(error);
+                debugLog.push(`Error loading form: ${error.message}`);
+            }
+        }
+        
+        // Load a more complex example
+        function loadComplexForm() {
+            const complexFormJson = {
+                "FormName": "Complex Form",
+                "DepartmentName": "Testing",
+                "FormioTemplate": {
+                    "Grid": {},
+                    "components": [
+                        {
+                            "label": "Panel with Fields",
+                            "key": "panel1",
+                            "type": "panel",
+                            "components": [
+                                {
+                                    "label": "Panel Text Field",
+                                    "key": "panelTextField",
+                                    "type": "textfield",
+                                    "input": true
+                                },
+                                {
+                                    "label": "Panel Text Area",
+                                    "key": "panelTextArea",
+                                    "type": "textarea",
+                                    "input": true
+                                }
+                            ]
+                        },
+                        {
+                            "label": "Nested Fieldset",
+                            "key": "fieldset1",
+                            "type": "fieldset",
+                            "components": [
+                                {
+                                    "label": "Fieldset Field",
+                                    "key": "fieldsetField",
+                                    "type": "textfield",
+                                    "input": true
+                                },
+                                {
+                                    "label": "Nested Panel",
+                                    "key": "nestedPanel",
+                                    "type": "panel",
+                                    "components": [
+                                        {
+                                            "label": "Nested Field",
+                                            "key": "nestedField",
+                                            "type": "textfield",
+                                            "input": true
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "label": "Multi-level Columns",
+                            "type": "columns",
+                            "columns": [
+                                {
+                                    "components": [
+                                        {
+                                            "label": "Column 1 Field",
+                                            "key": "column1Field",
+                                            "type": "textfield",
+                                            "input": true
+                                        },
+                                        {
+                                            "label": "Nested Columns",
+                                            "type": "columns",
+                                            "columns": [
+                                                {
+                                                    "components": [
+                                                        {
+                                                            "label": "Nested Col 1",
+                                                            "key": "nestedCol1",
+                                                            "type": "textfield",
+                                                            "input": true
+                                                        }
+                                                    ],
+                                                    "width": 6
+                                                },
+                                                {
+                                                    "components": [
+                                                        {
+                                                            "label": "Nested Col 2",
+                                                            "key": "nestedCol2",
+                                                            "type": "checkbox",
+                                                            "input": true
+                                                        }
+                                                    ],
+                                                    "width": 6
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "width": 8
+                                },
+                                {
+                                    "components": [
+                                        {
+                                            "label": "Column 2 Field",
+                                            "key": "column2Field",
+                                            "type": "number",
+                                            "input": true,
+                                            "decimalLimit": 2
+                                        }
+                                    ],
+                                    "width": 4
+                                }
+                            ]
+                        }
+                    ]
+                }
+            };
+            
+            document.getElementById('formioTemplate').value = JSON.stringify(complexFormJson, null, 2);
+            alert('Complex example form loaded. Click "Analyze Fields" to process it.');
+        }function analyzeForm() {
+            const resultArea = document.getElementById('result');
+            resultArea.innerHTML = 'Analyzing form data...';
+            
+            try {
+                const formDataStr = document.getElementById('formioTemplate').value;
+                const formData = JSON.parse(formDataStr);
+                let formioTemplate;
+                
+                // Add debug info about the input data
+                const debugInfo = [];
+                debugInfo.push(`Form name: ${formData.FormName || 'unnamed'}`);
+                debugInfo.push(`Department: ${formData.DepartmentName || 'undefined'}`);
+                debugInfo.push(`FormioTemplate type: ${typeof formData.FormioTemplate}`);
+                
+                if (typeof formData.FormioTemplate === 'string') {
+                    debugInfo.push("FormioTemplate is a string, parsing...");
+                    try {
+                        formioTemplate = JSON.parse(formData.FormioTemplate);
+                        debugInfo.push("Successfully parsed FormioTemplate");
+                    } catch (parseError) {
+                        debugInfo.push(`Error parsing FormioTemplate: ${parseError.message}`);
+                        throw parseError;
+                    }
+                } else {
+                    debugInfo.push("FormioTemplate is already an object");
+                    formioTemplate = formData.FormioTemplate;
+                }
+                
+                if (!formioTemplate || !formioTemplate.components) {
+                    resultArea.innerHTML = 'Error: No valid components found in the FormIO template';
+                    return;
+                }
+                  debugInfo.push(`Top-level components: ${formioTemplate.components.length}`);
+                
+                // Reset global fields array
+                allFields = [];
+                const debugLog = [];
+                  // Recursive function to find all fields
+                function findComponents(components, path = '') {
+                    debugLog.push(`Checking ${components.length} components at path: ${path || 'root'}`);
+                    
+                    components.forEach(component => {
+                        // Basic component info
+                        const componentInfo = {
+                            type: component.type,
+                            key: component.key || '(no key)',
+                            path: path
+                        };
+                        
+                        // Check for supported field types
+                        if (component.key && ['textfield', 'number', 'textarea', 'email', 
+                                           'checkbox', 'datetime', 'select'].includes(component.type)) {
+                            
+                            debugLog.push(`Found supported field: ${component.type} - ${component.key}`);
+                            
+                            allFields.push({
+                                key: component.key,
+                                label: component.label || component.key,
+                                type: component.type,
+                                path: path,
+                                hasInput: Boolean(component.input),
+                                properties: {
+                                    decimalLimit: component.decimalLimit,
+                                    rows: component.rows,
+                                    multiple: component.multiple,
+                                    defaultValue: component.defaultValue
+                                }
+                            });
+                        } else {
+                            debugLog.push(`Skipping component: ${component.type} ${component.key || '(no key)'} - not a supported field type`);
+                        }
+                        
+                        // Check nested components in panels, etc
+                        if (component.components) {
+                            debugLog.push(`Found nested components in ${component.type} ${component.key || '(no key)'}: ${component.components.length} component(s)`);
+                            findComponents(component.components, path + (component.key ? `/${component.key}` : ''));
+                        }
+                        
+                        // Check columns
+                        if (component.columns) {
+                            debugLog.push(`Found columns layout with ${component.columns.length} columns`);
+                            component.columns.forEach((col, index) => {
+                                if (col.components) {
+                                    debugLog.push(`Checking column ${index + 1} with ${col.components.length} component(s)`);
+                                    findComponents(col.components, path + `/column${index + 1}`);
+                                }
+                            });
+                        }
+                    });
+                }
+                
+                // Find all fields in the form
+                findComponents(formioTemplate.components);
+                
+                // Generate XML for a field
+                function generateFieldXml(field) {
+                    // Helper function to escape XML special characters
+                    function escapeXmlText(unsafe) {
+                        if (!unsafe) return '';
+                        return unsafe
+                            .replace(/&/g, '&amp;')
+                            .replace(/</g, '&lt;')
+                            .replace(/>/g, '&gt;')
+                            .replace(/"/g, '&quot;')
+                            .replace(/'/g, '&apos;');
+                    }
+                    
+                    let xml = '';
+                    const fieldKey = escapeXmlText(field.key);
+                    const fieldLabel = escapeXmlText(field.label);
+                    
+                    switch(field.type) {
+                        case 'textfield':
+                        case 'email':
+                            xml = `<Item ControlType="XRLabel" Name="label_${fieldKey}" Text="${fieldLabel}"></Item>
+<Item ControlType="XRLabel" Name="${fieldKey}" TextAlignment="MiddleLeft" Borders="Bottom">
+  <ExpressionBindings>
+    <Item EventName="BeforePrint" PropertyName="Text" Expression="[${fieldKey}]" />
+  </ExpressionBindings>
+  <StylePriority UseTextAlignment="true" UseBorders="true" />
+</Item>`;
+                            break;
+                        case 'textarea':
+                            xml = `<Item ControlType="XRLabel" Name="label_${fieldKey}" Text="${fieldLabel}"></Item>
+<Item ControlType="XRLabel" Name="${fieldKey}" Multiline="true" TextAlignment="TopLeft" Borders="Bottom">
+  <ExpressionBindings>
+    <Item EventName="BeforePrint" PropertyName="Text" Expression="[${fieldKey}]" />
+  </ExpressionBindings>
+  <StylePriority UseTextAlignment="true" UseBorders="true" />
+</Item>`;
+                            break;
+                        case 'number':
+                            xml = `<Item ControlType="XRLabel" Name="label_${fieldKey}" Text="${fieldLabel}"></Item>
+<Item ControlType="XRLabel" Name="${fieldKey}" TextAlignment="MiddleRight" Borders="Bottom">
+  <ExpressionBindings>
+    <Item EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0:n2}', [${fieldKey}])" />
+  </ExpressionBindings>
+  <StylePriority UseTextAlignment="true" UseBorders="true" />
+</Item>`;
+                            break;
+                        case 'checkbox':
+                            xml = `<Item ControlType="XRCheckBox" Name="${fieldKey}" Text="${fieldLabel}">
+  <ExpressionBindings>
+    <Item EventName="BeforePrint" PropertyName="CheckState" Expression="[${fieldKey}]" />
+  </ExpressionBindings>
+</Item>`;
+                            break;
+                        case 'select':
+                            xml = `<Item ControlType="XRLabel" Name="label_${fieldKey}" Text="${fieldLabel}"></Item>
+<Item ControlType="XRLabel" Name="${fieldKey}" TextAlignment="MiddleLeft" Borders="Bottom">
+  <ExpressionBindings>
+    <Item EventName="BeforePrint" PropertyName="Text" Expression="[${fieldKey}]" />
+  </ExpressionBindings>
+  <StylePriority UseTextAlignment="true" UseBorders="true" />
+</Item>`;
+                            break;
+                        case 'datetime':
+                            xml = `<Item ControlType="XRLabel" Name="label_${fieldKey}" Text="${fieldLabel}"></Item>
+<Item ControlType="XRLabel" Name="${fieldKey}" TextAlignment="MiddleLeft" Borders="Bottom">
+  <ExpressionBindings>
+    <Item EventName="BeforePrint" PropertyName="Text" Expression="FormatDateTime([${fieldKey}], 'g')" />
+  </ExpressionBindings>
+  <StylePriority UseTextAlignment="true" UseBorders="true" />
+</Item>`;
+                            break;
+                        default:
+                            xml = `<Item ControlType="XRLabel" Name="label_${fieldKey}" Text="${fieldLabel}"></Item>
+<Item ControlType="XRLabel" Name="${fieldKey}" TextAlignment="MiddleLeft" Borders="Bottom">
+  <ExpressionBindings>
+    <Item EventName="BeforePrint" PropertyName="Text" Expression="[${fieldKey}]" />
+  </ExpressionBindings>
+  <StylePriority UseTextAlignment="true" UseBorders="true" />
+</Item>`;
+                    }
+                    return xml;
+                }// Output results with debugging information
+                const html = `
+<h3>Debugging Information:</h3>
+<pre style="background-color: #f0f0f0; padding: 10px; border-radius: 4px;">${debugInfo.join('\n')}</pre>
+
+<h3>Component Detection Log:</h3>
+<pre style="background-color: #fff0f0; padding: 10px; border-radius: 4px; max-height: 200px; overflow-y: auto;">${debugLog.join('\n')}</pre>
+
+<h3>Found ${allFields.length} supported fields:</h3>
+<ul class="fieldlist">
+    ${allFields.map(field => `
+        <li>
+            <strong>${field.key}</strong> (${field.type}) - "${field.label}" ${field.path ? `at ${field.path}` : ''}
+        </li>
+    `).join('')}
+</ul>
+
+<h3>Sample XML for Fields:</h3>
+<div>
+${allFields.map(field => `
+<h4>${field.key} (${field.type}):</h4>
+<pre style="background-color: #f5f5f5; padding: 8px;">${generateFieldXml(field)}</pre>
+`).join('')}
+</div>
+
+<h3>Combined XML for All Fields:</h3>
+<pre style="background-color: #eef; padding: 10px; max-height: 300px; overflow-y: auto;">${allFields.map(field => generateFieldXml(field)).join('\n\n')}</pre>
+
+<h3>DevExpress Report Structure</h3>
+<button id="generateFullXml" style="background-color: #28a745; margin-bottom: 10px;">Generate Full DevExpress XML</button>
+<pre id="fullXmlOutput" style="background-color: #efe; padding: 10px; max-height: 300px; overflow-y: auto;">&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;XtraReportsLayoutSerializer&gt;
+  &lt;Bands&gt;
+    &lt;Item ControlType="TopMarginBand" /&gt;
+    &lt;Item ControlType="PageHeaderBand"&gt;
+      &lt;Controls&gt;
+        &lt;Item ControlType="XRLabel" Text="${formData.FormName || 'Report'}" /&gt;
+      &lt;/Controls&gt;
+    &lt;/Item&gt;
+    &lt;Item ControlType="DetailBand"&gt;
+      &lt;Controls&gt;
+        ${allFields.map(field => '        ' + generateFieldXml(field).replace(/\n/g, '\n        ')).join('\n\n')}
+      &lt;/Controls&gt;
+    &lt;/Item&gt;
+    &lt;Item ControlType="BottomMarginBand" /&gt;
+  &lt;/Bands&gt;
+&lt;/XtraReportsLayoutSerializer&gt;</pre>                `;
+                resultArea.innerHTML = html;
+                
+                // Add event listener to the generateFullXml button after it's been created
+                setTimeout(() => {
+                    const generateFullXmlButton = document.getElementById('generateFullXml');
+                    if (generateFullXmlButton) {
+                        generateFullXmlButton.addEventListener('click', generateFullDevExpressXml);
+                    }
+                }, 100);
+                
+            } catch (error) {
+                resultArea.innerHTML = `Error analyzing form: ${error.message}`;
+            }
+        }
+
+        // Generate full DevExpress XML report
+        function generateFullDevExpressXml() {
+            try {
+                if (!allFields || allFields.length === 0) {
+                    alert('Please analyze a form first to detect fields');
+                    return;
+                }
+                
+                // Constants for layout
+                const LAYOUT = {
+                    MARGIN: 40,
+                    VERTICAL_SPACING: 10,
+                    LABEL_HEIGHT: 25,
+                    INPUT_HEIGHT: 30,
+                    DEFAULT_WIDTH: 300,
+                    PAGE_WIDTH: 850,
+                    PAGE_HEIGHT: 1100
+                };
+                
+                // Generate XML with field references
+                let refCounter = 1;
+                const formName = document.getElementById('formioTemplate').value.FormName || 'Report';
+                  // Helper function to escape XML special characters
+                function escapeXml(text) {
+                    if (!text) return '';
+                    return text
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&apos;');
+                }
+                
+                // Generate field elements with proper layout
+                let fieldsXml = '';
+                let currentY = 60; // Start below header
+                
+                allFields.forEach(field => {
+                    const labelRef = refCounter++;
+                    const valueRef = refCounter++;
+                    const styleRef = refCounter++;
+                    const exprRef = refCounter++;
+                    
+                    // Generate label component
+                    fieldsXml += `
+        <Item${labelRef} ControlType="XRLabel" Name="label_${field.key}"
+          Text="${escapeXml(field.label)}"
+          SizeF="${LAYOUT.DEFAULT_WIDTH},${LAYOUT.LABEL_HEIGHT}"
+          LocationFloat="${LAYOUT.MARGIN},${currentY}"
+          Padding="2,2,0,0,100"
+          Font="Arial, 9.75pt, style=Bold">
+          <StylePriority Ref="${styleRef}" UseFont="true" />
+        </Item${labelRef}>`;
+                    
+                    currentY += LAYOUT.LABEL_HEIGHT;
+                      // Generate field value component based on type
+                    switch (field.type) {
+                        case 'textarea':
+                            fieldsXml += `
+        <Item${valueRef} ControlType="XRLabel" Name="${escapeXml(field.key)}"
+          SizeF="${LAYOUT.DEFAULT_WIDTH},${LAYOUT.INPUT_HEIGHT * 2}"
+          LocationFloat="${LAYOUT.MARGIN},${currentY}"
+          Padding="2,2,0,0,100"
+          Multiline="true"
+          Borders="Bottom">
+          <ExpressionBindings>
+            <Item1 Ref="${exprRef}" EventName="BeforePrint" PropertyName="Text" Expression="[${escapeXml(field.key)}]" />
+          </ExpressionBindings>
+          <StylePriority Ref="${refCounter++}" UseBorders="false" />
+        </Item${valueRef}>`;
+                            currentY += LAYOUT.INPUT_HEIGHT * 2;
+                            break;
+                            
+                        case 'number':
+                            fieldsXml += `
+        <Item${valueRef} ControlType="XRLabel" Name="${escapeXml(field.key)}"
+          SizeF="${LAYOUT.DEFAULT_WIDTH},${LAYOUT.INPUT_HEIGHT}"
+          LocationFloat="${LAYOUT.MARGIN},${currentY}"
+          Padding="2,2,0,0,100"
+          Borders="Bottom">
+          <ExpressionBindings>
+            <Item1 Ref="${exprRef}" EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0:n2}', [${escapeXml(field.key)}])" />
+          </ExpressionBindings>
+          <StylePriority Ref="${refCounter++}" UseBorders="false" />
+        </Item${valueRef}>`;
+                            currentY += LAYOUT.INPUT_HEIGHT;
+                            break;
+                            
+                        case 'checkbox':
+                            fieldsXml += `
+        <Item${valueRef} ControlType="XRCheckBox" Name="${escapeXml(field.key)}"
+          Text="${escapeXml(field.label)}"
+          SizeF="${LAYOUT.DEFAULT_WIDTH},${LAYOUT.INPUT_HEIGHT}"
+          LocationFloat="${LAYOUT.MARGIN},${currentY - LAYOUT.LABEL_HEIGHT}"
+          Padding="2,2,0,0,100">
+          <ExpressionBindings>
+            <Item1 Ref="${exprRef}" EventName="BeforePrint" PropertyName="CheckState" Expression="[${escapeXml(field.key)}]" />
+          </ExpressionBindings>
+          <StylePriority Ref="${refCounter++}" UseBorders="false" />
+        </Item${valueRef}>`;
+                            // We've moved the checkbox up to replace the label, so don't add extra space
+                            break;
+                            
+                        default: // textfield, email, etc.
+                            fieldsXml += `
+        <Item${valueRef} ControlType="XRLabel" Name="${escapeXml(field.key)}"
+          SizeF="${LAYOUT.DEFAULT_WIDTH},${LAYOUT.INPUT_HEIGHT}"
+          LocationFloat="${LAYOUT.MARGIN},${currentY}"
+          Padding="2,2,0,0,100"
+          Borders="Bottom">
+          <ExpressionBindings>
+            <Item1 Ref="${exprRef}" EventName="BeforePrint" PropertyName="Text" Expression="[${escapeXml(field.key)}]" />
+          </ExpressionBindings>
+          <StylePriority Ref="${refCounter++}" UseBorders="false" />
+        </Item${valueRef}>`;
+                            currentY += LAYOUT.INPUT_HEIGHT;
+                    }
+                    
+                    currentY += LAYOUT.VERTICAL_SPACING;
+                });
+                
+                // Calculate total height needed
+                const contentHeight = currentY + LAYOUT.MARGIN;                // Validate that fieldsXml exists and contains valid XML
+                if (!fieldsXml || fieldsXml.trim().length === 0) {
+                    console.warn("No fields XML to include in the template");
+                    fieldsXml = "<!-- No fields found to include in the report -->";
+                }
+                
+                // Generate full XML template with proper formatting
+                const xml = `<?xml version="1.0" encoding="utf-8"?>
+<XtraReportsLayoutSerializer SerializerVersion="22.2.6.0" Ref="1" 
+    ControlType="DevExpress.XtraReports.UI.XtraReport, DevExpress.XtraReports.v22.2, Version=22.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" 
+    Name="Report" DisplayName="${escapeXml(formName)}" 
+    PageWidth="${LAYOUT.PAGE_WIDTH}" PageHeight="${LAYOUT.PAGE_HEIGHT}" 
+    Version="22.2" DataMember="FormData">
+  <Extensions>
+    <Item1 Ref="2" Key="DataSerializationExtension" Value="DevExpress.XtraReports.Web.ReportDesigner.DefaultDataSerializer"/>
+  </Extensions>
+  <Bands>
+    <Item1 Ref="3" ControlType="TopMarginBand" Name="TopMargin" HeightF="${LAYOUT.MARGIN}"/>
+    <Item2 Ref="4" ControlType="PageHeaderBand" Name="PageHeader" HeightF="44.79">
+      <Controls>
+        <Item1 Ref="5" ControlType="XRLabel" Name="headerLabel" 
+          Text="${escapeXml(formName)}" TextAlignment="MiddleCenter" 
+          SizeF="${LAYOUT.PAGE_WIDTH - (LAYOUT.MARGIN * 2)},23" 
+          LocationFloat="${LAYOUT.MARGIN},10" 
+          Font="Arial, 12pt, style=Bold" 
+          Padding="2,2,0,0,100">
+          <StylePriority Ref="6" UseFont="true" UseTextAlignment="true"/>
+        </Item1>
+      </Controls>
+    </Item2>
+    <Item3 Ref="7" ControlType="DetailBand" Name="Detail" HeightF="${contentHeight}">
+      <Controls>
+${fieldsXml}
+      </Controls>
+    </Item3>
+    <Item4 Ref="8" ControlType="BottomMarginBand" Name="BottomMargin" HeightF="${LAYOUT.MARGIN}"/>
+  </Bands>
+</XtraReportsLayoutSerializer>`;
+                  // Validate the XML
+                const validationResults = validateXmlOutput(xml);
+                
+                // Output the XML
+                document.getElementById('fullXmlOutput').textContent = xml;
+                
+                // Create a "copy to clipboard" option
+                const copyBtn = document.createElement('button');
+                copyBtn.textContent = 'Copy XML to Clipboard';
+                copyBtn.style = 'background-color: #17a2b8; margin-bottom: 10px; margin-left: 5px;';
+                copyBtn.onclick = () => {
+                    navigator.clipboard.writeText(xml)
+                        .then(() => alert('XML copied to clipboard'))
+                        .catch(err => console.error('Failed to copy: ', err));
+                };
+                
+                // Create a validation result div
+                const validationDiv = document.createElement('div');
+                validationDiv.style = 'background-color: ' + 
+                    (validationResults.some(msg => msg.startsWith("ERROR")) ? '#ffe6e6' : // Red for errors
+                    validationResults.some(msg => msg.startsWith("WARNING")) ? '#fff9e6' : // Yellow for warnings
+                    '#e6ffe6') + // Green for success
+                    '; padding: 8px; margin-bottom: 10px; border-radius: 4px;';
+                validationDiv.innerHTML = '<strong>XML Validation:</strong><br>' + 
+                    validationResults.map(msg => msg).join('<br>');
+                
+                const container = document.getElementById('generateFullXml').parentNode;
+                
+                // Add copy button if not already present
+                if (!container.querySelector('button:nth-child(2)')) {
+                    container.insertBefore(copyBtn, document.getElementById('fullXmlOutput'));
+                }
+                
+                // Add validation results
+                container.insertBefore(validationDiv, document.getElementById('fullXmlOutput'));
+                
+            } catch (error) {
+                console.error('Error generating XML:', error);
+                document.getElementById('fullXmlOutput').textContent = `Error generating XML: ${error.message}`;
+            }
+        }
+
+        // Validate XML structure and report any issues
+        function validateXmlOutput(xml) {
+            try {
+                // Create a validation message container
+                const validationResults = [];
+                
+                // Basic string checks
+                if (!xml || xml.trim() === '') {
+                    return ["ERROR: XML is empty"];
+                }
+                
+                // Check for XML declaration
+                if (!xml.startsWith('<?xml')) {
+                    validationResults.push("WARNING: Missing XML declaration");
+                }
+                
+                // Check for well-formedness by parsing with DOMParser
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xml, "text/xml");
+                
+                // Check if parsing failed
+                const parseError = xmlDoc.getElementsByTagName("parsererror");
+                if (parseError.length > 0) {
+                    validationResults.push(`ERROR: XML is not well-formed. ${parseError[0].textContent}`);
+                    return validationResults;
+                }
+                
+                // Check for required elements
+                const bands = xmlDoc.getElementsByTagName("Bands");
+                if (bands.length === 0) {
+                    validationResults.push("ERROR: Missing required <Bands> element");
+                }
+                
+                // Check for DetailBand
+                const detailBands = xmlDoc.querySelectorAll("Item3[ControlType='DetailBand']");
+                if (detailBands.length === 0) {
+                    validationResults.push("ERROR: Missing DetailBand element");
+                } else {
+                    // Check for Controls within DetailBand
+                    const controls = detailBands[0].getElementsByTagName("Controls");
+                    if (controls.length === 0) {
+                        validationResults.push("ERROR: DetailBand has no Controls element");
+                    } else {
+                        // Check for field elements in Controls
+                        const items = controls[0].children;
+                        if (items.length === 0) {
+                            validationResults.push("WARNING: No field items found in DetailBand Controls");
+                        } else {
+                            validationResults.push(`INFO: Found ${items.length} control items in DetailBand`);
+                        }
+                    }
+                }
+                
+                // Success if no errors
+                if (validationResults.length === 0) {
+                    validationResults.push("SUCCESS: XML is valid and well-formed");
+                }
+                
+                return validationResults;
+            } catch (error) {
+                return [`Exception during validation: ${error.message}`];
+            }
+        }
+
+        // Run a complete conversion from FormIO to DevExpress
+        function runFullReportConversion() {
+            const resultArea = document.getElementById('result');
+            resultArea.innerHTML = '<div class="loading">Running full conversion test...</div>';
+            
+            try {
+                // Get template text and parse
+                const templateText = document.getElementById('formioTemplate').value;
+                let formData;
+                
+                try {
+                    formData = JSON.parse(templateText);
+                } catch (err) {
+                    resultArea.innerHTML = `<div class="error">Error parsing JSON: ${err.message}</div>`;
+                    return;
+                }
+                
+                // Initialize debug logs
+                const conversionLogs = [];
+                conversionLogs.push("=== Starting Full Report Conversion Test ===");
+                conversionLogs.push(`Form Name: ${formData.FormName || "Unnamed Form"}`);
+                conversionLogs.push(`Department: ${formData.DepartmentName || "Unknown Department"}`);
+                
+                // Process FormioTemplate
+                let formTemplate = formData.FormioTemplate;
+                if (typeof formTemplate === 'string') {
+                    try {
+                        formTemplate = JSON.parse(formTemplate);
+                        conversionLogs.push("Successfully parsed FormioTemplate string to object");
+                    } catch (err) {
+                        conversionLogs.push(`ERROR: Failed to parse FormioTemplate: ${err.message}`);
+                        resultArea.innerHTML = `<div class="error">Error parsing FormioTemplate: ${err.message}</div>`;
+                        return;
+                    }
+                }
+                  conversionLogs.push(`Found ${formTemplate.components?.length || 0} top-level components`);
+                
+                // Reset and use global allFields variable
+                allFields = [];
+                
+                // Recursive function to find components
+                function findComponents(components, path = '') {
+                    if (!components || !Array.isArray(components)) {
+                        conversionLogs.push(`WARNING: Invalid components at path ${path}`);
+                        return;
+                    }
+                    
+                    conversionLogs.push(`Searching ${components.length} components at path: ${path || 'root'}`);
+                    
+                    components.forEach(component => {
+                        // Check if component is valid
+                        if (!component) {
+                            conversionLogs.push("WARNING: Found null or undefined component");
+                            return;
+                        }
+                        
+                        // Check for supported field types
+                        if (component.key && ['textfield', 'number', 'textarea', 'email', 
+                                           'checkbox', 'datetime', 'select'].includes(component.type)) {
+                            
+                            conversionLogs.push(`FOUND FIELD: ${component.key} (${component.type}) - "${component.label || component.key}"`);
+                            
+                            allFields.push({
+                                key: component.key,
+                                label: component.label || component.key, 
+                                type: component.type,
+                                path: path
+                            });
+                        }
+                        
+                        // Check for nested components
+                        if (component.components) {
+                            findComponents(component.components, path + (component.key ? `/${component.key}` : ''));
+                        }
+                        
+                        // Check for columns
+                        if (component.columns) {
+                            component.columns.forEach((col, index) => {
+                                if (col.components) {
+                                    findComponents(col.components, path + `/column${index + 1}`);
+                                }
+                            });
+                        }
+                    });
+                }
+                
+                // Find all fields
+                findComponents(formTemplate.components);
+                conversionLogs.push(`Found ${allFields.length} supported form fields`);
+                
+                // Generate DevExpress report XML
+                conversionLogs.push("=== Generating DevExpress XML ===");
+                
+                // Constants for layout and formatting
+                const LAYOUT = {
+                    MARGIN: 40,
+                    VERTICAL_SPACING: 10,
+                    LABEL_HEIGHT: 25,
+                    INPUT_HEIGHT: 30,
+                    DEFAULT_WIDTH: 300,
+                    PAGE_WIDTH: 850,
+                    PAGE_HEIGHT: 1100
+                };
+                  // Helper function to escape XML special characters
+                function escapeXml(unsafe) {
+                    if (!unsafe) return '';
+                    return unsafe
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&apos;');
+                }
+                
+                // Generate field XML
+                let formFieldsXml = '';
+                let currentY = 50;
+                let refCounter = 100;
+                
+                allFields.forEach(field => {
+                    conversionLogs.push(`Generating XML for field: ${field.key} (${field.type})`);
+                    
+                    const labelRef = refCounter++;
+                    const fieldRef = refCounter++;
+                    const styleRef = refCounter++;
+                    const exprRef = refCounter++;
+                    
+                    // Skip label for checkboxes
+                    if (field.type !== 'checkbox') {
+                        formFieldsXml += `
+        <Item${labelRef} ControlType="XRLabel" Name="label_${escapeXml(field.key)}"
+          Text="${escapeXml(field.label)}"
+          SizeF="${LAYOUT.DEFAULT_WIDTH},${LAYOUT.LABEL_HEIGHT}"
+          LocationFloat="${LAYOUT.MARGIN},${currentY}"
+          Font="Times New Roman, 9.75pt, style=Bold"
+          Padding="2,2,0,0,100">
+          <StylePriority Ref="${styleRef}" UseFont="true" />
+        </Item${labelRef}>`;
+                        
+                        currentY += LAYOUT.LABEL_HEIGHT + 2; // Add spacing after label
+                    }
+                      // Generate field based on type
+                    switch (field.type) {
+                        case 'textarea':
+                            formFieldsXml += `
+        <Item${fieldRef} ControlType="XRLabel" Name="${escapeXml(field.key)}"
+          SizeF="${LAYOUT.DEFAULT_WIDTH},${LAYOUT.INPUT_HEIGHT * 2}"
+          LocationFloat="${LAYOUT.MARGIN},${currentY}"
+          Padding="2,2,0,0,100"
+          Multiline="true"
+          TextAlignment="TopLeft"
+          Borders="Bottom">
+          <ExpressionBindings>
+            <Item1 Ref="${exprRef}" EventName="BeforePrint" PropertyName="Text" Expression="[${escapeXml(field.key)}]" />
+          </ExpressionBindings>
+          <StylePriority Ref="${refCounter++}" UseBorders="false" UseTextAlignment="true" />
+        </Item${fieldRef}>`;
+                            currentY += LAYOUT.INPUT_HEIGHT * 2 + LAYOUT.VERTICAL_SPACING;
+                            break;
+                            
+                        case 'checkbox':
+                            formFieldsXml += `
+        <Item${fieldRef} ControlType="XRCheckBox" Name="${escapeXml(field.key)}"
+          Text="${escapeXml(field.label)}"
+          SizeF="${LAYOUT.DEFAULT_WIDTH},${LAYOUT.INPUT_HEIGHT}"
+          LocationFloat="${LAYOUT.MARGIN},${currentY}"
+          Padding="2,2,0,0,100">
+          <ExpressionBindings>
+            <Item1 Ref="${exprRef}" EventName="BeforePrint" PropertyName="CheckState" Expression="[${escapeXml(field.key)}]" />
+          </ExpressionBindings>
+          <StylePriority Ref="${refCounter++}" UseTextAlignment="true" />
+        </Item${fieldRef}>`;
+                            currentY += LAYOUT.INPUT_HEIGHT + LAYOUT.VERTICAL_SPACING;
+                            break;
+                            
+                        case 'number':
+                            formFieldsXml += `
+        <Item${fieldRef} ControlType="XRLabel" Name="${escapeXml(field.key)}"
+          SizeF="${LAYOUT.DEFAULT_WIDTH},${LAYOUT.INPUT_HEIGHT}"
+          LocationFloat="${LAYOUT.MARGIN},${currentY}"
+          Padding="2,2,0,0,100"
+          TextAlignment="MiddleRight"
+          Borders="Bottom">
+          <ExpressionBindings>
+            <Item1 Ref="${exprRef}" EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0:n2}', [${escapeXml(field.key)}])" />
+          </ExpressionBindings>
+          <StylePriority Ref="${refCounter++}" UseBorders="false" UseTextAlignment="true" />
+        </Item${fieldRef}>`;
+                            currentY += LAYOUT.INPUT_HEIGHT + LAYOUT.VERTICAL_SPACING;
+                            break;
+                            
+                        default: // textfield, email, select, etc.
+                            formFieldsXml += `
+        <Item${fieldRef} ControlType="XRLabel" Name="${escapeXml(field.key)}"
+          SizeF="${LAYOUT.DEFAULT_WIDTH},${LAYOUT.INPUT_HEIGHT}"
+          LocationFloat="${LAYOUT.MARGIN},${currentY}"
+          Padding="2,2,0,0,100"
+          TextAlignment="MiddleLeft"
+          Borders="Bottom">
+          <ExpressionBindings>
+            <Item1 Ref="${exprRef}" EventName="BeforePrint" PropertyName="Text" Expression="[${escapeXml(field.key)}]" />
+          </ExpressionBindings>
+          <StylePriority Ref="${refCounter++}" UseBorders="false" UseTextAlignment="true" />
+        </Item${fieldRef}>`;
+                            currentY += LAYOUT.INPUT_HEIGHT + LAYOUT.VERTICAL_SPACING;
+                    }
+                });
+                
+                // Calculate the content height
+                const contentHeight = currentY + LAYOUT.MARGIN;
+                conversionLogs.push(`Generated XML for ${allFields.length} fields with total height of ${contentHeight}px`);
+                
+                // Generate the full DevExpress XML
+                const pageHeaderRef = 3;
+                const headerLabelRef = 4;
+                const headerStyleRef = 5;
+                const detailBandRef = 6;
+                const bottomMarginRef = 7;
+                
+                const xml = `<?xml version="1.0" encoding="utf-8"?>
+<XtraReportsLayoutSerializer SerializerVersion="22.2.6.0" Ref="1" 
+    ControlType="DevExpress.XtraReports.UI.XtraReport, DevExpress.XtraReports.v22.2, Version=22.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" 
+    Name="Report" DisplayName="${escapeXml(formData.FormName)}" 
+    PageWidth="${LAYOUT.PAGE_WIDTH}" PageHeight="${LAYOUT.PAGE_HEIGHT}" 
+    Version="22.2" DataMember="FormData">
+  <Bands>
+    <Item1 Ref="2" ControlType="TopMarginBand" Name="TopMargin" HeightF="${LAYOUT.MARGIN}"/>
+    <Item2 Ref="${pageHeaderRef}" ControlType="PageHeaderBand" Name="PageHeader" HeightF="44.792">
+      <Controls>
+        <Item1 Ref="${headerLabelRef}" ControlType="XRLabel" 
+          Name="headerLabel" 
+          Text="${escapeXml(formData.FormName || 'Report')}" 
+          TextAlignment="MiddleCenter" 
+          SizeF="${LAYOUT.PAGE_WIDTH - (LAYOUT.MARGIN * 2)},23" 
+          LocationFloat="${LAYOUT.MARGIN},10" 
+          Font="Times New Roman, 11pt, style=Bold" 
+          Padding="2,2,0,0,100">
+          <StylePriority Ref="${headerStyleRef}" UseFont="true" UseTextAlignment="true"/>
+        </Item1>
+      </Controls>
+    </Item2>
+    <Item3 Ref="${detailBandRef}" ControlType="DetailBand" Name="Detail" HeightF="${contentHeight}">
+      <Controls>
+        ${formFieldsXml}
+      </Controls>
+    </Item3>
+    <Item4 Ref="${bottomMarginRef}" ControlType="BottomMarginBand" Name="BottomMargin" HeightF="${LAYOUT.MARGIN}"/>
+  </Bands>
+</XtraReportsLayoutSerializer>`;
+                
+                conversionLogs.push("XML generation completed successfully");
+                  // Validate the XML
+                const validationResults = validateXmlOutput(xml);
+                conversionLogs.push("=== XML Validation Results ===");
+                validationResults.forEach(result => conversionLogs.push(result));
+                
+                // Display results
+                const resultHtml = `
+<h2>Report Conversion Test Results</h2>
+
+<h3>Conversion Log:</h3>
+<pre style="background-color: #f0f0f0; padding: 10px; border-radius: 4px; max-height: 200px; overflow-y: auto;">${conversionLogs.join('\n')}</pre>
+
+<h3>Fields Found (${allFields.length}):</h3>
+<ul class="fieldlist">
+    ${allFields.map(field => `
+        <li>
+            <strong>${field.key}</strong> (${field.type}) - "${field.label}" ${field.path ? `at ${field.path}` : ''}
+        </li>
+    `).join('')}
+</ul>
+
+<h3>Generated DevExpress XML:</h3>
+<div>
+    <button id="copyFullXml" style="background-color: #17a2b8; margin-bottom: 10px;">Copy XML to Clipboard</button>
+    
+    <div style="background-color: ${
+        validationResults.some(msg => msg.startsWith("ERROR")) ? '#ffe6e6' : // Red for errors
+        validationResults.some(msg => msg.startsWith("WARNING")) ? '#fff9e6' : // Yellow for warnings
+        '#e6ffe6' // Green for success
+    }; padding: 8px; margin-bottom: 10px; border-radius: 4px;">
+        <strong>XML Validation:</strong><br>
+        ${validationResults.map(msg => msg).join('<br>')}
+    </div>
+    
+    <pre style="background-color: #eef8ff; padding: 10px; max-height: 400px; overflow-y: auto; border: 1px solid #ccc;">${xml.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>
+</div>
+                `;
+                
+                resultArea.innerHTML = resultHtml;
+                
+                // Add copy to clipboard functionality
+                document.getElementById('copyFullXml').addEventListener('click', function() {
+                    navigator.clipboard.writeText(xml)
+                        .then(() => alert('XML copied to clipboard'))
+                        .catch(err => console.error('Failed to copy: ', err));
+                });
+                
+            } catch (error) {
+                console.error('Error in full conversion test:', error);
+                resultArea.innerHTML = `<div class="error">Error in full conversion test: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>
