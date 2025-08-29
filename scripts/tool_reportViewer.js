@@ -24,6 +24,8 @@ async function loadViewerComponent(containerId) {
   }
 }
 
+// This section is removed as the copy button functionality will be directly added to the HTML file
+
 const PREVIEW_HANDLERS = {
   XRLabel: (control, sanitizedText) => {
     control.classList.add('preview-label');

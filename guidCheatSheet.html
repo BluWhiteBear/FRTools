@@ -25,85 +25,91 @@
             <section class="tool-section mb-5">
                 <div class="card shadow-lg border-0">
                     <div class="card-body p-4">
-                        <!--Search Bar-->
-                        <!-- 
-                        <div class="mb-4 text-light-emphasis">
-                            <label for="searchInput" class="form-label text-light">Search:</label>
-                            <input type="text" class="form-control form-control-lg" id="searchInput" placeholder="Keywords...">
+
+                        <div class="text-center mb-4">                    
+                            <h2 class="h4 text-center text-light mb-0">
+                                <i class="bi bi-search me-2"></i>VBScript
+                                <p class="text-light-emphasis small fw-light mb-0">For use in Server Side Form Script</p>
+                            </h2>
                         </div>
-                        -->
+                        
                         <div class="row g-4">
                             <div class="col-md-6">
                                 <div class="tool-card h-100 p-4">
-                                    <h3 class="h5 mb-3">TheForm.User.ContactGUID.toString()</h3>
-                                    <p class="mb-4 text-light-emphasis">This is the blah blah blah blah something</p>
+                                    <h3 class="h5 mb-3">TheForm.User.OwnerObjectGUID.toString()</h3>
+                                    <p class="mb-4 text-light-emphasis">The ContactGUID of the contact that "owns" the form instance. This describes the open contact.</p>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="tool-card h-100 p-4">
                                     <h3 class="h5 mb-3">TheForm.User.ContactGUID.toString()</h3>
-                                    <p class="mb-4 text-light-emphasis">This is the blah blah blah blah something</p>
+                                    <p class="mb-4 text-light-emphasis">The ContactGUID of the signed in user. This describes the contact of the user that is accessing the form.</p>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="tool-card h-100 p-4">
-                                    <h3 class="h5 mb-3">TheForm.User.ContactGUID.toString()</h3>
-                                    <p class="mb-4 text-light-emphasis">This is the blah blah blah blah something</p>
+                                    <h3 class="h5 mb-3">TheForm.User.UserGUID.toString()</h3>
+                                    <p class="mb-4 text-light-emphasis">The UserGUID of the currently signed in user. This describes the user the is accessing the form.</p>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="tool-card h-100 p-4">
-                                    <h3 class="h5 mb-3">TheForm.User.ContactGUID.toString()</h3>
-                                    <p class="mb-4 text-light-emphasis">This is the blah blah blah blah something</p>
+                                    <h3 class="h5 mb-3">TheForm.FormDefinition.FormDefinitionGUID.toString()</h3>
+                                    <p class="mb-4 text-light-emphasis">The FormDefinitionGUID of the current form. This tells the system which form is being referenced.</p>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="tool-card h-100 p-4">
-                                    <h3 class="h5 mb-3">TheForm.User.ContactGUID.toString()</h3>
-                                    <p class="mb-4 text-light-emphasis">This is the blah blah blah blah something</p>
+                                    <h3 class="h5 mb-3">TheForm.FormInstanceGUID.toString()</h3>
+                                    <p class="mb-4 text-light-emphasis">The FormInstanceGUID of the current form. This tells the system which instance of the current form is being referenced.</p>
+                                </div>                                
+                            </div>
+                            <div class="col-md-6">
+                                <div class="tool-card h-100 p-4">
+                                    <h3 class="h5 mb-3">theForm.GetGuid().toString()</h3>
+                                    <p class="mb-4 text-light-emphasis">This generates a new GUID.</p>
+                                </div>                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="tool-section mb-5">
+                <div class="card shadow-lg border-0">
+                    <div class="card-body p-4">
+
+                        <div class="text-center mb-4">                    
+                            <h2 class="h4 text-center text-light mb-0">
+                                <i class="bi bi-search me-2"></i>Combobox/Dropdown SQL Source
+                                <p class="text-light-emphasis small fw-light mb-0">For use in the SQL Source of Comboboxes</p>
+                            </h2>
+                        </div>
+                        
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="tool-card h-100 p-4">
+                                    <h3 class="h5 mb-3">#OwnerObjectGUID</h3>
+                                    <p class="mb-4 text-light-emphasis">The ContactGUID of the contact that "owns" the form instance. This describes the open contact.</p>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="tool-card h-100 p-4">
-                                    <h3 class="h5 mb-3">TheForm.User.ContactGUID.toString()</h3>
-                                    <p class="mb-4 text-light-emphasis">This is the blah blah blah blah something</p>
+                                    <h3 class="h5 mb-3">#UserGUID</h3>
+                                    <p class="mb-4 text-light-emphasis">The UserGUID of the currently signed in user. This describes the user the is accessing the form.</p>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="tool-card h-100 p-4">
-                                    <h3 class="h5 mb-3">TheForm.User.ContactGUID.toString()</h3>
-                                    <p class="mb-4 text-light-emphasis">This is the blah blah blah blah something</p>
+                                    <h3 class="h5 mb-3">#FormGUID</h3>
+                                    <p class="mb-4 text-light-emphasis">The FormDefinitionGUID of the current form. This tells the system which form is being referenced.</p>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="tool-card h-100 p-4">
-                                    <h3 class="h5 mb-3">TheForm.User.ContactGUID.toString()</h3>
-                                    <p class="mb-4 text-light-emphasis">This is the blah blah blah blah something</p>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="tool-card h-100 p-4">
-                                    <h3 class="h5 mb-3">TheForm.User.ContactGUID.toString()</h3>
-                                    <p class="mb-4 text-light-emphasis">This is the blah blah blah blah something</p>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="tool-card h-100 p-4">
-                                    <h3 class="h5 mb-3">TheForm.User.ContactGUID.toString()</h3>
-                                    <p class="mb-4 text-light-emphasis">This is the blah blah blah blah something</p>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="tool-card h-100 p-4">
-                                    <h3 class="h5 mb-3">TheForm.User.ContactGUID.toString()</h3>
-                                    <p class="mb-4 text-light-emphasis">This is the blah blah blah blah something</p>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="tool-card h-100 p-4">
-                                    <h3 class="h5 mb-3">TheForm.User.ContactGUID.toString()</h3>
-                                    <p class="mb-4 text-light-emphasis">This is the blah blah blah blah something</p>
-                                </div>
+                                    <h3 class="h5 mb-3">#FormInstanceGUID</h3>
+                                    <p class="mb-4 text-light-emphasis">The FormInstanceGUID of the current form. This tells the system which instance of the current form is being referenced.</p>
+                                </div>                                
                             </div>
                         </div>
                     </div>

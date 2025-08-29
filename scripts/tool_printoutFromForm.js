@@ -1,14 +1,21 @@
 // Constants
+const VERSION_INFO = {
+  version: '0.2.2',
+  updated: '08/29/2025',
+  devexpressVersion: '23.2.5.0'
+};
+
 const LAYOUT = {
   MARGIN: 0,
   VERTICAL_SPACING: 10,
   LABEL_HEIGHT: 25,
   INPUT_HEIGHT: 25,
   DEFAULT_WIDTH: 650,
+  COLUMN_WIDTH: 325,  // Width for column fields
   PAGE_WIDTH: 850,
   PAGE_HEIGHT: 1100,
   LANDSCAPE: false,
-  
+  HEADER_WIDTH: 769.987, // Match the real template's header width
 };
 
 const TABLE_LAYOUT = {
@@ -23,8 +30,13 @@ const TABLE_LAYOUT = {
 // Core Module: Form to DevExpress Conversion
 class DevExpressConverter {
   static state = {
-    refCounter: 0
+    devExpressJson: null // For storing the generated JSON
   };
+
+  static initialize() {
+    this.state.devExpressJson = null;
+    FieldGenerator.initRefs(); // Reset ref and item counters at start
+  }
 
   static COMPONENT_TO_CONTROL_TYPE = {
     textfield: 'XRLabel',
@@ -60,22 +72,22 @@ class DevExpressConverter {
   }
 
   static getTypeCastedFieldExpression(component) {
-    const key = component.key;
+    const key = Utils.escapeXml(component.key);
     switch (component.type) {
       case 'datetime':
-        return `IIF(IsNull([${key}]), '', Format(ToDateTime([${key}]), 'g'))`;
+        return `Iif(IsNullOrEmpty([${key}]), '', FormatString('{0:g}', [${key}]))`;
       case 'number':
         if (component.decimalLimit) {
-          return `IIF(IsNull([${key}]), '', Format(ToDecimal([${key}], CultureInfo.InvariantCulture), 'n${component.decimalLimit}'))`;
+          return `Iif(IsNullOrEmpty([${key}]), '', FormatString('{0:N${component.decimalLimit}}', [${key}]))`;
         }
-        return `IIF(IsNull([${key}]), '', ToString([${key}]))`;
+        return `Iif(IsNullOrEmpty([${key}]), '', [${key}])`;
       case 'checkbox':
-        return `IIF(IsNull([${key}]), 'No', IIF(ToBoolean([${key}]), 'Yes', 'No'))`;
+        return `Iif(IsNullOrEmpty([${key}]), False, ToBoolean([${key}]))`;
       case 'select':
       case 'radio':
-        return `IIF(IsNull([${key}]), '', ToString([${key}]))`;
+        return `Iif(IsNullOrEmpty([${key}]), '', ToString([${key}]))`;
       default:
-        return `IIF(IsNull([${key}]), '', ToString([${key}]))`;
+        return `Iif(IsNullOrEmpty([${key}]), '', ToString([${key}]))`;
     }
   }
 
@@ -100,31 +112,57 @@ class DevExpressConverter {
     return true;
   }
 
-  static handlers = {
-    // Container Components
-    panel: (component, itemNum, ref, componentWidth, xOffset, currentY, context) => {
-      // Check visibility considering parent state
-      if (!DevExpressConverter.isComponentVisible(component)) return '';
+  static handlers = {    panel: (component, itemNum, ref, componentWidth, xOffset, currentY, context) => {
+      // Check both the panel's visibility and parent's visibility
+      const isVisible = DevExpressConverter.isComponentVisible(component, context.parentVisible);
+      if (!isVisible) {
+        console.log(`Skipping hidden panel/fieldset: ${component.key}`);
+        return '';
+      }
+
+      console.log(`Processing panel/fieldset: ${component.key}`, {
+        type: component.type,
+        hasComponents: Boolean(component.components),
+        componentCount: component.components?.length,
+        currentContext: { ...context, parentVisible: isVisible }
+      });
       
       const panelItemNum = context.itemCounter++; 
       const headerHeight = component.label ? context.LAYOUT.LABEL_HEIGHT : 0;
+      
+      // Create a nested context that inherits visibility from this panel
+      const nestedContext = {
+        ...context,
+        parentVisible: isVisible
+      };
+      
       const contentHeight = component.components?.length ? 
-        context.calculateNestedHeight(component.components) : 0;
+        context.calculateNestedHeight(component.components, nestedContext) : 0;
       const totalHeight = headerHeight + contentHeight + (context.LAYOUT.VERTICAL_SPACING * 2);
   
-      return `<Item${panelItemNum} Ref="${DevExpressConverter.state.refCounter++}" ControlType="XRPanel" 
+      // Generate panel XML with nested visibility context
+      const panelXml = `<Item${panelItemNum} ControlType="XRPanel" 
         Name="${context.escapeXml(component.key || `panel${panelItemNum}`)}"
         CanShrink="true"
         SizeF="${componentWidth},${totalHeight}"
         LocationFloat="${xOffset},${currentY}"
-        Padding="2,2,0,0,96"
+        Padding="2,2,0,0,100"
         Borders="Left, Right, Bottom">
         <Controls>
-          ${component.label ? context.generateLabel(component, context) : ''}
-          ${context.generatePanelContent(component, context)}
+          ${component.label ? context.generateLabel(component, nestedContext) : ''}          ${component.components ? 
+            context.processNestedComponents(
+              component.components,
+              FieldGenerator.getNextRef(),
+              componentWidth - (context.LAYOUT.MARGIN * 2),
+              context.LAYOUT.MARGIN,
+              component.label ? context.LAYOUT.LABEL_HEIGHT + context.LAYOUT.VERTICAL_SPACING : 0,
+              nestedContext
+            ) : ''}
         </Controls>
-        <StylePriority Ref="${DevExpressConverter.state.refCounter++}" UseBorders="false" />
+        <StylePriority Ref="${FieldGenerator.getNextRef()}" UseBorders="false" />
       </Item${panelItemNum}>`;
+
+      return panelXml;
     },
   
     fieldset: (component, itemNum, ref, componentWidth, xOffset, currentY, context) => {
@@ -135,29 +173,18 @@ class DevExpressConverter {
       const componentHeight = (component.rows?.length || 1) * context.TABLE_LAYOUT.ROW_HEIGHT;
       const tableItemNum = context.itemCounter++;
       
-      return `<Item${tableItemNum} ControlType="XRTable" Name="${context.escapeXml(component.key || `table${tableItemNum}`)}"
-        SizeF="${componentWidth},${componentHeight}"
-        LocationFloat="${xOffset},${currentY}"
-        Padding="${context.TABLE_LAYOUT.CELL_PADDING},${context.TABLE_LAYOUT.CELL_PADDING},0
-        ,0,96"
-        Borders="All">
-        <Rows>
-          ${(component.rows || []).map((row, rowIndex) => {
-            const rowItemNum = context.itemCounter++;
-            return `<Item${rowItemNum} ControlType="XRTableRow" Name="row_${rowItemNum}" Weight="1">
-              <Cells>
-                ${(row.cells || []).map((cell, cellIndex) => {
-                  const cellItemNum = context.itemCounter++;
-                  return `<Item${cellItemNum} ControlType="XRTableCell" Name="cell_${cellItemNum}"
-                    Weight="${1/row.cells.length}"
-                    Text="${context.escapeXml(cell.content || '')}"
-                    Padding="${context.TABLE_LAYOUT.CELL_PADDING},${context.TABLE_LAYOUT.CELL_PADDING},0,0,96"/>`;
-                }).join('\n')}
-              </Cells>
-            </Item${rowItemNum}>`;
-          }).join('\n')}
-        </Rows>
-      </Item${tableItemNum}>`;
+      // Generate table XML with proper escaping and formatting
+      const rows = (component.rows || []).map((row, rowIndex) => {
+        const rowItemNum = context.itemCounter++;
+        const cells = (row.cells || []).map((cell, cellIndex) => {
+          const cellItemNum = context.itemCounter++;
+          const cellWeight = (1/row.cells.length).toFixed(4); // Prevent floating point precision issues
+          return `<Item${cellItemNum} ControlType="XRTableCell" Name="cell_${cellItemNum}" Weight="${cellWeight}" Text="${Utils.escapeXml(cell.content || '')}" Padding="${context.TABLE_LAYOUT.CELL_PADDING},${context.TABLE_LAYOUT.CELL_PADDING},0,0,96"/>`;
+        }).join('');
+        return `<Item${rowItemNum} ControlType="XRTableRow" Name="row_${rowItemNum}" Weight="1"><Cells>${cells}</Cells></Item${rowItemNum}>`;
+      }).join('');
+      
+      return `<Item${tableItemNum} ControlType="XRTable" Name="${Utils.escapeXml(component.key || `table${tableItemNum}`)}" SizeF="${componentWidth},${componentHeight}" LocationFloat="${xOffset},${currentY}" Padding="${context.TABLE_LAYOUT.CELL_PADDING},${context.TABLE_LAYOUT.CELL_PADDING},0,0,96" Borders="All"><Rows>${rows}</Rows></Item${tableItemNum}>`;
     },
 
     XRTable: (component, itemNum, ref, componentWidth, xOffset, currentY, context) => {
@@ -165,12 +192,11 @@ class DevExpressConverter {
       return `<Item${tableItemNum} ControlType="XRTable" Name="${context.escapeXml(component.key || `table${tableItemNum}`)}"
         SizeF="${componentWidth},${context.TABLE_LAYOUT.ROW_HEIGHT * (component.rows?.length || 1)}"
         LocationFloat="${xOffset},${currentY}"
-        Padding="2,2,0,0,96"
+        Padding="2,2,0,0,100"
         Borders="All">
-        <Rows>
-          ${component.rows?.map(row => `<Item1 ControlType="XRTableRow" Name="row${DevExpressConverter.state.refCounter++}" Weight="1" />`).join('\n')}
+        <Rows>          ${component.rows?.map(row => `<Item1 ControlType="XRTableRow" Name="row${FieldGenerator.getNextRef()}" Weight="1" />`).join('\n')}
         </Rows>
-        <StylePriority Ref="${DevExpressConverter.state.refCounter++}" UseBorders="false" />
+        <StylePriority Ref="${FieldGenerator.getNextRef()}" UseBorders="false" />
       </Item${tableItemNum}>`;
     },    columns: (component, itemNum, ref, componentWidth, xOffset, currentY, context) => {
       // Check visibility of the columns container
@@ -266,7 +292,7 @@ class DevExpressConverter {
       return `<Item${tableItemNum} ControlType="XRTable" Name="${context.escapeXml(component.key || `datagrid${tableItemNum}`)}"
         SizeF="${componentWidth},${componentHeight}"
         LocationFloat="${xOffset},${currentY}"
-        Padding="2,2,0,0,96"
+        Padding="2,2,0,0,100"
         Borders="All">
         <Rows>
           <!-- Header Row -->
@@ -390,11 +416,11 @@ class DevExpressConverter {
         Text="${context.escapeXml(component.label || '')}"
         SizeF="${componentWidth},${componentHeight}"
         LocationFloat="${xOffset},${currentY}"
-        Padding="2,2,0,0,96"
+        Padding="2,2,0,0,100"
         Borders="None">
-        <GlyphOptions Ref="${glyphRef}" Size="13,13" />
+        <GlyphOptions Ref="${glyphRef}" Size="13,13"/>
         <ExpressionBindings>
-          <Item1 Ref="${exprRef}" EventName="BeforePrint" PropertyName="CheckState" Expression="IIF(IsNull([${context.escapeXml(component.key)}]), False, ToBoolean([${context.escapeXml(component.key)}]))" />
+          <Item1 Ref="${exprRef}" EventName="BeforePrint" PropertyName="CheckState" Expression="IIF(ISNULL([${context.escapeXml(component.key)}], False), False, ToBoolean([${context.escapeXml(component.key)}]))" />
         </ExpressionBindings>
         <StylePriority Ref="${styleRef}" UseBorders="false" UseTextAlignment="true" />
       </Item${checkboxItemNum}>`;
@@ -411,7 +437,7 @@ class DevExpressConverter {
         SizeF="${componentWidth},${context.LAYOUT.INPUT_HEIGHT}"
         LocationFloat="${xOffset},${currentY}"
         TextAlignment="MiddleLeft"
-        Padding="2,2,0,0,96">
+        Padding="2,2,0,0,100">
         <StylePriority Ref="${DevExpressConverter.state.refCounter++}" UseTextAlignment="false" />
       </Item${dateItemNum}>`;
     },
@@ -423,7 +449,7 @@ class DevExpressConverter {
         Text="${context.escapeXml(component.content)}"
         SizeF="${componentWidth},${componentHeight}"
         LocationFloat="${xOffset},${currentY}"
-        Padding="2,2,0,0,96"
+        Padding="2,2,0,0,100"
         AllowMarkupText="true"/>`;
     },
 
@@ -432,7 +458,7 @@ class DevExpressConverter {
       return `<Item${pictureItemNum} ControlType="XRPictureBox" Name="${context.escapeXml(component.key || `picture${pictureItemNum}`)}"
         SizeF="${componentWidth},${context.LAYOUT.INPUT_HEIGHT}"
         LocationFloat="${xOffset},${currentY}"
-        Padding="2,2,0,0,96"
+        Padding="2,2,0,0,100"
         Sizing="ZoomImage">
         <ExpressionBindings>
           <Item1 Ref="${DevExpressConverter.state.refCounter++}" EventName="BeforePrint" 
@@ -453,7 +479,7 @@ class DevExpressConverter {
         SizeF="${componentWidth},${context.LAYOUT.INPUT_HEIGHT * 2}"
         LocationFloat="${xOffset},${currentY}"
         Font="${context.LAYOUT.DEFAULT_FONT}"
-        Padding="2,2,0,0,96">
+        Padding="2,2,0,0,100">
         <ExpressionBindings>
           <Item1 Ref="${DevExpressConverter.state.refCounter++}" EventName="BeforePrint" 
                  PropertyName="Html" Expression="[${component.key}]" />
@@ -480,7 +506,7 @@ class DevExpressConverter {
       return `<Item${barcodeItemNum} ControlType="XRBarCode" Name="${context.escapeXml(component.key || `barcode${barcodeItemNum}`)}"
         SizeF="${componentWidth},${context.LAYOUT.INPUT_HEIGHT}"
         LocationFloat="${xOffset},${currentY}"
-        Padding="2,2,0,0,96"
+        Padding="2,2,0,0,100"
         Symbology="QRCode"
         AutoModule="true"
         TextAlignment="MiddleCenter">
@@ -515,11 +541,21 @@ class DevExpressConverter {
             const visibleComps = (comps || []).filter(c => DevExpressConverter.isComponentVisible(c, isVisible));
             return DevExpressConverter.core.calculateNestedHeight(visibleComps);
           },
-          processNestedComponents: DevExpressConverter.core.processNestedComponents,
+          processNestedComponents: (nestedComps, nestedRef, nestedWidth, nestedXOffset, nestedYOffset) => {
+            return DevExpressConverter.core.processNestedComponents(
+              nestedComps,
+              nestedRef,
+              nestedWidth,
+              nestedXOffset,
+              nestedYOffset,
+              true
+            );
+          },
           generateLabel: DevExpressConverter.core.generateLabel,
           generatePanelContent: DevExpressConverter.core.generatePanelContent,
           generateControl: DevExpressConverter.core.generateControl,
           generateControls: DevExpressConverter.core.generateControls,
+          parentWidth: parentWidth,
           parentVisible: isVisible // Pass down current visibility state
         };
         return handler(component, itemNum, ref, componentWidth, xOffset, currentY, context);
@@ -619,50 +655,73 @@ class DevExpressConverter {
     },    processNestedComponents(components, startRef, parentWidth, xOffset, yOffset = 0, parentVisible = true) {
       let currentY = yOffset;
       
-      // Filter out non-visible components
-      const visibleComponents = (components || []).filter(comp => 
-        DevExpressConverter.isComponentVisible(comp, parentVisible));
+      // Validate input components
+      if (!components || !Array.isArray(components)) {
+        console.log('No components to process or invalid components array');
+        return '';
+      }
       
-      return visibleComponents.map((component) => {
-        const ref = startRef++;
-        let componentWidth = component.width ? 
-          (component.width / 100) * parentWidth : // Convert percentage to pixels
+      // Filter and process visible components
+      const results = components.map((component) => {
+        // Check visibility in context of parent
+        if (!DevExpressConverter.isComponentVisible(component, parentVisible)) {
+          console.log(`Skipping hidden component: ${component.key || 'unnamed'}`);
+          return '';
+        }
+  
+        console.log(`Processing nested component: ${component.key || 'unnamed'}`, {
+          type: component.type,
+          currentY,
+          hasChildren: Boolean(component.components?.length)
+        });
+  
+        // Calculate component width (percentage or absolute)
+        const componentWidth = component.width ? 
+          (component.width / 100) * parentWidth : 
           Math.min(parentWidth - (LAYOUT.MARGIN * 2), LAYOUT.DEFAULT_WIDTH);
-        
-        // Calculate center offset if component should be centered
+  
+        // Handle component centering
         const centerOffset = component.width && component.width < 100 ? 
           (parentWidth - componentWidth) / 2 : 
           xOffset;
-          
-        // Process component with relative positioning, passing visibility context
-        const result = DevExpressConverter.core.processComponent(
-          component, 
+  
+        // Process the component
+        const ref = startRef++;
+        const result = this.processComponent(
+          component,
           DevExpressConverter.state.itemCounter,
-          ref, 
+          ref,
           componentWidth,
-          centerOffset, // Use calculated offset
+          centerOffset,
           currentY,
           parentWidth,
-          parentVisible // Pass the parent's visibility state
+          true // Component already verified as visible
         );
-        
-        // Only update currentY for visible components that returned content
+  
+        // Update vertical position if content was generated
         if (result) {
-          const componentHeight = DevExpressConverter.core.calculateComponentHeight(component);
+          const componentHeight = this.calculateComponentHeight(component);
           currentY += componentHeight + LAYOUT.VERTICAL_SPACING;
+          console.log(`Component processed, new Y: ${currentY}`);
         }
-        
-        return result;
-      }).filter(Boolean).join('\n'); // Filter out empty strings before joining
+  
+        return result || '';
+      });
+  
+      // Filter out empty results and combine
+      return results.filter(Boolean).join('\n');
     },
 
     generateLabel(component, context) {
       const labelItemNum = context.itemCounter++;
-      return `<Item${labelItemNum} ControlType="XRLabel" Name="label_${context.escapeXml(component.key || `field${labelItemNum}`)}"
+      return `<Item${labelItemNum} Ref="${context.refCounter++}" ControlType="XRLabel" Name="label_${context.escapeXml(component.key || `field${labelItemNum}`)}"
         Text="${context.escapeXml(component.label || '')}"
+        TextAlignment="MiddleLeft"
         SizeF="${context.LAYOUT.PAGE_WIDTH - (context.LAYOUT.MARGIN * 2)},${context.LAYOUT.LABEL_HEIGHT}"
         LocationFloat="0,0"
-        Padding="2,2,0,0,96">
+        Font="Times New Roman, 9.75pt, style=Bold"
+        Padding="2,2,0,0,100">
+        Borders="None"
         <StylePriority UseFont="false"/>
       </Item${labelItemNum}>`;
     },
@@ -718,7 +777,7 @@ class DevExpressConverter {
             <Item1 ControlType="XRTable" Name="table_${context.escapeXml(component.key || `table${itemCounter}`)}"
               SizeF="${LAYOUT.PAGE_WIDTH - (LAYOUT.MARGIN * 2)},${DevExpressConverter.core.calculateComponentHeight(component)}"
               LocationFloat="0,0"
-              Padding="2,2,0,0,96"
+              Padding="2,2,0,0,100"
               Borders="All">
               <Rows>
                 <Item1 ControlType="XRTableRow" Name="row_${component.key || `row${itemCounter}`}" Weight="1">
@@ -745,14 +804,12 @@ class DevExpressConverter {
             PropertyName="Text" 
             Expression="[${component.key}]"/>
         </ExpressionBindings>`;
-    },
-
-    generateControls(component, context) {
+    },    generateControls(component, context) {
       // Use processComponent to generate controls
       return DevExpressConverter.core.processComponent(
         component, 
         context.itemCounter,
-        DevExpressConverter.state.refCounter++, 
+        FieldGenerator.getNextRef(), 
         LAYOUT.PAGE_WIDTH - (LAYOUT.MARGIN * 2),
         LAYOUT.MARGIN,
         0,
@@ -763,18 +820,19 @@ class DevExpressConverter {
     // Generate field label component (bold)
     generateFieldValue(component, itemNum, width, xOffset, yOffset, context, borderStyle = "Bottom") {
       const valueItemNum = context.itemCounter++;
-      return `<Item${valueItemNum} ControlType="XRLabel"
+      return `<Item${valueItemNum} Ref="${FieldGenerator.getNextRef()}" ControlType="XRLabel"
         Name="${context.escapeXml(component.key || `value${valueItemNum}`)}"
+        TextAlignment="MiddleLeft"
         SizeF="${width},${context.LAYOUT.INPUT_HEIGHT}"
         LocationFloat="${xOffset},${yOffset}"
-        Padding="2,2,0,0,96"
-        StylePriority-UseBorders="false" 
+        Padding="2,2,0,0,100"
         Borders="${borderStyle}">
         <ExpressionBindings>
-          <Item1 EventName="BeforePrint" 
+          <Item1 Ref="${FieldGenerator.getNextRef()}"
+            EventName="BeforePrint" 
             PropertyName="Text" 
             Expression="${this.getTypeCastedFieldExpression(component)}"/>
-        </ExpressionBindings>
+        </ExpressionBindings Ref="${FieldGenerator.getNextRef()}" UseBorders="false"/>
       </Item${valueItemNum}>`;
     },
   };
@@ -799,6 +857,9 @@ class DevExpressConverter {
 
   static transformToDevExpress(formioData) {
     try {
+      // Initialize counters
+      DevExpressConverter.initialize();
+
       if (!formioData) {
         throw new Error('No form data provided');
       }
@@ -811,24 +872,32 @@ class DevExpressConverter {
       
       // Get a minimal valid XML template with the report name
       const xmlTemplateFunc = generateMinimalXmlTemplate();
-      const xmlTemplate = xmlTemplateFunc(formioData);
+      let xmlTemplate = xmlTemplateFunc(formioData);
       
       console.log("XML template generated, length:", xmlTemplate.length);
       console.log("XML preview:", xmlTemplate.substring(0, 200) + "...");
 
     // Clean XML - remove unnecessary whitespace but preserve structure
-      const cleanXml = Utils.cleanAndPrepareXmlForOutput(xmlTemplate);
+      // Clean and validate XML before compressing
+      xmlTemplate = xmlTemplate.replace(/>\s+</g, '><')
+                              .replace(/\s+>/g, '>')
+                              .replace(/<\s+/g, '<')
+                              .replace(/\s{2,}/g, ' ')
+                              .trim();
 
-      // Validate cleaned XML before compressing
-      const cleanValidationResults = Utils.validateXmlOutput(cleanXml);
-      console.log("Cleaned XML validation results:", cleanValidationResults);
+      const initialValidation = Utils.validateXmlOutput(xmlTemplate);
+      console.log("Initial XML validation results:", initialValidation);
+
+      if (initialValidation.some(result => result.startsWith("ERROR"))) {
+        throw new Error('XML validation failed with critical errors. See console for details.');
+      }
 
       // Compress and encode the XML
       let base64Template;
       try {
         // Convert XML to bytes
         const encoder = new TextEncoder();
-        const xmlBytes = encoder.encode(cleanXml);
+        const xmlBytes = encoder.encode(xmlTemplate);
         
         // Compress the XML bytes
         const compressed = pako.gzip(xmlBytes, { level: 9 });
@@ -882,6 +951,13 @@ class DevExpressConverter {
         throw new Error('XML validation failed with critical errors. See console for details.');
       }
       
+      // Add ComponentStorage and ObjectStorage sections with proper data structure
+      const formFields = Object.keys(formioData)
+        .map(key => `<Column Name="${Utils.escapeXml(key)}" Type="System.String"/>`)
+        .join('');
+
+      xmlTemplate = xmlTemplate.replace('</Bands>', `</Bands><ComponentStorage><Item1 Ref="0" ObjectType="DevExpress.DataAccess.Json.JsonDataSource,DevExpress.DataAccess.v23.2" Name="jsonDataSource1"><Source Type="DevExpress.DataAccess.Json.CustomJsonSource"/><Parameters><Item1 Ref="100" ValueInfo="00000000-0000-0000-0000-000000000000" Name="FormDataGUID" Type="#Ref-3"/><Item2 Ref="101" ValueInfo="00000000-0000-0000-0000-000000000000" Name="ObjectGUID" Type="#Ref-3"/></Parameters><Schema><Item Type="DefaultSchema"><Columns>${formFields}</Columns></Item></Schema></Item1></ComponentStorage><ObjectStorage><Item1 Ref="3" ObjectType="System.Type" Content="System.Guid"/><Item2 Ref="4" ObjectType="DevExpress.XtraReports.Parameters.StaticListLookUpSettings, DevExpress.Printing.v23.2.Core"><LookUpValues><Item1 Content="System.String"/></LookUpValues></Item2></ObjectStorage>`);
+
       // Create minimal DevExpress JSON structure
       const departmentName = formioData.DepartmentName || 'FormIO';
       const reportName = formioData.FormName || 'Simple Report';
@@ -928,9 +1004,43 @@ const Utils = {  escapeXml(unsafe) {
       // Create a validation result array
       const validationResults = [];
       
+      // Log XML for debugging
+      console.log("Validating XML:", xml.substring(0, 200) + "...");
+      
       // Basic string checks
       if (!xml || xml.trim() === '') {
         return ["ERROR: XML is empty"];
+      }
+
+      // Try to find any unclosed or malformed tags
+      const tagStack = [];
+      let pos = 0;
+      while (pos < xml.length) {
+        const nextOpen = xml.indexOf('<', pos);
+        if (nextOpen === -1) break;
+        
+        const nextClose = xml.indexOf('>', nextOpen);
+        if (nextClose === -1) {
+          console.error("Found unclosed tag at position:", nextOpen);
+          return ["ERROR: Unclosed tag found at position " + nextOpen];
+        }
+        
+        const tag = xml.substring(nextOpen, nextClose + 1);
+        console.log("Processing tag:", tag);
+        pos = nextClose + 1;
+      }
+      
+      // Clean up any potential formatting issues
+      xml = xml.replace(/>\s+</g, '><')  // Remove whitespace between tags
+               .replace(/\s+>/g, '>')     // Remove whitespace before closing bracket
+               .replace(/<\s+/g, '<')     // Remove whitespace after opening bracket
+               .replace(/\s{2,}/g, ' ');  // Collapse multiple spaces
+      
+      console.log("Cleaned XML:", xml.substring(0, 200) + "...");
+               
+      // Check basic XML structure
+      if (!xml.startsWith('<?xml')) {
+        return ["ERROR: XML must start with XML declaration"];
       }
       
       // Check for XML declaration
@@ -1085,8 +1195,16 @@ const Utils = {  escapeXml(unsafe) {
   },
 
   generateSqlQuery(formioData) {
+    // Query Data
     const departmentName = formioData.DepartmentName?.replace(/\s+/g, '_') || '';
     const formName = formioData.FormName?.replace(/\s+/g, '_') || '';
+
+    // Query Header
+    const generateDate = new Date().toLocaleDateString();
+    const generateTime = new Date().toLocaleTimeString();
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const timeZoneAbbr = moment.tz(timeZone).zoneAbbr();
+    const version = VERSION_INFO.version;
   
     const sql = 
     `
@@ -1094,13 +1212,16 @@ const Utils = {  escapeXml(unsafe) {
       @FormDataGUID uniqueidentifier = null,
       @OwnerObjectGUID uniqueidentifier = null
     as
-      // This procedure was generated by the Formio to DevExpress converter tool on ${new Date().toLocaleDateString()}.
-      // It is not intended for direct use and should be modified as needed.
+      /*
+        This procedure was generated by version ${VERSION_INFO.version} of
+        the Formio to DevExpress converter tool on ${generateDate} at ${generateTime} ${timeZoneAbbr}
+        It is not intended for direct use and should be modified as needed.
+      */
+
       set nocount on;
       select
         ownCon.first
         ,ownCon.last
-        ,ownCon.DOB
         ,main.*
       from [dbo].[ct_${departmentName}_${formName}] main
       join Contact ownCon with(NOLOCK) on ownCon.ContactGUID = main.__ownerobjectguid
@@ -1438,30 +1559,71 @@ const ComponentCleaner = {
 
 // Field Generation Utility Module
 const FieldGenerator = {
-  // Generate a reference counter
-  refCounter: 10, // Start with 10 to avoid conflicts with base structure refs
+  refCounter: 1,  // Start at 1 for main report
+  itemCounter: 1, // Start at 1 for numbered items (Item1, Item2, etc.)
+  usedRefs: new Set(), // Track used reference numbers
   
-  // Get next reference ID
+  // Initialize or reset both counters
+  initRefs() {
+    this.refCounter = 1; // Always start at 1 for refs
+    this.itemCounter = 1; // Always start at 1 for items
+    this.usedRefs.clear();
+  },
+  
+  // Get next sequential reference number
   getNextRef() {
-    return this.refCounter++;
+    const ref = this.refCounter++;
+    this.usedRefs.add(ref);
+    console.log(`Assigned Ref="${ref}"`); // Debug logging
+    return ref;
+  },
+  
+  // Get next sequential item number
+  getNextItemNum() {
+    return this.itemCounter++;
+  },
+  
+  // Reserve a specific reference number
+  reserveRef(ref) {
+    this.usedRefs.add(ref);
   },
   
   // Generate field label component (bold)
   generateFieldLabel(key, label, width, xOffset, yOffset) {
     const labelRef = this.getNextRef();
     const styleRef = this.getNextRef();
+    const itemNum = this.getNextItemNum();
     
-    return `<Item${labelRef} ControlType="XRLabel" Name="label_${Utils.escapeXml(key || `field${labelRef}`)}"
+    return `<Item${itemNum} ControlType="XRLabel" Name="label_${Utils.escapeXml(key || `field${itemNum}`)}"
       Text="${Utils.escapeXml(label || '')}"
       SizeF="${width},${LAYOUT.LABEL_HEIGHT}"
       LocationFloat="${xOffset},${yOffset}"
       TextAlignment="MiddleLeft"
       Font="Times New Roman, 9.75pt, style=Bold"
-      Padding="2,2,0,0,96"
+      Padding="2,2,0,0,100"
       Borders="None">
       <StylePriority Ref="${styleRef}" UseFont="true" UseTextAlignment="false" UseBorders="false" />
-    </Item${labelRef}>`;
+    </Item${itemNum}>`;
   },
+  
+  // Generate field label component (bold)
+  generateFieldLabel(key, label, width, xOffset, yOffset) {
+    const labelRef = this.getNextRef();
+    const styleRef = this.getNextRef();
+    const itemNum = this.getNextItemNum();
+    
+    return `<Item${itemNum} ControlType="XRLabel" Name="label_${Utils.escapeXml(key || `field${itemNum}`)}"
+      Text="${Utils.escapeXml(label || '')}"
+      SizeF="${width},${LAYOUT.LABEL_HEIGHT}"
+      LocationFloat="${xOffset},${yOffset}"
+      TextAlignment="MiddleLeft"
+      Font="Times New Roman, 9.75pt, style=Bold"
+      Padding="2,2,0,0,100"
+      Borders="None">
+      <StylePriority Ref="${styleRef}" UseFont="true" UseTextAlignment="false" UseBorders="false" />
+    </Item${itemNum}>`;
+  },
+
   // Generate field value component
   generateFieldValue(key, width, xOffset, yOffset, borderStyle = "Bottom", fieldType = "text") {
     const fieldRef = this.getNextRef();
@@ -1478,7 +1640,7 @@ const FieldGenerator = {
         case 'boolean':
           return `IIF(ToBoolean([${Utils.escapeXml(fieldKey)}]), 'Yes', 'No')`;
         default:
-          return `ToString([${Utils.escapeXml(fieldKey)}])`;
+          return `[${Utils.escapeXml(fieldKey)}]`;
       }
     };
 
@@ -1496,7 +1658,7 @@ const FieldGenerator = {
       SizeF="${width},${fieldType === 'textarea' ? LAYOUT.INPUT_HEIGHT * 2 : LAYOUT.INPUT_HEIGHT}"
       LocationFloat="${xOffset},${yOffset}"
       TextAlignment="${textAlignment}"${multilineAttribute}
-      Padding="2,2,0,0,96"
+      Padding="2,2,0,0,100"
       Borders="${borderStyle}">
       <ExpressionBindings>
         <Item1 Ref="${exprRef}" EventName="BeforePrint" PropertyName="Text" Expression="${expression}" />
@@ -1516,7 +1678,7 @@ const FieldGenerator = {
       Text="${Utils.escapeXml(label || '')}"
       SizeF="${width},${LAYOUT.INPUT_HEIGHT}"
       LocationFloat="${xOffset},${yOffset}"
-      Padding="2,2,0,0,96"
+      Padding="2,2,0,0,100"
       Borders="None">
       <GlyphOptions Ref="${glyphRef}" Size="13,13" />
       <ExpressionBindings>
@@ -1553,10 +1715,10 @@ const FieldGenerator = {
           LocationFloat="${xOffset},${yOffset + LAYOUT.LABEL_HEIGHT + 2}"
           TextAlignment="TopLeft"
           Multiline="true"
-          Padding="2,2,0,0,96"
+          Padding="2,2,0,0,100"
           Borders="Bottom">
           <ExpressionBindings>
-            <Item1 Ref="${exprRef}" EventName="BeforePrint" PropertyName="Text" Expression="ToString([${Utils.escapeXml(key)}])" />
+            <Item1 Ref="${exprRef}" EventName="BeforePrint" PropertyName="Text" Expression="[${Utils.escapeXml(key)}]" />
           </ExpressionBindings>
           <StylePriority Ref="${styleRef}" UseTextAlignment="false" UseBorders="false" />
         </Item${fieldRef}>`;
@@ -1614,27 +1776,27 @@ const getFieldExpression = (component) => {
       if (component.decimalLimit) {
         return `IIF(IsNull([${key}]), '', Format(ToDecimal([${key}], CultureInfo.InvariantCulture), 'n${component.decimalLimit}'))`;
       }
-      return `IIF(IsNull([${key}]), '', ToString([${key}]))`;
+      return `IIF(IsNull([${key}]), '', T[${key})`;
     case 'checkbox':
       return `IIF(IsNull([${key}]), 'No', IIF(ToBoolean([${key}]), 'Yes', 'No'))`;
     case 'select':
     case 'radio':
-      return `IIF(IsNull([${key}]), '', ToString([${key}]))`;
+      return `IIF(IsNull([${key}]), '', T[${key})`;
     default:
-      return `IIF(IsNull([${key}]), '', ToString([${key}]))`;
+      return `IIF(IsNull([${key}]), '', T[${key})`;
   }
 };
 
 const generateFieldValue = (component) => {
-  const valueItemNum = DevExpressConverter.state.itemCounter++;
-  const exprRef = DevExpressConverter.state.refCounter++;
-  const styleRef = DevExpressConverter.state.refCounter++;
+  const valueItemNum = FieldGenerator.getNextItemNum();
+  const exprRef = FieldGenerator.getNextRef();
+  const styleRef = FieldGenerator.getNextRef();
 
   return `<Item${valueItemNum} ControlType="XRLabel"
     Name="${Utils.escapeXml(component.key || `value${valueItemNum}`)}"
     SizeF="${LAYOUT.DEFAULT_WIDTH},${LAYOUT.INPUT_HEIGHT}"
     LocationFloat="${LAYOUT.MARGIN},${LAYOUT.LABEL_HEIGHT}"
-    Padding="2,2,0,0,96"
+    Padding="2,2,0,0,100"
     StylePriority-UseBorders="false"
     Borders="Bottom">
     <ExpressionBindings>
@@ -1647,17 +1809,17 @@ const generateFieldValue = (component) => {
 };
 
 const generateCheckboxField = (component) => {
-  const itemNum = DevExpressConverter.state.itemCounter++;
-  const exprRef = DevExpressConverter.state.refCounter++;
-  const glyphRef = DevExpressConverter.state.refCounter++;
-  const styleRef = DevExpressConverter.state.refCounter++;
+  const itemNum = FieldGenerator.getNextItemNum();
+  const exprRef = FieldGenerator.getNextRef();
+  const glyphRef = FieldGenerator.getNextRef();
+  const styleRef = FieldGenerator.getNextRef();
 
   return `<Item${itemNum} ControlType="XRCheckBox"
     Name="${Utils.escapeXml(component.key || `checkbox${itemNum}`)}"
     Text="${Utils.escapeXml(component.label || '')}"
     SizeF="${LAYOUT.DEFAULT_WIDTH},${LAYOUT.INPUT_HEIGHT}"
     LocationFloat="${LAYOUT.MARGIN},${LAYOUT.LABEL_HEIGHT}"
-    Padding="2,2,0,0,96">
+    Padding="2,2,0,0,100">
     <GlyphOptions Ref="${glyphRef}" Size="13,13"/>
     <ExpressionBindings>
       <Item1 Ref="${exprRef}" EventName="BeforePrint"
@@ -1672,12 +1834,13 @@ const generateCheckboxField = (component) => {
 function generateMinimalXmlTemplate() {
   return (formioData) => {
     // Reset ref counter for each new template generation
-    FieldGenerator.refCounter = 5; // Start at 5 to leave room for base structure refs
+    FieldGenerator.refCounter = 1;
     
     // Extract form fields from FormioTemplate
     let formFieldsXml = '';
     let currentY = 60; // Start fields below header
     const supportedComponents = [];
+    const displayName = formioData?.FormName || 'Simple Report';
     
     // Component storage for field types
     const usedControlTypes = new Set(['XRLabel', 'XRCheckBox']); // Start with basic types
@@ -1725,40 +1888,102 @@ function generateMinimalXmlTemplate() {
       processComponents(formioData.FormioTemplate.components);
     }
 
+    // REPORT BOILERPLATE
     const reportName = formioData?.FormName || 'Simple Report';
-    return `<?xml version="1.0" encoding="utf-8"?>
-<XtraReportsLayoutSerializer SerializerVersion="22.2.6.0" 
-    Ref="1" 
-    ControlType="DevExpress.XtraReports.UI.XtraReport, DevExpress.XtraReports.v22.2, Version=22.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" 
-    Name="Report" 
-    DisplayName="${Utils.escapeXml(reportName)}"
-    PageWidth="850" 
-    PageHeight="1100" 
-    Version="22.2">
-  <Bands>
-    <Item1 Ref="2" ControlType="TopMarginBand" Name="TopMargin" HeightF="40"/>
-    <Item2 Ref="3" ControlType="PageHeaderBand" Name="PageHeader" HeightF="50">
+    const guid = formioData?.ReportGuid || '00000000-0000-0000-0000-000000000000';
+    const deptGuid = formioData?.DepartmentGuid || '00000000-0000-0000-0000-000000000000';
+    // Match real template's DisplayName format
+    const escapedReportName = Utils.escapeXml(`${reportName};${reportName};false;false;${deptGuid};${guid}`);
+    
+    // Build XML in smaller, validated chunks
+    // Reset reference counter at start of template generation
+    FieldGenerator.refCounter = 0;
+    
+    const headerXml = `<?xml version="1.0" encoding="utf-8"?>
+<XtraReportsLayoutSerializer 
+  SerializerVersion="23.2.5.0" 
+  Ref="${FieldGenerator.getNextRef()}" 
+  ControlType="DevExpress.XtraReports.UI.XtraReport, DevExpress.XtraReports.v23.2, Version=23.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" 
+  Name="Report" 
+  DisplayName="${escapedReportName}"
+  Margins="40, 40, 40, 40"
+  PageWidth="850" 
+  PageHeight="1100" 
+  Version="23.2" 
+  DataMember="Root"
+>`;
+
+    const extensionsXml = `  <Extensions>
+    <Item1 
+      Ref="${FieldGenerator.getNextRef()}"
+      Key="DataSerializationExtension"
+      Value="DevExpress.XtraReports.Web.ReportDesigner.DefaultDataSerializer"
+    />
+  </Extensions>`;
+
+    const parametersXml = `  <Parameters>
+    <Item1
+      Ref="${FieldGenerator.getNextRef()}"
+      Description="FormDataGUID"
+      ValueInfo="00000000-0000-0000-0000-000000000000"
+      Name="FormDataGUID"
+    />
+    <Item2
+      Ref="${FieldGenerator.getNextRef()}"
+      Description="ObjectGUID"
+      ValueInfo="00000000-0000-0000-0000-000000000000"
+      Name="ObjectGUID"
+    />
+  </Parameters>`;
+
+    const bandsXml = `  <Bands>
+    <Item1 Ref="${FieldGenerator.getNextRef()}" ControlType="TopMarginBand" Name="TopMargin" HeightF="40" />
+    <Item2 Ref="${FieldGenerator.getNextRef()}" ControlType="PageHeaderBand" Name="PageHeader" HeightF="50">
       <Controls>
-        <Item1 Ref="4" ControlType="XRLabel" 
-          Name="headerLabel" 
-          Text="${Utils.escapeXml(reportName)}" 
-          TextAlignment="MiddleCenter" 
-          SizeF="${LAYOUT.DEFAULT_WIDTH},30" 
-          LocationFloat="${LAYOUT.MARGIN},0" 
-          Font="Times New Roman, 14pt, style=Bold" 
-          Padding="2,2,0,0,96">
-          <StylePriority Ref="5" UseFont="true" UseTextAlignment="true"/>
+        <Item1
+          Ref="${FieldGenerator.getNextRef()}"
+          ControlType="XRLabel"
+          Name="headerLabel"
+          Text="${displayName}"
+          TextAlignment="MiddleCenter"
+          SizeF="${LAYOUT.HEADER_WIDTH},30"
+          LocationFloat="${LAYOUT.MARGIN},0"
+          Font="Times New Roman, 14pt, style=Bold"
+          Padding="2,2,0,0,100"
+        >
+          <StylePriority Ref="9" UseFont="true" UseTextAlignment="true" />
         </Item1>
       </Controls>
     </Item2>
-    <Item3 Ref="6" ControlType="DetailBand" Name="Detail" HeightF="${currentY + LAYOUT.MARGIN}">
+    <Item3
+      Ref="10"
+      ControlType="DetailBand"
+      Name="Detail"
+      HeightF="${currentY + LAYOUT.MARGIN}"
+    >
       <Controls>
-${formFieldsXml}
+        ${formFieldsXml.trim()}
       </Controls>
     </Item3>
-    <Item4 Ref="7" ControlType="BottomMarginBand" Name="BottomMargin" HeightF="40"/>
-  </Bands>
-</XtraReportsLayoutSerializer>`;  
+    <Item4 Ref="11" ControlType="BottomMarginBand" Name="BottomMargin" HeightF="40" />
+  </Bands>`;
+
+    // Add ParameterPanelLayoutItems section
+    // Generate final refs for parameter panel
+    const parameterPanelXml = `  <ParameterPanelLayoutItems>
+    <Item1 Ref="${FieldGenerator.getNextRef()}" LayoutItemType="Parameter" Parameter="#Ref-3" />
+    <Item2 Ref="${FieldGenerator.getNextRef()}" LayoutItemType="Parameter" Parameter="#Ref-4" />
+  </ParameterPanelLayoutItems>`;
+
+    // Combine all pieces with proper indentation
+    return [
+      headerXml,
+      extensionsXml,
+      parametersXml,
+      bandsXml,
+      parameterPanelXml,
+      '</XtraReportsLayoutSerializer>'
+    ].join('\n');  
   };
 }
 
