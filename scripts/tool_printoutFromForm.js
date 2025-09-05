@@ -1,7 +1,7 @@
 // Constants
 const VERSION_INFO = {
-  version: '0.2.2',
-  updated: '08/29/2025',
+  version: '0.2.3',
+  updated: '09/05/2025',
   devexpressVersion: '23.2.5.0'
 };
 
@@ -1403,19 +1403,33 @@ const UIHandlers = {
                   xmlContainer.innerHTML = `<div class="alert alert-danger">No XML content available</div>`;
                   console.error('XML content missing from decoded template');
                 } else {
-                  // Escape XML for display
-                  const escapedXml = decodedTemplate.content
-                    .replace(/&/g, '&amp;')
-                    .replace(/</g, '&lt;')
-                    .replace(/>/g, '&gt;');
-                    
-                  xmlContainer.innerHTML = `<code class="language-markup">${escapedXml}</code>`;
+                  // Format the XML with proper indentation
+                  const formatXml = (xml) => {
+                    let formatted = '';
+                    let indent = '';
+                    const tab = '  '; // 2 spaces indentation
+                    xml.split(/>\s*</).forEach(node => {
+                      if (node.match(/^\/\w/)) { // Closing tag
+                        indent = indent.substring(tab.length);
+                      }
+                      formatted += indent + '<' + node + '>\r\n';
+                      if (node.match(/^<?\w[^>]*[^\/]$/)) { // Opening tag
+                        indent += tab;
+                      }
+                    });
+                    return formatted.substring(1, formatted.length - 2);
+                  };
+                  
+                  // Set the formatted XML content
+                  xmlContainer.textContent = formatXml(decodedTemplate.content);
+                  // Trigger Prism.js highlighting
+                  Prism.highlightElement(xmlContainer);
                   
                   // Debug output
                   console.log('XML container updated:', {
                     containerExists: Boolean(xmlContainer),
-                    contentLength: escapedXml.length,
-                    firstChars: escapedXml.substring(0, 100)
+                    contentLength: decodedTemplate.content.length,
+                    firstChars: decodedTemplate.content.substring(0, 100)
                   });
                   
                   Prism.highlightAll();
@@ -1830,160 +1844,125 @@ const generateCheckboxField = (component) => {
   </Item${itemNum}>`;
 };
 
+import { XMLProcessor } from './xmlProcessor.js';
+import { ComponentProcessor } from './componentProcessor.js';
+
 // This function generates a minimal valid DevExpress XML report with a header
 function generateMinimalXmlTemplate() {
   return (formioData) => {
-    // Reset ref counter for each new template generation
-    FieldGenerator.refCounter = 1;
+    const processor = new XMLProcessor();
     
-    // Extract form fields from FormioTemplate
-    let formFieldsXml = '';
-    let currentY = 60; // Start fields below header
-    const supportedComponents = [];
-    const displayName = formioData?.FormName || 'Simple Report';
+    // Report metadata
+    const name = formioData?.FormName || 'Simple Report';
+    const reportGuid = formioData?.ReportGuid || '00000000-0000-0000-0000-000000000000';
+    const departmentGuid = formioData?.DepartmentGuid || '00000000-0000-0000-0000-000000000000';
+    const displayName = Utils.escapeXml(`${name};${name};false;false;${departmentGuid};${reportGuid}`);
     
-    // Component storage for field types
-    const usedControlTypes = new Set(['XRLabel', 'XRCheckBox']); // Start with basic types
+    // Create root node
+    const root = processor.buildNode('XtraReportsLayoutSerializer', {
+      SerializerVersion: "23.2.5.0",
+      ControlType: "DevExpress.XtraReports.UI.XtraReport, DevExpress.XtraReports.v23.2, Version=23.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a",
+      Name: "Report",
+      DisplayName: displayName,
+      Margins: "40, 40, 40, 40",
+      PageWidth: "850",
+      PageHeight: "1100",
+      Version: "23.2",
+      DataMember: "Root"
+    });
 
-    // Process form components to generate field XML
-    const processComponents = (components) => {
-      if (!components || !Array.isArray(components)) return;
-      
-      components.forEach(component => {
-        // Skip unsupported components
-        if (!component.key || !['textfield', 'number', 'textarea', 'email', 'checkbox', 'datetime', 'select'].includes(component.type)) {
-          if (component.components) {
-            processComponents(component.components);
-          }
-          if (component.columns) {
-            component.columns.forEach(col => {
-              if (col.components) {
-                processComponents(col.components);
-              }
-            });
-          }
-          return;
-        }
+    // Build basic structure
+    const extensions = processor.buildNode('Extensions', {}, [
+      processor.createItemNode(1, undefined, {
+        Key: "DataSerializationExtension",
+        Value: "DevExpress.XtraReports.Web.ReportDesigner.DefaultDataSerializer"
+      })
+    ]);
 
-        supportedComponents.push(component);
-        const fieldXml = FieldGenerator.generateComponentField(
-          component,
-          LAYOUT.DEFAULT_WIDTH,
-          LAYOUT.MARGIN,
-          currentY
-        );
-        
-        if (fieldXml) {
-          formFieldsXml += fieldXml;
-          // Increment Y position based on field type
-          currentY += component.type === 'textarea' ? 
-            (LAYOUT.LABEL_HEIGHT + (LAYOUT.INPUT_HEIGHT * 2) + LAYOUT.VERTICAL_SPACING) : 
-            (LAYOUT.LABEL_HEIGHT + LAYOUT.INPUT_HEIGHT + LAYOUT.VERTICAL_SPACING);
-        }
-      });
-    };
+    const parameters = processor.buildNode('Parameters', {}, [
+      processor.createItemNode(1, undefined, {
+        Description: "FormDataGUID",
+        ValueInfo: "00000000-0000-0000-0000-000000000000",
+        Name: "FormDataGUID"
+      }),
+      processor.createItemNode(2, undefined, {
+        Description: "ObjectGUID",
+        ValueInfo: "00000000-0000-0000-0000-000000000000",
+        Name: "ObjectGUID"
+      })
+    ]);
 
-    // Process all components in the form
+    // Process form components using the ComponentProcessor
+    const componentProcessor = new ComponentProcessor(processor);
+    componentProcessor.currentY = 60; // Start position for components
+    
+    const controls = [];
     if (formioData?.FormioTemplate?.components) {
-      processComponents(formioData.FormioTemplate.components);
+        const processedNodes = componentProcessor.processComponents(
+            formioData.FormioTemplate.components,
+            650, // Default width
+            0    // Starting X offset
+        );
+        controls.push(...processedNodes);
     }
-
-    // REPORT BOILERPLATE
-    const reportName = formioData?.FormName || 'Simple Report';
-    const guid = formioData?.ReportGuid || '00000000-0000-0000-0000-000000000000';
-    const deptGuid = formioData?.DepartmentGuid || '00000000-0000-0000-0000-000000000000';
-    // Match real template's DisplayName format
-    const escapedReportName = Utils.escapeXml(`${reportName};${reportName};false;false;${deptGuid};${guid}`);
     
-    // Build XML in smaller, validated chunks
-    // Reset reference counter at start of template generation
-    FieldGenerator.refCounter = 0;
+    const detailControls = processor.buildNode('Controls', {}, controls);
+
+    // Build header controls
+    const headerControls = processor.buildNode('Controls', {}, [
+      processor.createItemNode(1, "XRLabel", {
+        Name: "headerLabel",
+        Text: name,
+        TextAlignment: "MiddleCenter",
+        SizeF: "769.987,30",
+        LocationFloat: "0,0",
+        Font: "Times New Roman, 14pt, style=Bold",
+        Padding: "2,2,0,0,100"
+      })
+    ]);
+
+    // Build bands structure
+    const bands = processor.buildNode('Bands', {}, [
+      processor.createItemNode(1, "TopMarginBand", { 
+        Name: "TopMargin", 
+        HeightF: "40" 
+      }),
+      processor.createItemNode(2, "PageHeaderBand", { 
+        Name: "PageHeader", 
+        HeightF: "50"
+      }),
+      processor.createItemNode(3, "DetailBand", { 
+        Name: "Detail",
+        HeightF: "830"
+      }),
+      processor.createItemNode(4, "BottomMarginBand", { 
+        Name: "BottomMargin", 
+        HeightF: "40" 
+      })
+    ]);
+
+    // Add controls to their respective bands
+    bands.children[1].addChild(headerControls);  // Add header controls to PageHeaderBand
+    bands.children[2].addChild(detailControls);  // Add detail controls to DetailBand
+
+    // Add all main sections to root
+    root.addChild(extensions);
+    root.addChild(parameters);
+    root.addChild(bands);
+
+    // Add ParameterPanelLayoutItems
+    const parameterPanel = processor.buildNode('ParameterPanelLayoutItems', {}, [
+      processor.createItemNode(1, "Parameter", { Parameter: "#Ref-3" }),
+      processor.createItemNode(2, "Parameter", { Parameter: "#Ref-4" })
+    ]);
+    root.addChild(parameterPanel);
+
+    // Second pass: Assign all references
+    processor.assignReferences(root);
+
+    // Final pass: Generate XML string
+    return '<?xml version="1.0" encoding="utf-8"?>\n' + processor.generateXML(root);
     
-    const headerXml = `<?xml version="1.0" encoding="utf-8"?>
-<XtraReportsLayoutSerializer 
-  SerializerVersion="23.2.5.0" 
-  Ref="${FieldGenerator.getNextRef()}" 
-  ControlType="DevExpress.XtraReports.UI.XtraReport, DevExpress.XtraReports.v23.2, Version=23.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" 
-  Name="Report" 
-  DisplayName="${escapedReportName}"
-  Margins="40, 40, 40, 40"
-  PageWidth="850" 
-  PageHeight="1100" 
-  Version="23.2" 
-  DataMember="Root"
->`;
-
-    const extensionsXml = `  <Extensions>
-    <Item1 
-      Ref="${FieldGenerator.getNextRef()}"
-      Key="DataSerializationExtension"
-      Value="DevExpress.XtraReports.Web.ReportDesigner.DefaultDataSerializer"
-    />
-  </Extensions>`;
-
-    const parametersXml = `  <Parameters>
-    <Item1
-      Ref="${FieldGenerator.getNextRef()}"
-      Description="FormDataGUID"
-      ValueInfo="00000000-0000-0000-0000-000000000000"
-      Name="FormDataGUID"
-    />
-    <Item2
-      Ref="${FieldGenerator.getNextRef()}"
-      Description="ObjectGUID"
-      ValueInfo="00000000-0000-0000-0000-000000000000"
-      Name="ObjectGUID"
-    />
-  </Parameters>`;
-
-    const bandsXml = `  <Bands>
-    <Item1 Ref="${FieldGenerator.getNextRef()}" ControlType="TopMarginBand" Name="TopMargin" HeightF="40" />
-    <Item2 Ref="${FieldGenerator.getNextRef()}" ControlType="PageHeaderBand" Name="PageHeader" HeightF="50">
-      <Controls>
-        <Item1
-          Ref="${FieldGenerator.getNextRef()}"
-          ControlType="XRLabel"
-          Name="headerLabel"
-          Text="${displayName}"
-          TextAlignment="MiddleCenter"
-          SizeF="${LAYOUT.HEADER_WIDTH},30"
-          LocationFloat="${LAYOUT.MARGIN},0"
-          Font="Times New Roman, 14pt, style=Bold"
-          Padding="2,2,0,0,100"
-        >
-          <StylePriority Ref="9" UseFont="true" UseTextAlignment="true" />
-        </Item1>
-      </Controls>
-    </Item2>
-    <Item3
-      Ref="10"
-      ControlType="DetailBand"
-      Name="Detail"
-      HeightF="${currentY + LAYOUT.MARGIN}"
-    >
-      <Controls>
-        ${formFieldsXml.trim()}
-      </Controls>
-    </Item3>
-    <Item4 Ref="11" ControlType="BottomMarginBand" Name="BottomMargin" HeightF="40" />
-  </Bands>`;
-
-    // Add ParameterPanelLayoutItems section
-    // Generate final refs for parameter panel
-    const parameterPanelXml = `  <ParameterPanelLayoutItems>
-    <Item1 Ref="${FieldGenerator.getNextRef()}" LayoutItemType="Parameter" Parameter="#Ref-3" />
-    <Item2 Ref="${FieldGenerator.getNextRef()}" LayoutItemType="Parameter" Parameter="#Ref-4" />
-  </ParameterPanelLayoutItems>`;
-
-    // Combine all pieces with proper indentation
-    return [
-      headerXml,
-      extensionsXml,
-      parametersXml,
-      bandsXml,
-      parameterPanelXml,
-      '</XtraReportsLayoutSerializer>'
-    ].join('\n');  
   };
 }
 
