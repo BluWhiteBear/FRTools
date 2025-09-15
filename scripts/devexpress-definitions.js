@@ -1,6 +1,59 @@
 export const DevExpressDefinitions = {
+    
+    // Component Property Definitions:
+    /*
+        === Text & Label ===
+        controlType: The DevExpress control type to use (e.g., XRLabel, XRCheckBox)
+        requiresLabel: Whether a separate label component is needed above the field component
+        useContentAsText: For HTML elements, use the content property as the Text attribute
+        useTextAsLabel: For checkboxes, use the Text attribute as the label
+        TextAlignment: Standard text alignment options (MiddleLeft, MiddleCenter, etc.)
+        Font: Standard font format 'FontName, Sizept, style=Style'
+        Multiline: Whether text can span multiple lines
+        AllowMarkupText: Whether HTML/markup content is allowed in text
+
+        === Sizing & Layout ===
+        defaultHeight: Default height in pixels for the component
+        calculateHeight: For containers, function to calculate height based on children and spacing
+        Padding: Standard padding format 'left,top,right,bottom,dpi'
+        AnchorHorizontal: For tables, how the table anchors horizontally (Left, Right, Both)
+        AnchorVertical: For tables, how the table anchors vertically (Top, Bottom, Both)
+        Weight: For table rows/cells, relative weight for sizing (0.5 = Equal Width Columns)
+        CanShrink: Whether container can shrink to fit content
+        SizeF: Size format for components
+        LocationFloat: Position coordinates
+
+        === Appearance ===
+        Borders: Standard border options (None, Bottom, All, etc.)
+        GlyphOptions: For checkboxes, options for the checkbox glyph
+            Size: For glyphs, size in pixels 'width,height'
+        Sizing: For images, how to size the content (e.g., ZoomImage)
+
+        === Data & Expressions ===
+        attributes: Default attributes to apply to the component
+        expression: Function to generate the ExpressionBindings for data fields
+
+        === Table/Container Specific ===
+        rowAttributes: For tables, default attributes for rows
+        cellAttributes: For tables, default attributes for cells
+    */
+    
+    
     // Base component types and their DevExpress equivalents
     componentTypes: {
+        htmlelement: {
+            controlType: 'XRLabel',
+            defaultHeight: 25,
+            requiresLabel: false,
+            attributes: {
+                TextAlignment: 'TopLeft',
+                Borders: 'None',
+                Padding: '2,2,0,0,100',
+                Multiline: 'false',
+                AllowMarkupText: 'true'
+            },
+            useContentAsText: true
+        },
         textfield: {
             controlType: 'XRLabel',
             defaultHeight: 25,
@@ -38,14 +91,14 @@ export const DevExpressDefinitions = {
         checkbox: {
             controlType: 'XRCheckBox',
             defaultHeight: 25,
-            requiresLabel: false,  // Label is handled in Text property
+            requiresLabel: false,
             attributes: {
                 Padding: '2,2,0,0,100',
                 GlyphOptions: {
                     Size: '13,13'
                 }
             },
-            useTextAsLabel: true,  // Special flag to indicate label goes in Text property
+            useTextAsLabel: true,
             expression: (key) => `IIF(ISNULL([${key}], False), False, ToBoolean([${key}]))`
         },
         select: {
@@ -103,7 +156,6 @@ export const DevExpressDefinitions = {
                 Padding: '2,2,0,0,100'
             },
             calculateHeight: (components, spacing) => {
-                // Base height plus spacing for each component
                 return components.reduce((total, comp) => 
                     total + (comp.defaultHeight || 25) + spacing, 0);
             }
@@ -116,7 +168,6 @@ export const DevExpressDefinitions = {
                 Padding: '2,2,0,0,100'
             },
             calculateHeight: (components, spacing) => {
-                // Similar to fieldset
                 return components.reduce((total, comp) => 
                     total + (comp.defaultHeight || 25) + spacing, 0);
             }
@@ -135,7 +186,7 @@ export const DevExpressDefinitions = {
                 Padding: '8,8,8,8,96',
                 Borders: 'None',
                 TextAlignment: 'TopLeft',
-                Weight: '0.5'  // Default to equal width columns
+                Weight: '0.5'
             }
         },
         table: {

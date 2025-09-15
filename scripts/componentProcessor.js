@@ -193,11 +193,16 @@ export class ComponentProcessor {
 
         // For components that use the label in the Text property (like checkboxes)
         if (def.useTextAsLabel && component.label) {
-            node.attributes.Text = component.label;
+            node.attributes.Text = this.xmlProcessor.escapeText(component.label);
+        }
+        // For components that use content as Text (like HTML elements)
+        else if (def.useContentAsText && component.content) {
+            // Preserve HTML content but escape special XML characters
+            node.attributes.Text = this.xmlProcessor.escapeText(component.content);
         }
 
-        // Add expression binding for the component's value
-        if (component.key) {
+        // Add expression binding for the component's value (skip for HTML elements)
+        if (component.key && !def.useContentAsText) {
             const expressionBindings = this.xmlProcessor.createExpressionBindings({
                 eventName: 'BeforePrint',
                 propertyName: def.controlType === 'XRCheckBox' ? 'CheckBoxState' : 'Text',

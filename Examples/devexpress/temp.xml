@@ -3,7 +3,7 @@
     Ref="0"
     ControlType="DevExpress.XtraReports.UI.XtraReport, DevExpress.XtraReports.v23.2, Version=23.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a"
     Name="Report"
-    DisplayName="FormIO2DevExpressTest;FormIO2DevExpressTest;false;false;00000000-0000-0000-0000-000000000000;00000000-0000-0000-0000-000000000000"
+    DisplayName="FormIO2DevExpressTestForm1;FormIO2DevExpressTestForm1;false;false;00000000-0000-0000-0000-000000000000;00000000-0000-0000-0000-000000000000"
     Margins="40, 40, 40, 40"
     PageWidth="850"
     PageHeight="1100"
@@ -35,7 +35,7 @@
                     Ref="7"
                     ControlType="XRLabel"
                     Name="headerLabel"
-                    Text="FormIO2DevExpressTest"
+                    Text="FormIO2DevExpressTestForm1"
                     TextAlignment="MiddleCenter"
                     SizeF="769.987,30"
                     LocationFloat="0,0"
@@ -108,7 +108,7 @@
                     ControlType="XRLabel"
                     Name="txtaUnnestedField3"
                     Multiline="true"
-                    TextAlignment="TopLeft"
+                    TextAlignment="BottomLeft"
                     SizeF="650,50"
                     LocationFloat="0,201"
                     Padding="2,2,0,0,100"
@@ -169,7 +169,7 @@
                             ControlType="XRLabel"
                             Name="txtaFieldsetField2"
                             Multiline="true"
-                            TextAlignment="TopLeft"
+                            TextAlignment="BottomLeft"
                             SizeF="630,50"
                             LocationFloat="10,83"
                             Padding="2,2,0,0,100"
@@ -192,14 +192,10 @@
                                 ><Item1
                                     Ref="27"
                                     EventName="BeforePrint"
-                                    PropertyName="CheckState"
-                                    Expression="[chkFieldsetField3]" /><Item2
-                                    Ref="28"
-                                    EventName="BeforePrint"
                                     PropertyName="CheckBoxState"
-                                    Expression="[testAPIKey]" /></ExpressionBindings></Item5></Controls></Item7
+                                    Expression="[chkFieldsetField3]" /></ExpressionBindings></Item5></Controls></Item7
                 ><Item8
-                    Ref="29"
+                    Ref="28"
                     ControlType="XRPanel"
                     Name="panel"
                     CanShrink="true"
@@ -209,7 +205,7 @@
                     Borders="None"
                     ><Controls
                         ><Item1
-                            Ref="30"
+                            Ref="29"
                             ControlType="XRLabel"
                             Name="label_txtPanelField1"
                             Text="Panel Field 1"
@@ -219,7 +215,7 @@
                             Font="Times New Roman, 9.75pt, style=Bold"
                             Padding="2,2,0,0,100"
                             Borders="None" /><Item2
-                            Ref="31"
+                            Ref="30"
                             ControlType="XRLabel"
                             Name="txtPanelField1"
                             TextAlignment="MiddleLeft"
@@ -229,12 +225,12 @@
                             Borders="Bottom"
                             ><ExpressionBindings
                                 ><Item1
-                                    Ref="32"
+                                    Ref="31"
                                     EventName="BeforePrint"
                                     PropertyName="Text"
                                     Expression="[txtPanelField1]" /></ExpressionBindings></Item2
                         ><Item3
-                            Ref="33"
+                            Ref="32"
                             ControlType="XRLabel"
                             Name="label_cmbPanelField2"
                             Text="Panel Field 2"
@@ -244,7 +240,7 @@
                             Font="Times New Roman, 9.75pt, style=Bold"
                             Padding="2,2,0,0,100"
                             Borders="None" /><Item4
-                            Ref="34"
+                            Ref="33"
                             ControlType="XRLabel"
                             Name="cmbPanelField2"
                             TextAlignment="MiddleLeft"
@@ -254,12 +250,12 @@
                             Borders="Bottom"
                             ><ExpressionBindings
                                 ><Item1
-                                    Ref="35"
+                                    Ref="34"
                                     EventName="BeforePrint"
                                     PropertyName="Text"
                                     Expression="[cmbPanelField2]" /></ExpressionBindings></Item4></Controls></Item8
                 ><Item9
-                    Ref="36"
+                    Ref="35"
                     ControlType="XRTable"
                     Name="columns"
                     KeepTogether="true"
@@ -270,124 +266,145 @@
                     Padding="0,0,0,0,96"
                     ><Rows
                         ><Item1
-                            Ref="37"
+                            Ref="36"
                             ControlType="XRTableRow"
-                            Name="columnsRow_1757103101817"
+                            Name="columnsRow_1757967740648"
                             Weight="0.18699186991869918"
                             ><Cells
                                 ><Item1
-                                    Ref="38"
+                                    Ref="37"
                                     ControlType="XRTableCell"
                                     Name="column_1"
                                     Weight="0.5"
                                     TextAlignment="TopLeft"
                                     Padding="8,8,8,8,96"
-                                    Borders="All"
+                                    Borders="None"
                                     ><Controls
                                         ><Item1
-                                            Ref="39"
+                                            Ref="38"
                                             ControlType="XRLabel"
                                             Name="label_txtColumn1Field1"
                                             Text="Column 1 Field 1"
                                             TextAlignment="MiddleLeft"
-                                            SizeF="309,25"
+                                            SizeF="200.666672,25"
                                             LocationFloat="8,0"
                                             Font="Times New Roman, 9.75pt, style=Bold"
                                             Padding="2,2,0,0,100"
                                             Borders="None" /><Item2
-                                            Ref="40"
+                                            Ref="39"
                                             ControlType="XRLabel"
                                             Name="txtColumn1Field1"
                                             TextAlignment="MiddleLeft"
-                                            SizeF="309,25"
+                                            SizeF="200.666672,25"
                                             LocationFloat="8,25"
                                             Padding="2,2,0,0,100"
                                             Borders="Bottom"
                                             ><ExpressionBindings
                                                 ><Item1
-                                                    Ref="41"
+                                                    Ref="40"
                                                     EventName="BeforePrint"
                                                     PropertyName="Text"
                                                     Expression="[txtColumn1Field1]" /></ExpressionBindings></Item2
                                         ><Item3
-                                            Ref="42"
+                                            Ref="41"
                                             ControlType="XRLabel"
                                             Name="label_txtColumn1Field2"
                                             Text="Column 1 Field 2"
                                             TextAlignment="MiddleLeft"
-                                            SizeF="309,25"
+                                            SizeF="200.666672,25"
                                             LocationFloat="8,58"
                                             Font="Times New Roman, 9.75pt, style=Bold"
                                             Padding="2,2,0,0,100"
                                             Borders="None" /><Item4
-                                            Ref="43"
+                                            Ref="42"
                                             ControlType="XRLabel"
                                             Name="txtColumn1Field2"
                                             TextAlignment="MiddleLeft"
-                                            SizeF="309,25"
+                                            SizeF="200.666672,25"
                                             LocationFloat="8,83"
                                             Padding="2,2,0,0,100"
                                             Borders="Bottom"
                                             ><ExpressionBindings
                                                 ><Item1
-                                                    Ref="44"
+                                                    Ref="43"
                                                     EventName="BeforePrint"
                                                     PropertyName="Text"
                                                     Expression="[txtColumn1Field2]" /></ExpressionBindings></Item4></Controls></Item1
                                 ><Item2
-                                    Ref="45"
+                                    Ref="44"
                                     ControlType="XRTableCell"
                                     Name="column_2"
                                     Weight="0.5"
                                     TextAlignment="TopLeft"
                                     Padding="8,8,8,8,96"
-                                    Borders="All"
+                                    Borders="None"
                                     ><Controls
                                         ><Item1
-                                            Ref="46"
+                                            Ref="45"
                                             ControlType="XRLabel"
                                             Name="label_txtColumn2Field1"
                                             Text="Column 2 Field 1"
                                             TextAlignment="MiddleLeft"
-                                            SizeF="309,25"
+                                            SizeF="200.666672,25"
                                             LocationFloat="8,0"
                                             Font="Times New Roman, 9.75pt, style=Bold"
                                             Padding="2,2,0,0,100"
                                             Borders="None" /><Item2
-                                            Ref="47"
+                                            Ref="46"
                                             ControlType="XRLabel"
                                             Name="txtColumn2Field1"
                                             TextAlignment="MiddleLeft"
-                                            SizeF="309,25"
+                                            SizeF="200.666672,25"
                                             LocationFloat="8,25"
                                             Padding="2,2,0,0,100"
                                             Borders="Bottom"
                                             ><ExpressionBindings
                                                 ><Item1
-                                                    Ref="48"
+                                                    Ref="47"
                                                     EventName="BeforePrint"
                                                     PropertyName="Text"
                                                     Expression="[txtColumn2Field1]" /></ExpressionBindings></Item2
                                         ><Item3
-                                            Ref="49"
+                                            Ref="48"
                                             ControlType="XRCheckBox"
                                             Name="chkColumn2Field2"
                                             Text="Column 2 Field 2"
-                                            SizeF="309,25"
+                                            SizeF="200.666672,25"
                                             LocationFloat="8,58"
                                             Padding="2,2,0,0,100"
                                             ><GlyphOptions
-                                                Ref="50"
+                                                Ref="49"
                                                 Size="13,13" /><ExpressionBindings
                                                 ><Item1
-                                                    Ref="51"
+                                                    Ref="50"
                                                     EventName="BeforePrint"
-                                                    PropertyName="CheckState"
-                                                    Expression="[chkColumn2Field2]" /></ExpressionBindings></Item3></Controls></Item2></Cells></Item1></Rows></Item9></Controls></Item3
-        ><Item4 Ref="52" ControlType="BottomMarginBand" Name="BottomMargin" HeightF="40" /></Bands
+                                                    PropertyName="CheckBoxState"
+                                                    Expression="[chkColumn2Field2]" /></ExpressionBindings></Item3></Controls></Item2
+                                ><Item3
+                                    Ref="51"
+                                    ControlType="XRTableCell"
+                                    Name="column_3"
+                                    Weight="0.5"
+                                    TextAlignment="TopLeft"
+                                    Padding="8,8,8,8,96"
+                                    Borders="None"
+                                    ><Controls
+                                        ><Item1
+                                            Ref="52"
+                                            ControlType="XRLabel"
+                                            Name="htmlTestElement"
+                                            Multiline="true"
+                                            AllowMarkupText="true"
+                                            Text="<b>TEST HTML ELEMENT</b>"
+                                            TextAlignment="TopLeft"
+                                            SizeF="200.666672,25"
+                                            LocationFloat="8,0"
+                                            Padding="2,2,0,0,100"
+                                            Borders="None" /></Controls></Item3></Cells></Item1></Rows></Item9></Controls></Item3
+        ><Item4 Ref="53" ControlType="BottomMarginBand" Name="BottomMargin" HeightF="40" /></Bands
     ><ParameterPanelLayoutItems
-        ><Item1 Ref="53" LayoutItemType="Parameter" Parameter="#Ref-3" /><Item2
-            Ref="54"
+        ><Item1 Ref="54" LayoutItemType="Parameter" Parameter="#Ref-3" /><Item2
+            Ref="55"
             LayoutItemType="Parameter"
             Parameter="#Ref-4" /></ParameterPanelLayoutItems
 ></XtraReportsLayoutSerializer>

@@ -37,6 +37,16 @@ class XMLProcessor {
         this.currentItemNum = 0;
     }
 
+    escapeText(text) {
+        if (!text) return '';
+        return text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&apos;');
+    }
+
     reset() {
         this.currentRef = 0;
         this.currentItemNum = 0;
