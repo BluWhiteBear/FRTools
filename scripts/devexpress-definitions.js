@@ -1,4 +1,45 @@
 export const DevExpressDefinitions = {
+
+    // Component Support Status:
+    /*
+        === Basic Fields ===
+        textfield: Single-line text input | FULLY SUPPORTED
+        textarea: Multi-line text input | FULLY SUPPORTED
+        number: Numeric input | FULLY SUPPORTED
+        checkbox: Boolean input | FULLY SUPPORTED
+        select: Dropdown/Select/Combobox input | FULLY SUPPORTED
+        radio: Radio button group input | FULLY SUPPORTED
+
+        === Advanced Fields ===
+        Nested Form: Subform/nested form input | PARTIALLY SUPPORTED
+        Email: Email input | FULLY SUPPORTED
+        URL: URL input | FULLY SUPPORTED
+        Phone Number: Phone number input | FULLY SUPPORTED
+        Address: Address input | FULLY SUPPORTED
+        Date/Time: Date/time picker input | FULLY SUPPORTED
+        Day: Date input | NOT SUPPORTED
+        Time: Time input | NOT SUPPORTED
+        Signature: Signature input | PARTIALLY SUPPORTED
+
+        === Layout Components ===
+        HTML Element: Static HTML content | FULLY SUPPORTED
+        Content: Static text content | NOT SUPPORTED
+        Columns: Multi-column layout | FULLY SUPPORTED
+        Fieldset: Grouping container | FULLY SUPPORTED
+        Panel: Collapsible/expandable container | FULLY SUPPORTED
+        Table: Tabular layout | FULLY SUPPORTED
+        Tabs: Tabbed container | FULLY SUPPORTED
+        Well: Simple container with border | FULLY SUPPORTED
+
+        === Data Components ===
+        Form Grid: Grid of Dialog forms | NOT SUPPORTED
+        Hidden: ???? | NOT SUPPORTED
+        Container: ???? | NOT SUPPORTED
+        Data Map: ???? | NOT SUPPORTED
+        Data Grid: Grid of data from external table | NOT SUPPORTED
+        Edit Grid: ???? | NOT SUPPORTED
+        Tree: ???? | NOT SUPPORTED
+    */
     
     // Component Property Definitions:
     /*
@@ -41,6 +82,16 @@ export const DevExpressDefinitions = {
     
     // Base component types and their DevExpress equivalents
     componentTypes: {
+        nestedsubform: {
+            controlType: 'XRSubreport',
+            defaultHeight: 50,
+            requiresLabel: true,
+            attributes: {
+                ReportSourceId: "0",
+                SizeF: "650,50",
+                GenerateOwnPages: "true"
+            }
+        },
         htmlelement: {
             controlType: 'XRLabel',
             defaultHeight: 25,
@@ -54,6 +105,19 @@ export const DevExpressDefinitions = {
             },
             useContentAsText: true
         },
+        content: {
+            controlType: 'XRLabel',
+            defaultHeight: 25,
+            requiresLabel: false,
+            attributes: {
+                TextAlignment: 'TopLeft',
+                Borders: 'None',
+                Padding: '2,2,0,0,100',
+                Multiline: 'false',
+                AllowMarkupText: 'true'
+            },
+            useHtmlAsText: true
+        },
         textfield: {
             controlType: 'XRLabel',
             defaultHeight: 25,
@@ -62,8 +126,7 @@ export const DevExpressDefinitions = {
                 TextAlignment: 'MiddleLeft',
                 Borders: 'Bottom',
                 Padding: '2,2,0,0,100'
-            },
-            expression: (key) => `Iif(IsNullOrEmpty([${key}]), '', ToString([${key}]))`
+            }
         },
         textarea: {
             controlType: 'XRLabel',
@@ -74,19 +137,17 @@ export const DevExpressDefinitions = {
                 Multiline: 'true',
                 Borders: 'Bottom',
                 Padding: '2,2,0,0,100'
-            },
-            expression: (key) => `Iif(IsNullOrEmpty([${key}]), '', ToString([${key}]))`
+            }
         },
         number: {
             controlType: 'XRLabel',
             defaultHeight: 25,
             requiresLabel: true,
             attributes: {
-                TextAlignment: 'MiddleRight',
+                TextAlignment: 'MiddleLeft',
                 Borders: 'Bottom',
                 Padding: '2,2,0,0,100'
-            },
-            expression: (key) => `Iif(IsNullOrEmpty([${key}]), '', ToString([${key}]))`
+            }
         },
         checkbox: {
             controlType: 'XRCheckBox',
@@ -99,7 +160,7 @@ export const DevExpressDefinitions = {
                 }
             },
             useTextAsLabel: true,
-            expression: (key) => `IIF(ISNULL([${key}], False), False, ToBoolean([${key}]))`
+            expression: (key) => `IIF([${key}] == 'true', True, False)`
         },
         select: {
             controlType: 'XRLabel',
@@ -110,18 +171,31 @@ export const DevExpressDefinitions = {
                 Borders: 'Bottom',
                 Padding: '2,2,0,0,100'
             },
-            expression: (key) => `Iif(IsNullOrEmpty([${key}]), '', ToString([${key}]))`
+            expression: (key) => `[${key}]`
         },
         radio: {
-            controlType: 'XRLabel',
+            controlType: 'XRPanel',
             defaultHeight: 25,
             requiresLabel: true,
+            calculateHeight: (options) => options.values.length * 25,
             attributes: {
                 TextAlignment: 'MiddleLeft',
-                Borders: 'Bottom',
-                Padding: '2,2,0,0,100'
+                Padding: '2,2,0,0,100',
+                CanShrink: 'true'
             },
-            expression: (key) => `Iif(IsNullOrEmpty([${key}]), '', ToString([${key}]))`
+            child: {
+                controlType: 'XRCheckBox',
+                defaultHeight: 25,
+                requiresLabel: false,
+                attributes: {
+                    Padding: '2,2,0,0,100',
+                    GlyphOptions: {
+                        Size: '13,13'
+                    }
+                },
+                useTextAsLabel: true,
+                expressionTransform: (key, value) => `IIF([${key}] == '${value}', True, False)`
+            }
         },
         datetime: {
             controlType: 'XRLabel',
@@ -132,7 +206,7 @@ export const DevExpressDefinitions = {
                 Borders: 'Bottom',
                 Padding: '2,2,0,0,100'
             },
-            expression: (key) => `FormatDateTime(ToDateTime([${key}]), 'g')`
+            expression: (key) => `FormatString('{0:MM/dd/yyyy hh:mm tt}', [${key}])`
         },
         signature: {
             controlType: 'XRPictureBox',
@@ -140,6 +214,51 @@ export const DevExpressDefinitions = {
             requiresLabel: true,
             attributes: {
                 Sizing: 'ZoomImage',
+                Padding: '2,2,0,0,100'
+            },
+            expression: (key) => `[${key}]`
+        },
+        email: {
+            controlType: 'XRLabel',
+            defaultHeight: 25,
+            requiresLabel: true,
+            attributes: {
+                TextAlignment: 'MiddleLeft',
+                Borders: 'Bottom',
+                Padding: '2,2,0,0,100'
+            },
+            expression: (key) => `[${key}]`
+        },
+        url: {
+            controlType: 'XRLabel',
+            defaultHeight: 25,
+            requiresLabel: true,
+            attributes: {
+                TextAlignment: 'MiddleLeft',
+                Borders: 'Bottom',
+                Padding: '2,2,0,0,100'
+            },
+            expression: (key) => `[${key}]`
+        },
+        phoneNumber: {
+            controlType: 'XRLabel',
+            defaultHeight: 25,
+            requiresLabel: true,
+            attributes: {
+                TextAlignment: 'MiddleLeft',
+                Borders: 'Bottom',
+                Padding: '2,2,0,0,100'
+            },
+            expression: (key) => `[${key}]`
+        },
+        address: {
+            controlType: 'XRLabel',
+            defaultHeight: 50,
+            requiresLabel: true,
+            attributes: {
+                TextAlignment: 'BottomLeft',
+                Multiline: 'true',
+                Borders: 'Bottom',
                 Padding: '2,2,0,0,100'
             },
             expression: (key) => `[${key}]`
@@ -170,6 +289,36 @@ export const DevExpressDefinitions = {
             calculateHeight: (components, spacing) => {
                 return components.reduce((total, comp) => 
                     total + (comp.defaultHeight || 25) + spacing, 0);
+            }
+        },
+        well: {
+            controlType: 'XRPanel',
+            attributes: {
+                CanShrink: 'true',
+                Borders: 'All',
+                BorderWidth: '1',
+                Padding: '10,10,10,10,100'  // Extra padding to account for border
+            },
+            calculateHeight: (components, spacing) => {
+                return components.reduce((total, comp) => 
+                    total + (comp.defaultHeight || 25) + spacing, 0);
+            }
+        },
+        tabs: {
+            controlType: 'XRPanel',
+            attributes: {
+                CanShrink: 'true',
+                Borders: 'None',
+                Padding: '2,2,0,0,100'
+            },
+            calculateHeight: (components, spacing) => {
+                // For tabs, we sum up the height of each tab's components
+                // Each tab gets spacing between it and the next
+                return components.reduce((total, tabComponents) => {
+                    const tabHeight = tabComponents.reduce((tabTotal, comp) => 
+                        tabTotal + (comp.defaultHeight || 25) + spacing, 0);
+                    return total + tabHeight + spacing;
+                }, 0);
             }
         },
         columns: {
@@ -248,8 +397,26 @@ export const DevExpressDefinitions = {
 export const DevExpressHelpers = {
     // Get component definition with fallback to default
     getComponentDef(type) {
-        return DevExpressDefinitions.componentTypes[type] || 
-               DevExpressDefinitions.componentTypes.textfield;
+        const def = DevExpressDefinitions.componentTypes[type];
+        if (!def) {
+            // Add warning about unhandled component type
+            const DevExpressConverter = window.DevExpressConverter;
+            if (DevExpressConverter && DevExpressConverter.state) {
+                const component = window.currentComponent || {};
+                DevExpressConverter.state.warnings = DevExpressConverter.state.warnings || [];
+                DevExpressConverter.state.warnings.push({
+                    type: 'unhandled_component',
+                    message: `Component type '${type}' is not explicitly supported. Using default textfield rendering.`,
+                    component: {
+                        type: type,
+                        key: component.key || '[unknown]',
+                        label: component.label || '[unknown]'
+                    }
+                });
+            }
+            return DevExpressDefinitions.componentTypes.textfield;
+        }
+        return def;
     },
 
     // Get container definition

@@ -4,6 +4,37 @@ export class ComponentProcessor {
     constructor(xmlProcessor) {
         this.xmlProcessor = xmlProcessor;
         this.currentY = 0;
+
+        // Create measurement div for HTML content
+        this.measureDiv = document.createElement('div');
+        this.measureDiv.style.position = 'absolute';
+        this.measureDiv.style.visibility = 'hidden';
+        this.measureDiv.style.fontFamily = 'Times New Roman';
+        this.measureDiv.style.fontSize = '9.75pt';
+        document.body.appendChild(this.measureDiv);
+    }
+
+    isHidden(component) {
+        // Check if component or any of its parents are hidden
+        if (!component) return false;
+        if (component.hidden === true) return true;
+        return false;
+    }
+
+    calculateHtmlHeight(content, width) {
+        // Set width and reset height
+        this.measureDiv.style.width = `${width}px`;
+        this.measureDiv.style.height = 'auto';
+        
+        // Set content and calculate height
+        this.measureDiv.innerHTML = content;
+        const height = Math.ceil(this.measureDiv.offsetHeight);
+        
+        // Clear content
+        this.measureDiv.innerHTML = '';
+        
+        // Return height with some padding for safety
+        return Math.max(25, height + 10);
     }
 
     // Main entry point for processing components
@@ -13,6 +44,13 @@ export class ComponentProcessor {
         const processedNodes = [];
         
         components.forEach(component => {
+            // Skip hidden components
+            if (this.isHidden(component)) {
+                // Skip this component but increment item counter to maintain sequence
+                this.xmlProcessor.currentItemNum++;
+                return;
+            }
+            
             const nodes = this.processComponent(component, containerWidth, xOffset);
             processedNodes.push(...nodes);
         });
@@ -21,17 +59,47 @@ export class ComponentProcessor {
     }
 
     processComponent(component, containerWidth, xOffset) {
+        // Pass component info to getComponentDef through the window object
+        window.currentComponent = component;
         const def = DevExpressHelpers.getComponentDef(component.type);
+        window.currentComponent = null;
         const nodes = [];
 
         switch(component.type) {
+            case 'nestedsubform':
+                // Save current item number state
+                const savedItemNum = this.xmlProcessor.currentItemNum;
+
+                // Handle nested subform
+                if (def.requiresLabel) {
+                    nodes.push(this.createLabelNode(component, containerWidth, xOffset));
+                    this.currentY += 25; // Label height
+                }
+
+                // Process the subreport itself
+                nodes.push(this.createSubReportNode(component, containerWidth, xOffset));
+                this.currentY += def.defaultHeight + DevExpressDefinitions.commonAttributes.spacing.componentSpacing;
+
+                // Restore item number state
+                this.xmlProcessor.currentItemNum = savedItemNum + 1; // +1 for the subreport itself
+                break;
+
             case 'panel':
             case 'fieldset':
+            case 'well':
                 nodes.push(...this.processContainer(component, containerWidth, xOffset));
                 break;
             
             case 'columns':
                 nodes.push(...this.processColumns(component, containerWidth, xOffset));
+                break;
+
+            case 'table':
+                nodes.push(...this.processTable(component, containerWidth, xOffset));
+                break;
+
+            case 'tabs':
+                nodes.push(...this.processTabs(component, containerWidth, xOffset));
                 break;
                 
             default:
@@ -40,14 +108,30 @@ export class ComponentProcessor {
                     nodes.push(this.createLabelNode(component, containerWidth, xOffset));
                     this.currentY += 25; // Label height
                 }
+                
+                // Calculate component height before creating node
+                let componentHeight = def.defaultHeight;
+                if (component.type === 'htmlelement' && component.content) {
+                    componentHeight = this.calculateHtmlHeight(component.content, containerWidth);
+                } else if (component.type === 'radio' && def.calculateHeight) {
+                    componentHeight = def.calculateHeight(component);
+                }
+
                 nodes.push(this.createValueNode(component, containerWidth, xOffset));
-                this.currentY += def.defaultHeight + DevExpressDefinitions.commonAttributes.spacing.componentSpacing;
+                this.currentY += componentHeight + DevExpressDefinitions.commonAttributes.spacing.componentSpacing;
         }
 
         return nodes;
     }
 
     processContainer(component, containerWidth, xOffset) {
+        // Skip if container is hidden
+        if (this.isHidden(component)) {
+            // Increment item counter but return empty array
+            this.xmlProcessor.currentItemNum++;
+            return [];
+        }
+
         const nodes = [];
         const containerDef = DevExpressHelpers.getContainerDef(component.type);
         const containerNode = this.xmlProcessor.createItemNode(undefined, containerDef.controlType, {
@@ -96,8 +180,18 @@ export class ComponentProcessor {
     }
 
     processColumns(component, containerWidth, xOffset) {
+        // Skip if columns component is hidden
+        if (this.isHidden(component)) {
+            this.xmlProcessor.currentItemNum++;
+            return [];
+        }
+
         const nodes = [];
         const columnDef = DevExpressHelpers.getContainerDef('columns');
+        
+        // Filter out hidden columns and adjust width calculation
+        const visibleColumns = component.columns.filter(col => !this.isHidden(col));
+        const columnWidth = containerWidth / (visibleColumns.length || 1);
         
         // Create table node
         const tableNode = this.xmlProcessor.createItemNode(undefined, 'XRTable', {
@@ -131,15 +225,22 @@ export class ComponentProcessor {
         // Reset item numbering for cells
         this.xmlProcessor.currentItemNum = 0;
 
-        // Process each column
-        const columnWidth = containerWidth / component.columns.length;
+        // Process only visible columns
+        let visibleIndex = 0;
         component.columns.forEach((col, index) => {
+            // Skip hidden columns but maintain item numbering
+            if (this.isHidden(col)) {
+                this.xmlProcessor.currentItemNum++;
+                return;
+            }
+
             // Create cell with explicit item number (Item1, Item2, etc.)
-            const cellNode = this.xmlProcessor.createItemNode(index + 1, 'XRTableCell', {
+            const cellNode = this.xmlProcessor.createItemNode(visibleIndex + 1, 'XRTableCell', {
                 Name: `column_${index + 1}`,
-                Weight: (1 / component.columns.length).toString(), // Equal width distribution
+                Weight: (1 / visibleColumns.length).toString(), // Equal width distribution for visible columns
                 ...columnDef.cellAttributes
             });
+            visibleIndex++;
 
             // Process components within the column
             if (col.components) {
@@ -184,10 +285,22 @@ export class ComponentProcessor {
 
     createValueNode(component, width, xOffset) {
         const def = DevExpressHelpers.getComponentDef(component.type);
+        let componentHeight = def.defaultHeight;
+
+        // For radio buttons, create a panel containing multiple checkboxes
+        if (component.type === 'radio') {
+            return this.createRadioButtonsNode(component, width, xOffset, def);
+        }
+
+        // For HTML elements, calculate height based on content
+        if (component.type === 'htmlelement' && component.content) {
+            componentHeight = this.calculateHtmlHeight(component.content, width);
+        }
+
         const node = this.xmlProcessor.createItemNode(undefined, def.controlType, {
             Name: component.key || `field${Date.now()}`,
             ...def.attributes,
-            SizeF: `${width},${def.defaultHeight}`,
+            SizeF: `${width},${componentHeight}`,
             LocationFloat: `${xOffset},${this.currentY}`
         });
 
@@ -197,16 +310,21 @@ export class ComponentProcessor {
         }
         // For components that use content as Text (like HTML elements)
         else if (def.useContentAsText && component.content) {
-            // Preserve HTML content but escape special XML characters
-            node.attributes.Text = this.xmlProcessor.escapeText(component.content);
+            // Use special HTML escaping for HTML content to preserve tags
+            node.attributes.Text = this.xmlProcessor.escapeHtml(component.content);
+        }
+        // For Form.io content components that use the html property
+        else if (def.useHtmlAsText && component.html) {
+            // Use special HTML escaping for HTML content to preserve tags
+            node.attributes.Text = this.xmlProcessor.escapeHtml(component.html);
         }
 
-        // Add expression binding for the component's value (skip for HTML elements)
-        if (component.key && !def.useContentAsText) {
+        // Add expression binding for the component's value (skip for HTML and content elements)
+        if (component.key && !def.useContentAsText && !def.useHtmlAsText) {
             const expressionBindings = this.xmlProcessor.createExpressionBindings({
                 eventName: 'BeforePrint',
                 propertyName: def.controlType === 'XRCheckBox' ? 'CheckBoxState' : 'Text',
-                expression: `[${component.key}]`
+                expression: def.expression ? def.expression(component.key) : `[${component.key}]`
             });
             node.addChild(expressionBindings);
         }
@@ -216,32 +334,355 @@ export class ComponentProcessor {
 
     calculateContainerHeight(container) {
         let height = 0;
+        
+        // Add label height if container has a label
         if (container.label) {
             height += 25; // Label height
         }
+        
+        // Calculate height of visible components only
         if (container.components) {
+            const containerWidth = 650 - 20; // Standard width minus padding
             height += container.components.reduce((total, comp) => {
+                // Skip hidden components in height calculation
+                if (this.isHidden(comp)) {
+                    return total;
+                }
+
                 const def = DevExpressHelpers.getComponentDef(comp.type);
-                return total + def.defaultHeight + (def.requiresLabel ? 25 : 0) + 
+                let componentHeight = def.defaultHeight;
+                
+                // Calculate special component heights
+                if (comp.type === 'htmlelement' && comp.content) {
+                    componentHeight = this.calculateHtmlHeight(comp.content, containerWidth);
+                } else if (comp.type === 'content' && comp.html) {
+                    componentHeight = this.calculateHtmlHeight(comp.html, containerWidth);
+                } else if (comp.type === 'table' && comp.rows) {
+                    componentHeight = this.calculateTableHeight(comp);
+                } else if (comp.type === 'radio' && def.calculateHeight) {
+                    componentHeight = def.calculateHeight(comp);
+                } else if (comp.type === 'tabs' && comp.components) {
+                    // For tabs, we need to account for each tab's contents plus spacing
+                    componentHeight = comp.components.reduce((tabsHeight, tab) => {
+                        // Calculate height of this tab (including its label if present)
+                        const tabHeight = this.calculateContainerHeight(tab);
+                        // Add spacing between tabs
+                        return tabsHeight + tabHeight + DevExpressDefinitions.commonAttributes.spacing.sectionSpacing;
+                    }, 0);
+                }
+                
+                // Add component height plus label height if needed
+                return total + componentHeight + (def.requiresLabel ? 25 : 0) + 
                        DevExpressDefinitions.commonAttributes.spacing.componentSpacing;
             }, 0);
         }
+        
+        // Add padding at top and bottom of container
         return height + (DevExpressDefinitions.commonAttributes.spacing.sectionSpacing * 2);
+    }
+
+    createSubReportNode(component, width, xOffset) {
+        const def = DevExpressHelpers.getComponentDef('nestedsubform');
+        
+        // Create the subreport node
+        const node = this.xmlProcessor.createItemNode(undefined, def.controlType, {
+            Name: `subreport_${component.key || Date.now()}`,
+            ...def.attributes,
+            SizeF: `${width},${def.defaultHeight}`,
+            LocationFloat: `${xOffset},${this.currentY}`,
+        });
+
+        // Add reference parameter binding for the form GUID
+        const parameterBindings = this.xmlProcessor.buildNode('ParameterBindings', {}, [
+            this.xmlProcessor.buildNode('Item1', {
+                Name: 'FormDataGUID',
+                Parameter: '#Ref-100'  // Reference to the FormDataGUID parameter
+            }),
+            this.xmlProcessor.buildNode('Item2', {
+                Name: 'ObjectGUID',
+                Parameter: '#Ref-101'  // Reference to the ObjectGUID parameter
+            })
+        ]);
+        node.addChild(parameterBindings);
+
+        // Add ReportSourceUrl parameter if provided in form.io definition
+        if (component.formPath) {
+            node.attributes.ReportSourceUrl = component.formPath;
+        }
+
+        return node;
+    }
+
+    createRadioButtonsNode(component, width, xOffset, def) {
+        // Create container panel
+        const node = this.xmlProcessor.createItemNode(undefined, def.controlType, {
+            Name: `radioPanel_${component.key || `field${Date.now()}`}`,
+            ...def.attributes,
+            SizeF: `${width},${def.calculateHeight(component)}`,
+            LocationFloat: `${xOffset},${this.currentY}`
+        });
+
+        // Create Controls container
+        const controlsNode = this.xmlProcessor.buildNode('Controls', {});
+        node.addChild(controlsNode);
+
+        // Save and reset item numbering for the buttons
+        const savedItemNum = this.xmlProcessor.currentItemNum;
+        this.xmlProcessor.currentItemNum = 0;
+
+        // Create a checkbox for each radio option
+        let optionY = 0;
+        if (component.values && Array.isArray(component.values)) {
+            component.values.forEach((option, index) => {
+                const buttonNode = this.xmlProcessor.createItemNode(index + 1, def.child.controlType, {
+                    Name: `radio_${component.key}_${index + 1}`,
+                    ...def.child.attributes,
+                    Text: this.xmlProcessor.escapeText(option.label),
+                    SizeF: `${width},25`,
+                    LocationFloat: `0,${optionY}`
+                });
+
+                // Add expression binding for the checkbox state
+                const expressionBindings = this.xmlProcessor.createExpressionBindings({
+                    eventName: 'BeforePrint',
+                    propertyName: 'CheckBoxState',
+                    expression: def.child.expressionTransform(component.key, option.value)
+                });
+                buttonNode.addChild(expressionBindings);
+
+                controlsNode.addChild(buttonNode);
+                optionY += 25;
+            });
+        }
+
+        // Restore original item number
+        this.xmlProcessor.currentItemNum = savedItemNum;
+
+        return node;
+    }
+
+    processTable(component, containerWidth, xOffset) {
+        // Skip if table is hidden
+        if (this.isHidden(component)) {
+            this.xmlProcessor.currentItemNum++;
+            return [];
+        }
+
+        const nodes = [];
+        const tableDef = DevExpressHelpers.getContainerDef('table');
+        
+        // Create table node
+        const tableNode = this.xmlProcessor.createItemNode(undefined, tableDef.controlType, {
+            Name: component.key || `table${Date.now()}`,
+            ...tableDef.attributes,
+            SizeF: `${containerWidth},${this.calculateTableHeight(component)}`,
+            LocationFloat: `${xOffset},${this.currentY}`
+        });
+
+        // Save current item number state
+        const savedItemNum = this.xmlProcessor.currentItemNum;
+
+        // Create Rows container
+        const rowsNode = this.xmlProcessor.buildNode('Rows', {});
+        tableNode.addChild(rowsNode);
+        
+        // Reset item numbering for rows
+        this.xmlProcessor.currentItemNum = 0;
+
+        // Process each row in the table
+        component.rows.forEach((row, rowIndex) => {
+            // Create row node
+            const rowNode = this.xmlProcessor.createItemNode(rowIndex + 1, 'XRTableRow', {
+                Name: `tableRow_${rowIndex + 1}`,
+                ...tableDef.rowAttributes
+            });
+            rowsNode.addChild(rowNode);
+
+            // Create Cells container
+            const cellsNode = this.xmlProcessor.buildNode('Cells', {});
+            rowNode.addChild(cellsNode);
+
+            // Reset item numbering for cells
+            this.xmlProcessor.currentItemNum = 0;
+
+            // Process each cell in the row
+            row.forEach((cell, colIndex) => {
+                // Create cell node
+                const cellNode = this.xmlProcessor.createItemNode(colIndex + 1, 'XRTableCell', {
+                    Name: `cell_${rowIndex + 1}_${colIndex + 1}`,
+                    ...tableDef.cellAttributes,
+                    Weight: (1 / row.length).toString() // Equal width distribution
+                });
+
+                // Process components within the cell
+                if (cell.components && cell.components.length > 0) {
+                    const controlsNode = this.xmlProcessor.buildNode('Controls', {});
+                    cellNode.addChild(controlsNode);
+
+                    // Reset item numbering for cell contents
+                    this.xmlProcessor.currentItemNum = 0;
+                    
+                    const savedY = this.currentY;
+                    this.currentY = 0; // Reset Y for cell content
+                    
+                    const cellWidth = (containerWidth / row.length) - 16;
+                    const cellNodes = this.processComponents(cell.components, cellWidth, 8);
+                    cellNodes.forEach(node => controlsNode.addChild(node));
+                    
+                    this.currentY = savedY; // Restore Y position
+                }
+
+                cellsNode.addChild(cellNode);
+            });
+        });
+
+        // Restore original item number state
+        this.xmlProcessor.currentItemNum = savedItemNum;
+
+        // Update vertical position
+        this.currentY += this.calculateTableHeight(component) + 
+                        DevExpressDefinitions.commonAttributes.spacing.sectionSpacing;
+        
+        nodes.push(tableNode);
+        return nodes;
+    }
+
+    processTabs(component, containerWidth, xOffset) {
+        // Skip if tabs container is hidden
+        if (this.isHidden(component)) {
+            this.xmlProcessor.currentItemNum++;
+            return [];
+        }
+
+        const nodes = [];
+        const tabsDef = DevExpressHelpers.getContainerDef('tabs');
+
+        // Save and reset item numbering
+        const savedItemNum = this.xmlProcessor.currentItemNum;
+        this.xmlProcessor.currentItemNum = 0;
+
+        // Process each tab as a separate panel
+        component.components.forEach((tab, index) => {
+            // Create panel for this tab
+            const panelNode = this.xmlProcessor.createItemNode(index + 1, tabsDef.controlType, {
+                Name: `tab_${tab.key || index + 1}`,
+                ...tabsDef.attributes,
+                SizeF: `${containerWidth},${this.calculateContainerHeight(tab)}`,
+                LocationFloat: `${xOffset},${this.currentY}`
+            });
+
+            // Create Controls node for the panel
+            const controlsNode = this.xmlProcessor.buildNode('Controls', {});
+            panelNode.addChild(controlsNode);
+
+            // Save current Y position and item number
+            const savedY = this.currentY;
+            const savedPanelItemNum = this.xmlProcessor.currentItemNum;
+
+            // Reset Y position for tab contents
+            this.currentY = 0;
+            this.xmlProcessor.currentItemNum = 0;
+
+            // Add tab label if it exists
+            if (tab.label) {
+                const labelNode = this.createLabelNode({
+                    label: tab.label,
+                    key: `${tab.key || `tab${index + 1}`}_label`
+                }, containerWidth - 10, 5);
+                controlsNode.addChild(labelNode);
+                this.currentY += 25; // Label height
+            }
+
+            // Process components in this tab
+            if (tab.components) {
+                const tabNodes = this.processComponents(tab.components, containerWidth - 20, 10);
+                tabNodes.forEach(node => controlsNode.addChild(node));
+            }
+
+            // Restore item numbering for the panel
+            this.xmlProcessor.currentItemNum = savedPanelItemNum;
+
+            // Update current Y position for next tab
+            this.currentY = savedY + this.calculateContainerHeight(tab) + 
+                          DevExpressDefinitions.commonAttributes.spacing.sectionSpacing;
+
+            nodes.push(panelNode);
+        });
+
+        // Restore original item numbering
+        this.xmlProcessor.currentItemNum = savedItemNum + component.components.length;
+
+        return nodes;
+    }
+
+    calculateTableHeight(tableComponent) {
+        // For tables, we need to calculate the maximum height needed for each row
+        let totalHeight = 0;
+
+        // Calculate each row's height
+        tableComponent.rows.forEach(row => {
+            let rowHeight = 25; // Minimum row height
+
+            // Find the maximum height needed by any cell in this row
+            row.forEach(cell => {
+                if (!cell.components) return;
+
+                let cellHeight = cell.components.reduce((total, comp) => {
+                    if (this.isHidden(comp)) return total;
+
+                    const def = DevExpressHelpers.getComponentDef(comp.type);
+                    let componentHeight = def.defaultHeight;
+                    
+                    if (comp.type === 'htmlelement' && comp.content) {
+                        // Approximate cell width for HTML height calculation
+                        componentHeight = this.calculateHtmlHeight(comp.content, 650 / row.length);
+                    }
+                    
+                    return total + componentHeight + (def.requiresLabel ? 25 : 0) + 
+                           DevExpressDefinitions.commonAttributes.spacing.componentSpacing;
+                }, 0);
+
+                rowHeight = Math.max(rowHeight, cellHeight);
+            });
+
+            totalHeight += rowHeight;
+        });
+
+        // Add padding for top and bottom
+        return totalHeight + (DevExpressDefinitions.commonAttributes.spacing.sectionSpacing * 2);
     }
 
     calculateColumnsHeight(columnsComponent) {
         let maxHeight = 0;
-        columnsComponent.columns.forEach(col => {
+        const visibleColumns = columnsComponent.columns.filter(col => !this.isHidden(col));
+        const columnWidth = (650 - 16) / (visibleColumns.length || 1); // Standard width minus padding, divided by visible column count
+
+        visibleColumns.forEach(col => {
             let colHeight = 0;
             if (col.components) {
                 colHeight = col.components.reduce((total, comp) => {
+                    // Skip hidden components in height calculation
+                    if (this.isHidden(comp)) {
+                        return total;
+                    }
+
                     const def = DevExpressHelpers.getComponentDef(comp.type);
-                    return total + def.defaultHeight + (def.requiresLabel ? 25 : 0) + 
+                    let componentHeight = def.defaultHeight;
+                    
+                    // Calculate actual height for HTML elements
+                    if (comp.type === 'htmlelement' && comp.content) {
+                        componentHeight = this.calculateHtmlHeight(comp.content, columnWidth - 16);
+                    }
+                    
+                    // Add component height plus label height if needed
+                    return total + componentHeight + (def.requiresLabel ? 25 : 0) + 
                            DevExpressDefinitions.commonAttributes.spacing.componentSpacing;
                 }, 0);
             }
             maxHeight = Math.max(maxHeight, colHeight);
         });
+        
+        // Add padding at top and bottom
         return maxHeight + (DevExpressDefinitions.commonAttributes.spacing.sectionSpacing * 2);
     }
 }

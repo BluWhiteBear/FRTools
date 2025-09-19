@@ -1,7 +1,7 @@
 // Constants
 const VERSION_INFO = {
-  version: '0.2.3',
-  updated: '09/05/2025',
+  version: '0.2.4',
+  updated: '09/18/2025',
   devexpressVersion: '23.2.5.0'
 };
 
@@ -15,7 +15,7 @@ const LAYOUT = {
   PAGE_WIDTH: 850,
   PAGE_HEIGHT: 1100,
   LANDSCAPE: false,
-  HEADER_WIDTH: 769.987, // Match the real template's header width
+  HEADER_WIDTH: 769.987,
 };
 
 const TABLE_LAYOUT = {
@@ -30,45 +30,53 @@ const TABLE_LAYOUT = {
 // Core Module: Form to DevExpress Conversion
 class DevExpressConverter {
   static state = {
-    devExpressJson: null // For storing the generated JSON
+    devExpressJson: null, // For storing the generated JSON
+    warnings: [] // For storing conversion warnings
   };
 
   static initialize() {
     this.state.devExpressJson = null;
+    this.state.warnings = []; // Reset warnings
     FieldGenerator.initRefs(); // Reset ref and item counters at start
   }
 
   static COMPONENT_TO_CONTROL_TYPE = {
     textfield: 'XRLabel',
     textarea: 'XRRichText',
-    number: 'XRLabel',
-    password: 'XRLabel',
     checkbox: 'XRCheckBox',
-    selectboxes: 'XRLabel',
     select: 'XRLabel',
     radio: 'XRLabel',
     button: 'XRLabel',
     signature: 'XRPictureBox',
-    file: 'XRLabel',
-    survey: 'XRLabel',
+    fileupload: 'XRLabel',
     columns: 'XRTable',
-    email: 'XRLabel',
-    phoneNumber: 'XRLabel',
     datetime: 'XRLabel',
     day: 'XRLabel',
     time: 'XRLabel',
-    currency: 'XRLabel',
     panel: 'XRPanel',
     table: 'XRTable',
     tabs: 'XRPanel',
     well: 'XRPanel',
     htmlelement: 'XRRichText',
     content: 'XRRichText',
-    qrcode: 'XRBarCode'
   };
 
   static getControlTypeForComponent(component) {
-    return this.COMPONENT_TO_CONTROL_TYPE[component.type] || 'XRLabel';
+    const controlType = this.COMPONENT_TO_CONTROL_TYPE[component.type];
+    if (!controlType) {
+      // Add warning about unhandled component type
+      this.state.warnings.push({
+        type: 'unhandled_component',
+        message: `Component type '${component.type}' is not explicitly supported. Defaulting to XRLabel.`,
+        component: {
+          type: component.type,
+          key: component.key || '[unnamed]',
+          label: component.label || '[unlabeled]'
+        }
+      });
+      return 'XRLabel'; // Fallback component behavior
+    }
+    return controlType;
   }
 
   static getTypeCastedFieldExpression(component) {
@@ -1524,10 +1532,30 @@ const UIHandlers = {
     const conversionInfo = document.getElementById('conversion-info');
     const timestamp = conversionInfo.querySelector('.conversion-timestamp');
     const durationEl = conversionInfo.querySelector('.conversion-duration');
+    const warningsSection = document.getElementById('conversion-warnings');
+    const warningsList = warningsSection.querySelector('ul');
   
     conversionInfo.className = 'alert alert-success mb-4';
     timestamp.textContent = `File converted on ${startDate.toLocaleDateString()} at ${startDate.toLocaleTimeString()} (${timeZoneAbbr})`;
     durationEl.textContent = `Conversion took ${duration.toFixed(2)}ms (${(duration/1000).toFixed(3)} seconds)`;
+    
+    // Handle warnings if any exist
+    if (DevExpressConverter.state.warnings.length > 0) {
+        warningsList.innerHTML = DevExpressConverter.state.warnings.map(warning => {
+            let details = '';
+            if (warning.component) {
+                details = ` (Component: ${warning.component.label} [${warning.component.type}]${warning.component.key !== '[unnamed]' ? `, Key: ${warning.component.key}` : ''})`;
+            }
+            return `<li class="mb-2">
+                <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>
+                ${warning.message}${details}
+            </li>`;
+        }).join('');
+        warningsSection.style.display = 'block';
+    } else {
+        warningsSection.style.display = 'none';
+    }
+
     conversionInfo.style.display = 'block';
   },
 
@@ -1880,15 +1908,17 @@ function generateMinimalXmlTemplate() {
     ]);
 
     const parameters = processor.buildNode('Parameters', {}, [
-      processor.createItemNode(1, undefined, {
+      processor.createItemNode(1, 'Parameter', {
         Description: "FormDataGUID",
-        ValueInfo: "00000000-0000-0000-0000-000000000000",
-        Name: "FormDataGUID"
+        Name: "FormDataGUID",
+        Type: "#Ref-3",
+        ValueInfo: "00000000-0000-0000-0000-000000000000"
       }),
-      processor.createItemNode(2, undefined, {
+      processor.createItemNode(2, 'Parameter', {
         Description: "ObjectGUID",
-        ValueInfo: "00000000-0000-0000-0000-000000000000",
-        Name: "ObjectGUID"
+        Name: "ObjectGUID",
+        Type: "#Ref-3",
+        ValueInfo: "00000000-0000-0000-0000-000000000000"
       })
     ]);
 

@@ -47,9 +47,41 @@ class XMLProcessor {
             .replace(/'/g, '&apos;');
     }
 
+    escapeHtml(text) {
+        if (!text) return '';
+        // Only escape quotes and ampersands, preserve HTML tags
+        return text
+            .replace(/&(?!(?:amp|lt|gt|quot|apos);)/g, '&amp;')  // Escape & but not if it's part of an entity
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&apos;');
+    }
+
     reset() {
         this.currentRef = 0;
         this.currentItemNum = 0;
+    }
+
+    requiresClosingTag(type) {
+        // These elements must always have closing tags in DevExpress XML
+        const requireClosing = [
+            'XtraReportsLayoutSerializer',
+            'Extensions',
+            'Parameters',
+            'Bands',
+            'Controls',
+            'Item1', 'Item2', 'Item3', 'Item4',
+            'TopMarginBand',
+            'PageHeaderBand',
+            'DetailBand',
+            'BottomMarginBand',
+            'XRLabel',
+            'XRPictureBox',
+            'XRRichText',
+            'XRTable',
+            'XRTableRow',
+            'XRTableCell'
+        ];
+        return requireClosing.includes(type);
     }
 
     getNextItemNum() {
@@ -76,25 +108,43 @@ class XMLProcessor {
 
     // Final pass: Convert to XML string with proper formatting
     generateXML(node, indent = 0) {
+        if (!node || !node.type) {
+            console.error('Invalid node:', node);
+            return '';
+        }
+
         const indentStr = '  '.repeat(indent);
         let xml = '';
 
-        // Debug logging for node generation
-        console.log(`Generating XML for node: ${node.type}`, {
-            attributes: node.attributes,
-            childCount: node.children.length,
-            ref: node.attributes.Ref
-        });
+        try {
+            // Opening tag
+            xml += `${indentStr}<${node.type}`;
 
-        // Opening tag
-        xml += `${indentStr}<${node.type}`;
+            // Add attributes
+            Object.entries(node.attributes || {}).forEach(([key, value]) => {
+                if (value !== undefined && value !== null) {
+                    xml += ` ${key}="${this.escapeText(String(value))}"`;
+                }
+            });
 
-        // Add attributes
-        Object.entries(node.attributes).forEach(([key, value]) => {
-            if (value !== undefined) {  // Only add defined attributes
-                xml += ` ${key}="${value}"`;
+            // Handle self-closing vs normal tags
+            if (!this.requiresClosingTag(node.type) && (!node.children || node.children.length === 0)) {
+                xml += ' />\n';
+            } else {
+                xml += '>\n';
+                // Process children
+                (node.children || []).forEach(child => {
+                    const childXml = this.generateXML(child, indent + 1);
+                    xml += childXml;
+                });
+                xml += `${indentStr}</${node.type}>\n`;
             }
-        });
+
+            return xml;
+        } catch (error) {
+            console.error(`Error generating XML for node ${node.type}:`, error);
+            throw error;
+        }
 
         if (node.children.length === 0) {
             xml += ' />\n';
