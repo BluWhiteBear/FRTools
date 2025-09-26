@@ -337,13 +337,14 @@ export class ComponentProcessor {
         
         // Add label height if container has a label
         if (container.label) {
-            height += 25; // Label height
+            height += 25; // Label height plus spacing
+            height += DevExpressDefinitions.commonAttributes.spacing.componentSpacing;
         }
         
         // Calculate height of visible components only
         if (container.components) {
             const containerWidth = 650 - 20; // Standard width minus padding
-            height += container.components.reduce((total, comp) => {
+            height += container.components.reduce((total, comp, index) => {
                 // Skip hidden components in height calculation
                 if (this.isHidden(comp)) {
                     return total;
@@ -357,6 +358,9 @@ export class ComponentProcessor {
                     componentHeight = this.calculateHtmlHeight(comp.content, containerWidth);
                 } else if (comp.type === 'content' && comp.html) {
                     componentHeight = this.calculateHtmlHeight(comp.html, containerWidth);
+                } else if (comp.type === 'panel' || comp.type === 'fieldset') {
+                    // For nested panels, recursively calculate height
+                    componentHeight = this.calculateContainerHeight(comp);
                 } else if (comp.type === 'table' && comp.rows) {
                     componentHeight = this.calculateTableHeight(comp);
                 } else if (comp.type === 'radio' && def.calculateHeight) {

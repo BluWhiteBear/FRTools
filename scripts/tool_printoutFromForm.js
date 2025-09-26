@@ -1,6 +1,6 @@
 // Constants
 const VERSION_INFO = {
-  version: '0.2.4',
+  version: '0.2.6',
   updated: '09/18/2025',
   devexpressVersion: '23.2.5.0'
 };
@@ -463,14 +463,21 @@ class DevExpressConverter {
 
     XRPictureBox: (component, itemNum, ref, componentWidth, xOffset, currentY, context) => {
       const pictureItemNum = context.itemCounter++;
+      const def = DevExpressHelpers.getComponentDef(component.type);
+      const exprBindings = def.expressionBindings?.map(binding => ({
+        ...binding,
+        expression: binding.expression(component.key)
+      })) || [];
+      
       return `<Item${pictureItemNum} ControlType="XRPictureBox" Name="${context.escapeXml(component.key || `picture${pictureItemNum}`)}"
         SizeF="${componentWidth},${context.LAYOUT.INPUT_HEIGHT}"
         LocationFloat="${xOffset},${currentY}"
         Padding="2,2,0,0,100"
         Sizing="ZoomImage">
         <ExpressionBindings>
-          <Item1 Ref="${DevExpressConverter.state.refCounter++}" EventName="BeforePrint" 
-                 PropertyName="ImageSource" Expression="[${component.key}]" />
+          ${exprBindings.map((binding, i) => `<Item${i + 1} Ref="${DevExpressConverter.state.refCounter++}" 
+                EventName="${binding.eventName}" PropertyName="${binding.propertyName}" 
+                Expression="${binding.expression}" />`).join('\n          ')}
         </ExpressionBindings>
       </Item${pictureItemNum}>`;
     },
@@ -629,8 +636,16 @@ class DevExpressConverter {
             // Only calculate height for visible nested components
             const visibleComponents = component.components?.filter(c => 
               DevExpressConverter.isComponentVisible(c, true)) || [];
-            const innerHeight = visibleComponents.length ? 
-              DevExpressConverter.core.calculateNestedHeight(visibleComponents, true) : 0;
+            
+            // Calculate nested components height with proper spacing
+            const innerHeight = visibleComponents.reduce((compTotal, comp) => {
+              const compHeight = DevExpressConverter.core.calculateComponentHeight(comp, true);
+              // Add extra spacing for nested panels
+              const extraSpacing = (comp.type === 'panel' || comp.type === 'fieldset') ? 
+                LAYOUT.VERTICAL_SPACING * 2 : LAYOUT.VERTICAL_SPACING;
+              return compTotal + compHeight + extraSpacing;
+            }, 0);
+            
             return total + headerHeight + innerHeight + (LAYOUT.VERTICAL_SPACING * 2);
           }
           case 'columns': {
@@ -897,7 +912,10 @@ class DevExpressConverter {
       console.log("Initial XML validation results:", initialValidation);
 
       if (initialValidation.some(result => result.startsWith("ERROR"))) {
-        throw new Error('XML validation failed with critical errors. See console for details.');
+        const criticalErrors = initialValidation.filter(result => result.startsWith("ERROR"));
+        const error = new Error('XML validation failed with critical errors.');
+        error.validationErrors = criticalErrors;
+        throw error;
       }
 
       // Compress and encode the XML
@@ -954,12 +972,14 @@ class DevExpressConverter {
       );
       
       if (hasCriticalErrors) {
-        console.error('Critical XML validation errors found:', 
-          validationResults.filter(msg => msg.startsWith("ERROR")));
-        throw new Error('XML validation failed with critical errors. See console for details.');
+        const criticalErrors = validationResults.filter(msg => msg.startsWith("ERROR"));
+        console.error('Critical XML validation errors found:', criticalErrors);
+        const error = new Error('XML validation failed with critical errors.');
+        error.validationErrors = criticalErrors;
+        throw error;
       }
-      
-      // Add ComponentStorage and ObjectStorage sections with proper data structure
+
+      // Add ComponentStorageand ObjectStorage sections with proper data structure
       const formFields = Object.keys(formioData)
         .map(key => `<Column Name="${Utils.escapeXml(key)}" Type="System.String"/>`)
         .join('');
@@ -1009,49 +1029,33 @@ const Utils = {  escapeXml(unsafe) {
   },
       validateXmlOutput(xml) {
     try {
-      // Create a validation result array
+      // Import validator 
+      if (!this.validator) {
+        import('./validator.js').then(({validator}) => {
+          this.validator = validator;
+        });
+      }
+
+      // If validator is ready, use it, otherwise fallback to basic validation
+      if (this.validator) {
+        return this.validator.validateDevExpressXml(xml);
+      }
+
+      // Fallback basic validation
       const validationResults = [];
-      
-      // Log XML for debugging
-      console.log("Validating XML:", xml.substring(0, 200) + "...");
       
       // Basic string checks
       if (!xml || xml.trim() === '') {
         return ["ERROR: XML is empty"];
       }
 
-      // Try to find any unclosed or malformed tags
-      const tagStack = [];
-      let pos = 0;
-      while (pos < xml.length) {
-        const nextOpen = xml.indexOf('<', pos);
-        if (nextOpen === -1) break;
-        
-        const nextClose = xml.indexOf('>', nextOpen);
-        if (nextClose === -1) {
-          console.error("Found unclosed tag at position:", nextOpen);
-          return ["ERROR: Unclosed tag found at position " + nextOpen];
-        }
-        
-        const tag = xml.substring(nextOpen, nextClose + 1);
-        console.log("Processing tag:", tag);
-        pos = nextClose + 1;
-      }
-      
       // Clean up any potential formatting issues
       xml = xml.replace(/>\s+</g, '><')  // Remove whitespace between tags
                .replace(/\s+>/g, '>')     // Remove whitespace before closing bracket
                .replace(/<\s+/g, '<')     // Remove whitespace after opening bracket
                .replace(/\s{2,}/g, ' ');  // Collapse multiple spaces
       
-      console.log("Cleaned XML:", xml.substring(0, 200) + "...");
-               
       // Check basic XML structure
-      if (!xml.startsWith('<?xml')) {
-        return ["ERROR: XML must start with XML declaration"];
-      }
-      
-      // Check for XML declaration
       if (!xml.startsWith('<?xml')) {
         validationResults.push("WARNING: Missing XML declaration");
       }
@@ -1071,12 +1075,14 @@ const Utils = {  escapeXml(unsafe) {
       const bands = xmlDoc.getElementsByTagName("Bands");
       if (bands.length === 0) {
         validationResults.push("ERROR: Missing required <Bands> element");
-      }      // Check for DetailBand - search for any Item with ControlType='DetailBand'
+      }
+
+      // Check for DetailBand
       const detailBands = xmlDoc.querySelectorAll("[ControlType='DetailBand']");
       if (detailBands.length === 0) {
         validationResults.push("ERROR: Missing DetailBand element");
       } else {
-        validationResults.push(`INFO: Found DetailBand element (${detailBands[0].tagName})`);
+        validationResults.push(`INFO: Found DetailBand element`);
         
         // Check for Controls within DetailBand
         const controls = detailBands[0].getElementsByTagName("Controls");
@@ -1089,18 +1095,13 @@ const Utils = {  escapeXml(unsafe) {
             validationResults.push("WARNING: No field items found in DetailBand Controls");
           } else {
             validationResults.push(`INFO: Found ${items.length} control items in DetailBand`);
-            // List first few items for debugging
-            for (let i = 0; i < Math.min(3, items.length); i++) {
-              const item = items[i];
-              validationResults.push(`INFO: Control item ${i+1}: ${item.tagName} (${item.getAttribute('ControlType') || 'unknown type'})`);
-            }
           }
         }
       }
       
       // Success if no errors
-      if (!validationResults.some(msg => msg.startsWith("ERROR") || msg.startsWith("WARNING"))) {
-        validationResults.push("SUCCESS: XML is valid and well-formed");
+      if (!validationResults.some(msg => msg.startsWith("ERROR"))) {
+        validationResults.push("SUCCESS: Basic XML validation passed");
       }
       
       return validationResults;
@@ -1203,20 +1204,20 @@ const Utils = {  escapeXml(unsafe) {
   },
 
   generateSqlQuery(formioData) {
-    // Query Data
-    const departmentName = formioData.DepartmentName?.replace(/\s+/g, '_') || '';
-    const formName = formioData.FormName?.replace(/\s+/g, '_') || '';
-
     // Query Header
     const generateDate = new Date().toLocaleDateString();
     const generateTime = new Date().toLocaleTimeString();
     const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const timeZoneAbbr = moment.tz(timeZone).zoneAbbr();
-    const version = VERSION_INFO.version;
+    
+    // Get the table name without [dbo]. prefix
+    const fullTableName = formioData.TableName || '[dbo].[DefaultTable]';
+    const tableName = fullTableName.replace(/^\[dbo\]\./i, '');
+    const procedureName = `[cstm_${tableName.replace(/[\[\]]/g, '')}_Printout]`;
   
     const sql = 
     `
-    create or alter procedure [cstm_${departmentName}_${formName}_Printout]
+    create or alter procedure ${procedureName}
       @FormDataGUID uniqueidentifier = null,
       @OwnerObjectGUID uniqueidentifier = null
     as
@@ -1231,7 +1232,7 @@ const Utils = {  escapeXml(unsafe) {
         ownCon.first
         ,ownCon.last
         ,main.*
-      from [dbo].[ct_${departmentName}_${formName}] main
+      from ${fullTableName} main
       join Contact ownCon with(NOLOCK) on ownCon.ContactGUID = main.__ownerobjectguid
       where main.__forminstanceguid = @FormDataGUID
       and main.__ownerobjectguid = @OwnerObjectGUID
@@ -1309,9 +1310,44 @@ const Utils = {  escapeXml(unsafe) {
 };
 
 const UIHandlers = {
+  setupUploadHandlers() {
+    // Setup the "Upload Another" button handler
+    const uploadAnotherBtn = document.getElementById('uploadAnotherBtn');
+    if (uploadAnotherBtn) {
+      uploadAnotherBtn.addEventListener('click', () => {
+        window.location.reload();
+      });
+    }
+  },
+
   handleFileUpload(event, createDevExpressPreview) {
     const file = event.target.files[0];
     if (!file) return;
+
+    // Show "Upload Another" button and hide initial upload
+    document.getElementById('initial-upload').style.display = 'none';
+    document.getElementById('upload-another').style.display = 'block';
+    // Re-setup the upload another handler as the button is now visible
+    Init.setupUploadAnotherHandler();
+
+    // Reset conversion info display
+    const conversionInfo = document.getElementById('conversion-info');
+    if (conversionInfo) {
+      // Hide the element
+      conversionInfo.style.display = 'none';
+      // Reset class to default
+      conversionInfo.className = 'alert mb-4';
+      // Clear all content
+      const timestamp = conversionInfo.querySelector('.conversion-timestamp');
+      const duration = conversionInfo.querySelector('.conversion-duration');
+      const warnings = conversionInfo.querySelector('#conversion-warnings ul');
+      if (timestamp) timestamp.textContent = '';
+      if (duration) duration.textContent = '';
+      if (warnings) warnings.innerHTML = '';
+      // Hide warnings section
+      const warningsContainer = conversionInfo.querySelector('#conversion-warnings');
+      if (warningsContainer) warningsContainer.style.display = 'none';
+    }
   
     const startTime = performance.now();
     const startDate = new Date();
@@ -1530,11 +1566,31 @@ const UIHandlers = {
 
   updateConversionInfo(startDate, timeZoneAbbr, duration) {
     const conversionInfo = document.getElementById('conversion-info');
-    const timestamp = conversionInfo.querySelector('.conversion-timestamp');
-    const durationEl = conversionInfo.querySelector('.conversion-duration');
-    const warningsSection = document.getElementById('conversion-warnings');
-    const warningsList = warningsSection.querySelector('ul');
+    
+    // Clear all existing content
+    conversionInfo.innerHTML = '';
+    
+    // Create fresh elements
+    const timestamp = document.createElement('div');
+    timestamp.className = 'conversion-timestamp';
+    const durationEl = document.createElement('div');
+    durationEl.className = 'conversion-duration';
+    const warningsSection = document.createElement('div');
+    warningsSection.id = 'conversion-warnings';
+    warningsSection.className = 'mt-3';
+    warningsSection.style.display = 'none';
+    warningsSection.innerHTML = `
+      <hr>
+      <h6 class="text-warning"><i class="bi bi-exclamation-triangle"></i> Conversion Warnings</h6>
+      <ul class="list-unstyled mb-0"></ul>
+    `;
+    
+    // Add elements to conversion info
+    conversionInfo.appendChild(timestamp);
+    conversionInfo.appendChild(durationEl);
+    conversionInfo.appendChild(warningsSection);
   
+    // Set success state
     conversionInfo.className = 'alert alert-success mb-4';
     timestamp.textContent = `File converted on ${startDate.toLocaleDateString()} at ${startDate.toLocaleTimeString()} (${timeZoneAbbr})`;
     durationEl.textContent = `Conversion took ${duration.toFixed(2)}ms (${(duration/1000).toFixed(3)} seconds)`;
@@ -1561,24 +1617,71 @@ const UIHandlers = {
 
   handleError(error) {
     const conversionInfo = document.getElementById('conversion-info');
+    // Clear any existing content first
+    conversionInfo.innerHTML = '';
+    const timestamp = document.createElement('div');
+    timestamp.className = 'conversion-timestamp';
+    const duration = document.createElement('div');
+    duration.className = 'conversion-duration';
+    const warnings = document.createElement('div');
+    warnings.id = 'conversion-warnings';
+    warnings.className = 'mt-3';
+    warnings.innerHTML = `
+      <hr>
+      <h6 class="text-warning"><i class="bi bi-exclamation-triangle"></i> Conversion Warnings</h6>
+      <ul class="list-unstyled mb-0"></ul>
+    `;
+    warnings.style.display = 'none';
+    
+    // Append the basic structure
+    conversionInfo.appendChild(timestamp);
+    conversionInfo.appendChild(duration);
+    conversionInfo.appendChild(warnings);
+
+    // Create the error content
+    const errorDetails = [];
+    if (error.validationErrors) {
+      errorDetails.push(...error.validationErrors);
+    }
+    if (error.data) {
+      errorDetails.push(`Additional data: ${JSON.stringify(error.data)}`);
+    }
+
+    // Create error header
+    const errorHeader = document.createElement('div');
+    errorHeader.className = 'conversion-header d-flex align-items-center mb-2';
+    errorHeader.innerHTML = `
+      <i class="bi bi-exclamation-triangle text-danger me-2"></i>
+      <strong>Conversion Error</strong>
+    `;
+    conversionInfo.insertBefore(errorHeader, timestamp);
+
+    // Update timestamp and error message
+    timestamp.textContent = `Error occurred on ${new Date().toLocaleString()} (${moment.tz(Intl.DateTimeFormat().resolvedOptions().timeZone).zoneAbbr()})`;
+    duration.innerHTML = `
+      <div class="conversion-error-message">
+        ${error.message}
+        ${errorDetails.length ? `
+          <div class="conversion-error-details mt-2 small">
+            <hr>
+            <ul class="mb-0 ps-3">
+              ${errorDetails.map(detail => `<li>${detail}</li>`).join('')}
+            </ul>
+          </div>
+        ` : ''}
+      </div>
+    `;
+
+    // Set error styles and show
     conversionInfo.className = 'alert alert-danger mb-4';
-  
-    const timestamp = conversionInfo.querySelector('.conversion-timestamp');
-    const durationEl = conversionInfo.querySelector('.conversion-duration');
-  
-    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const timeZoneAbbr = moment.tz(timeZone).zoneAbbr();
-    const currentDate = new Date();
-  
-    timestamp.textContent = `Error occurred on ${currentDate.toLocaleDateString()} at ${currentDate.toLocaleTimeString()} (${timeZoneAbbr})`;
-    durationEl.textContent = `Error: ${error.message}`;
     conversionInfo.style.display = 'block';
-  
-    // Log error details for debugging
+
+    // Still log details for debugging
     console.error('Error details:', {
-        message: error.message,
-        stack: error.stack,
-        rawData: error.rawData
+      message: error.message,
+      stack: error.stack,
+      details: errorDetails,
+      rawData: error.rawData
     });
   }
 };
@@ -2007,6 +2110,19 @@ const Init = {
     }
   },
 
+  setupUploadAnotherHandler() {
+    const uploadAnotherBtn = document.getElementById('uploadAnotherBtn');
+    if (uploadAnotherBtn) {
+      console.log('Setting up upload another button handler');
+      uploadAnotherBtn.addEventListener('click', () => {
+        console.log('Upload another clicked, reloading page');
+        window.location.reload();
+      });
+    } else {
+      console.log('Upload another button not found');
+    }
+  },
+
   initializeEventListeners(createDevExpressPreview) {
     const fileUpload = document.getElementById('fileUpload');
     const copyJsonBtn = document.getElementById('copyJsonBtn');
@@ -2016,7 +2132,8 @@ const Init = {
     const previewTab = document.querySelector('#preview-tab');
     const devexpressPreviewTab = document.querySelector('#devexpress-preview-tab');
   
-    // Add null checks before adding listeners
+    // Set up upload another handler separately since it might not exist yet
+    this.setupUploadAnotherHandler();
     if (fileUpload) {
       fileUpload.addEventListener('change', event => UIHandlers.handleFileUpload(event, createDevExpressPreview));
     }

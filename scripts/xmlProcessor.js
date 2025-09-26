@@ -95,6 +95,50 @@ class XMLProcessor {
         return node;
     }
 
+    // Import validator
+    async importValidator() {
+        if (!this.validator) {
+            const {validator} = await import('./validator.js');
+            this.validator = validator;
+        }
+        return this.validator;
+    }
+    
+    // Validates that all Ref attributes are correct and sequential
+    async validateReferences(xml) {
+        try {
+            const validator = await this.importValidator();
+            const results = validator.validateDevExpressXml(xml);
+            
+            // Convert validation results to the expected format
+            const errors = results
+                .filter(r => r.startsWith('ERROR'))
+                .map(error => ({
+                    message: error.replace('ERROR: ', ''),
+                    element: error.includes('element') ? error.split('element')[1].trim() : undefined
+                }));
+            
+            const totalRefs = results
+                .find(r => r.startsWith('INFO: Found'))
+                ?.match(/\d+/)?.[0] || 0;
+            
+            return {
+                isValid: !results.some(r => r.startsWith('ERROR')),
+                errors,
+                totalRefs: parseInt(totalRefs),
+                details: results
+            };
+        } catch (error) {
+            console.error('Validation error:', error);
+            return {
+                isValid: false,
+                errors: [{message: error.message}],
+                totalRefs: 0,
+                details: [`ERROR: ${error.message}`]
+            };
+        }
+    }
+
     // Second pass: Assign references sequentially
     assignReferences(node) {
         // Assign ref if needed

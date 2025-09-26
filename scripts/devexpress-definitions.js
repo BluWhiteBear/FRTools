@@ -216,7 +216,29 @@ export const DevExpressDefinitions = {
                 Sizing: 'ZoomImage',
                 Padding: '2,2,0,0,100'
             },
-            expression: (key) => `[${key}]`
+            expressionBindings: [
+                {
+                    eventName: 'BeforePrint',
+                    propertyName: 'ImageSource',
+                    expression: key => `[${key}]`
+                }
+            ]
+        },
+        picture: {
+            controlType: 'XRPictureBox',
+            defaultHeight: 100,
+            requiresLabel: false,
+            attributes: {
+                Sizing: 'ZoomImage',
+                Padding: '2,2,0,0,100'
+            },
+            expressionBindings: [
+                {
+                    eventName: 'BeforePrint',
+                    propertyName: 'ImageSource',
+                    expression: key => `[${key}]`
+                }
+            ]
         },
         email: {
             controlType: 'XRLabel',
@@ -286,9 +308,17 @@ export const DevExpressDefinitions = {
                 Borders: 'None',
                 Padding: '2,2,0,0,100'
             },
+            // Updated to handle nested panels better
             calculateHeight: (components, spacing) => {
-                return components.reduce((total, comp) => 
-                    total + (comp.defaultHeight || 25) + spacing, 0);
+                if (!components) return 0;
+                return components.reduce((total, comp) => {
+                    let height = comp.defaultHeight || 25;
+                    // Add extra spacing for nested panels
+                    if (comp.type === 'panel' || comp.type === 'fieldset') {
+                        height += spacing * 2; // Extra padding for nested containers
+                    }
+                    return total + height + spacing;
+                }, 0);
             }
         },
         well: {
