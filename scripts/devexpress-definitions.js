@@ -3,12 +3,12 @@ export const DevExpressDefinitions = {
     // Component Support Status:
     /*
         === Basic Fields ===
-        textfield: Single-line text input | FULLY SUPPORTED
-        textarea: Multi-line text input | FULLY SUPPORTED
-        number: Numeric input | FULLY SUPPORTED
-        checkbox: Boolean input | FULLY SUPPORTED
-        select: Dropdown/Select/Combobox input | FULLY SUPPORTED
-        radio: Radio button group input | FULLY SUPPORTED
+        Textfield: Single-line text input | FULLY SUPPORTED
+        Textarea: Multi-line text input | FULLY SUPPORTED
+        Number: Numeric input | FULLY SUPPORTED
+        Checkbox: Boolean input | FULLY SUPPORTED
+        Select: Dropdown/Select/Combobox input | FULLY SUPPORTED
+        Radio: Radio button group input | FULLY SUPPORTED
 
         === Advanced Fields ===
         Nested Form: Subform/nested form input | PARTIALLY SUPPORTED
@@ -17,8 +17,9 @@ export const DevExpressDefinitions = {
         Phone Number: Phone number input | FULLY SUPPORTED
         Address: Address input | FULLY SUPPORTED
         Date/Time: Date/time picker input | FULLY SUPPORTED
-        Day: Date input | NOT SUPPORTED
-        Time: Time input | NOT SUPPORTED
+        Day: Date input | FULLY SUPPORTED
+        Time: Time input | FULLY SUPPORTED'
+        Currency: Currency input | FULLY SUPPORTED
         Signature: Signature input | PARTIALLY SUPPORTED
 
         === Layout Components ===
@@ -55,6 +56,7 @@ export const DevExpressDefinitions = {
 
         === Sizing & Layout ===
         defaultHeight: Default height in pixels for the component
+        widthMultiplier: Optional multiplier (0-1) to adjust the final width of the component
         calculateHeight: For containers, function to calculate height based on children and spacing
         Padding: Standard padding format 'left,top,right,bottom,dpi'
         AnchorHorizontal: For tables, how the table anchors horizontally (Left, Right, Both)
@@ -121,6 +123,7 @@ export const DevExpressDefinitions = {
         textfield: {
             controlType: 'XRLabel',
             defaultHeight: 25,
+            widthMultiplier: 0.75,
             requiresLabel: true,
             attributes: {
                 TextAlignment: 'MiddleLeft',
@@ -131,6 +134,7 @@ export const DevExpressDefinitions = {
         textarea: {
             controlType: 'XRLabel',
             defaultHeight: 50,
+            widthMultiplier: 0.75,
             requiresLabel: true,
             attributes: {
                 TextAlignment: 'BottomLeft',
@@ -142,6 +146,7 @@ export const DevExpressDefinitions = {
         number: {
             controlType: 'XRLabel',
             defaultHeight: 25,
+            widthMultiplier: 0.25,
             requiresLabel: true,
             attributes: {
                 TextAlignment: 'MiddleLeft',
@@ -152,6 +157,7 @@ export const DevExpressDefinitions = {
         checkbox: {
             controlType: 'XRCheckBox',
             defaultHeight: 25,
+            widthMultiplier: 0.5,
             requiresLabel: false,
             attributes: {
                 Padding: '2,2,0,0,100',
@@ -165,6 +171,7 @@ export const DevExpressDefinitions = {
         select: {
             controlType: 'XRLabel',
             defaultHeight: 25,
+            widthMultiplier: 0.75,
             requiresLabel: true,
             attributes: {
                 TextAlignment: 'MiddleLeft',
@@ -172,6 +179,50 @@ export const DevExpressDefinitions = {
                 Padding: '2,2,0,0,100'
             },
             expression: (key) => `[${key}]`
+        },
+        datagrid: {
+            controlType: 'XRLabel',
+            defaultHeight: 50,
+            requiresLabel: true,
+            attributes: {
+                TextAlignment: 'MiddleLeft',
+                Padding: '2,2,0,0,100'
+            },
+            // Will be rendered as two tables - one for headers and one for field keys
+            headerTable: {
+                controlType: 'XRTable',
+                attributes: {
+                    Borders: 'All',
+                    BackColor: 'Gainsboro',
+                    Padding: '2,2,0,0,100'
+                },
+                rowAttributes: {
+                    Weight: '1',
+                    BackColor: 'Gainsboro'
+                },
+                cellAttributes: {
+                    Padding: '5,5,5,5,100',
+                    Borders: 'All',
+                    TextAlignment: 'MiddleLeft',
+                    Font: 'Arial, 10pt, style=Bold'
+                }
+            },
+            keysTable: {
+                controlType: 'XRTable',
+                attributes: {
+                    Borders: 'All',
+                    Padding: '2,2,0,0,100'
+                },
+                rowAttributes: {
+                    Weight: '1'
+                },
+                cellAttributes: {
+                    Padding: '5,5,5,5,100',
+                    Borders: 'All',
+                    TextAlignment: 'MiddleLeft',
+                    Font: 'Consolas, 9pt'
+                }
+            }
         },
         radio: {
             controlType: 'XRPanel',
@@ -186,6 +237,7 @@ export const DevExpressDefinitions = {
             child: {
                 controlType: 'XRCheckBox',
                 defaultHeight: 25,
+                widthMultiplier: 0.5,
                 requiresLabel: false,
                 attributes: {
                     Padding: '2,2,0,0,100',
@@ -200,6 +252,7 @@ export const DevExpressDefinitions = {
         datetime: {
             controlType: 'XRLabel',
             defaultHeight: 25,
+            widthMultiplier: 0.5,
             requiresLabel: true,
             attributes: {
                 TextAlignment: 'MiddleLeft',
@@ -208,41 +261,68 @@ export const DevExpressDefinitions = {
             },
             expression: (key) => `FormatString('{0:MM/dd/yyyy hh:mm tt}', [${key}])`
         },
+        day: {
+            controlType: 'XRLabel',
+            defaultHeight: 25,
+            widthMultiplier: 0.5,
+            requiresLabel: true,
+            attributes: {
+                TextAlignment: 'MiddleLeft',
+                Borders: 'Bottom',
+                Padding: '2,2,0,0,100'
+            },
+            expression: (key) => `FormatString('{0:MM/dd/yyyy}', [${key}])`
+        },
+        time: {
+            controlType: 'XRLabel',
+            defaultHeight: 25,
+            widthMultiplier: 0.5,
+            requiresLabel: true,
+            attributes: {
+                TextAlignment: 'MiddleLeft',
+                Borders: 'Bottom',
+                Padding: '2,2,0,0,100'
+            },
+            expression: (key) => `FormatString('{0:hh:mm tt}', [${key}])`
+        },
+        currency: {
+            controlType: 'XRLabel',
+            defaultHeight: 25,
+            widthMultiplier: 0.25,
+            requiresLabel: true,
+            attributes: {
+                TextAlignment: 'MiddleLeft',
+                Borders: 'Bottom',
+                Padding: '2,2,0,0,100'
+            },
+            expression: (key) => `FormatString('{0:C}', [${key}])`
+        },
         signature: {
             controlType: 'XRPictureBox',
             defaultHeight: 100,
+            widthMultiplier: 0.5,
             requiresLabel: true,
             attributes: {
                 Sizing: 'ZoomImage',
                 Padding: '2,2,0,0,100'
             },
-            expressionBindings: [
-                {
-                    eventName: 'BeforePrint',
-                    propertyName: 'ImageSource',
-                    expression: key => `[${key}]`
-                }
-            ]
+            expression: key => `[${key}]`
         },
         picture: {
             controlType: 'XRPictureBox',
             defaultHeight: 100,
+            widthMultiplier: 0.5,
             requiresLabel: false,
             attributes: {
                 Sizing: 'ZoomImage',
                 Padding: '2,2,0,0,100'
             },
-            expressionBindings: [
-                {
-                    eventName: 'BeforePrint',
-                    propertyName: 'ImageSource',
-                    expression: key => `[${key}]`
-                }
-            ]
+            expression: key => `[${key}]`
         },
         email: {
             controlType: 'XRLabel',
             defaultHeight: 25,
+            widthMultiplier: 0.75,
             requiresLabel: true,
             attributes: {
                 TextAlignment: 'MiddleLeft',
@@ -254,6 +334,7 @@ export const DevExpressDefinitions = {
         url: {
             controlType: 'XRLabel',
             defaultHeight: 25,
+            widthMultiplier: 0.75,
             requiresLabel: true,
             attributes: {
                 TextAlignment: 'MiddleLeft',
@@ -265,6 +346,7 @@ export const DevExpressDefinitions = {
         phoneNumber: {
             controlType: 'XRLabel',
             defaultHeight: 25,
+            widthMultiplier: 0.75,
             requiresLabel: true,
             attributes: {
                 TextAlignment: 'MiddleLeft',
@@ -275,15 +357,26 @@ export const DevExpressDefinitions = {
         },
         address: {
             controlType: 'XRLabel',
-            defaultHeight: 50,
+            defaultHeight: 25,
+            widthMultiplier: 0.75,
             requiresLabel: true,
             attributes: {
-                TextAlignment: 'BottomLeft',
+                TextAlignment: 'MiddleLeft',
                 Multiline: 'true',
                 Borders: 'Bottom',
                 Padding: '2,2,0,0,100'
             },
             expression: (key) => `[${key}]`
+        },
+        button: {
+            // Buttons are NOT supported, and should be skipped in rendering. We create a hidden placeholder.
+            controlType: 'XRLabel',
+            defaultHeight: 25,
+            requiresLabel: false,
+            attributes: {
+                Visible: 'false',
+                SizeF: '0,0'
+            }
         }
     },
 
@@ -457,6 +550,23 @@ export const DevExpressHelpers = {
     // Get label style
     getLabelStyle(style = 'default') {
         return DevExpressDefinitions.labelStyles[style];
+    },
+
+    // Calculate component width with multiplier
+    calculateComponentWidth(width, componentDef) {
+        if (!componentDef || typeof width !== 'number') {
+            return width;
+        }
+
+        const multiplier = componentDef.widthMultiplier;
+        if (typeof multiplier !== 'number') {
+            return width;
+        }
+
+        // Ensure multiplier is between 0 and 1
+        const clampedMultiplier = Math.max(0, Math.min(1, multiplier));
+        // Floor the result to avoid floating point issues
+        return Math.floor(width * clampedMultiplier);
     },
 
     // Combine attributes with defaults

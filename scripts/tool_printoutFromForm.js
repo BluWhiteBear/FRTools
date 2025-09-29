@@ -1,7 +1,7 @@
 // Constants
 const VERSION_INFO = {
-  version: '0.3.1',
-  updated: '09/26/2025',
+  version: '0.3.2',
+  updated: '09/29/2025',
   devexpressVersion: '23.2.5.0'
 };
 
@@ -11,7 +11,7 @@ const LAYOUT = {
   LABEL_HEIGHT: 25,
   INPUT_HEIGHT: 25,
   DEFAULT_WIDTH: 650,
-  COLUMN_WIDTH: 325,  // Width for column fields
+  COLUMN_WIDTH: 325,
   PAGE_WIDTH: 850,
   PAGE_HEIGHT: 1100,
   LANDSCAPE: false,

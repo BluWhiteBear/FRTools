@@ -1,0 +1,1068 @@
+<?xml version="1.0" encoding="utf-8"?><XtraReportsLayoutSerializer
+    SerializerVersion="23.2.5.0"
+    Ref="0"
+    ControlType="DevExpress.XtraReports.UI.XtraReport, DevExpress.XtraReports.v23.2, Version=23.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a"
+    Name="Report"
+    DisplayName="FormIO2DevExpressTestForm1;FormIO2DevExpressTestForm1;false;false;00000000-0000-0000-0000-000000000000;00000000-0000-0000-0000-000000000000"
+    Margins="40, 40, 40, 40"
+    PageWidth="850"
+    PageHeight="1100"
+    Version="23.2"
+    DataMember="Root"
+    ><Extensions
+        ><Item1
+            Ref="1"
+            Key="DataSerializationExtension"
+            Value="DevExpress.XtraReports.Web.ReportDesigner.DefaultDataSerializer" /></Extensions
+    ><Parameters
+        ><Item1
+            Ref="3"
+            Description="FormDataGUID"
+            ValueInfo="00000000-0000-0000-0000-000000000000"
+            Name="FormDataGUID" /><Item2
+            Ref="4"
+            Description="ObjectGUID"
+            ValueInfo="00000000-0000-0000-0000-000000000000"
+            Name="ObjectGUID" /></Parameters
+    ><Bands
+        ><Item1 Ref="5" ControlType="TopMarginBand" Name="TopMargin" HeightF="40" /><Item2
+            Ref="6"
+            ControlType="PageHeaderBand"
+            Name="PageHeader"
+            HeightF="50"
+            ><Controls
+                ><Item1
+                    Ref="7"
+                    ControlType="XRLabel"
+                    Name="headerLabel"
+                    Text="FormIO2DevExpressTestForm1"
+                    TextAlignment="MiddleCenter"
+                    SizeF="769.987,30"
+                    LocationFloat="0,0"
+                    Font="Times New Roman, 14pt, style=Bold"
+                    Padding="2,2,0,0,100" /></Controls></Item2
+        ><Item3 Ref="8" ControlType="DetailBand" Name="Detail" HeightF="2732"
+            ><Controls
+                ><Item1
+                    Ref="9"
+                    ControlType="XRLabel"
+                    Name="label_txtUnnestedField1"
+                    Text="Unnested Field 1"
+                    TextAlignment="MiddleLeft"
+                    SizeF="487,25"
+                    LocationFloat="0,60"
+                    Font="Times New Roman, 9.75pt, style=Bold"
+                    Padding="2,2,0,0,100"
+                    Borders="None" /><Item2
+                    Ref="10"
+                    ControlType="XRLabel"
+                    Name="txtUnnestedField1"
+                    TextAlignment="MiddleLeft"
+                    SizeF="487,25"
+                    LocationFloat="0,85"
+                    Padding="2,2,0,0,100"
+                    Borders="Bottom"
+                    ><ExpressionBindings
+                        ><Item1
+                            Ref="11"
+                            EventName="BeforePrint"
+                            PropertyName="Text"
+                            Expression="[txtUnnestedField1]" /></ExpressionBindings></Item2
+                ><Item3
+                    Ref="12"
+                    ControlType="XRLabel"
+                    Name="label_txtUnnestedField2"
+                    Text="Unnested Field 2"
+                    TextAlignment="MiddleLeft"
+                    SizeF="487,25"
+                    LocationFloat="0,118"
+                    Font="Times New Roman, 9.75pt, style=Bold"
+                    Padding="2,2,0,0,100"
+                    Borders="None" /><Item4
+                    Ref="13"
+                    ControlType="XRLabel"
+                    Name="txtUnnestedField2"
+                    TextAlignment="MiddleLeft"
+                    SizeF="487,25"
+                    LocationFloat="0,143"
+                    Padding="2,2,0,0,100"
+                    Borders="Bottom"
+                    ><ExpressionBindings
+                        ><Item1
+                            Ref="14"
+                            EventName="BeforePrint"
+                            PropertyName="Text"
+                            Expression="[txtUnnestedField2]" /></ExpressionBindings></Item4
+                ><Item5
+                    Ref="15"
+                    ControlType="XRLabel"
+                    Name="label_txtaUnnestedField3"
+                    Text="Unnested Field 3"
+                    TextAlignment="MiddleLeft"
+                    SizeF="487,25"
+                    LocationFloat="0,176"
+                    Font="Times New Roman, 9.75pt, style=Bold"
+                    Padding="2,2,0,0,100"
+                    Borders="None" /><Item6
+                    Ref="16"
+                    ControlType="XRLabel"
+                    Name="txtaUnnestedField3"
+                    Multiline="true"
+                    TextAlignment="BottomLeft"
+                    SizeF="487,50"
+                    LocationFloat="0,201"
+                    Padding="2,2,0,0,100"
+                    Borders="Bottom"
+                    ><ExpressionBindings
+                        ><Item1
+                            Ref="17"
+                            EventName="BeforePrint"
+                            PropertyName="Text"
+                            Expression="[txtaUnnestedField3]" /></ExpressionBindings></Item6
+                ><Item7
+                    Ref="18"
+                    ControlType="XRPanel"
+                    Name="miscFieldsPanel"
+                    CanShrink="true"
+                    SizeF="650,494"
+                    LocationFloat="0,259"
+                    Padding="2,2,0,0,100"
+                    Borders="None"
+                    ><Controls
+                        ><Item1
+                            Ref="19"
+                            ControlType="XRLabel"
+                            Name="label_txtTextField"
+                            Text="Text Field:"
+                            TextAlignment="MiddleLeft"
+                            SizeF="472,25"
+                            LocationFloat="10,25"
+                            Font="Times New Roman, 9.75pt, style=Bold"
+                            Padding="2,2,0,0,100"
+                            Borders="None" /><Item2
+                            Ref="20"
+                            ControlType="XRLabel"
+                            Name="txtTextField"
+                            TextAlignment="MiddleLeft"
+                            SizeF="472,25"
+                            LocationFloat="10,50"
+                            Padding="2,2,0,0,100"
+                            Borders="Bottom"
+                            ><ExpressionBindings
+                                ><Item1
+                                    Ref="21"
+                                    EventName="BeforePrint"
+                                    PropertyName="Text"
+                                    Expression="[txtTextField]" /></ExpressionBindings></Item2
+                        ><Item3
+                            Ref="22"
+                            ControlType="XRLabel"
+                            Name="label_txtaTextArea"
+                            Text="Text Area:"
+                            TextAlignment="MiddleLeft"
+                            SizeF="472,25"
+                            LocationFloat="10,83"
+                            Font="Times New Roman, 9.75pt, style=Bold"
+                            Padding="2,2,0,0,100"
+                            Borders="None" /><Item4
+                            Ref="23"
+                            ControlType="XRLabel"
+                            Name="txtaTextArea"
+                            Multiline="true"
+                            TextAlignment="BottomLeft"
+                            SizeF="472,50"
+                            LocationFloat="10,108"
+                            Padding="2,2,0,0,100"
+                            Borders="Bottom"
+                            ><ExpressionBindings
+                                ><Item1
+                                    Ref="24"
+                                    EventName="BeforePrint"
+                                    PropertyName="Text"
+                                    Expression="[txtaTextArea]" /></ExpressionBindings></Item4
+                        ><Item5
+                            Ref="25"
+                            ControlType="XRLabel"
+                            Name="label_txtNumber"
+                            Text="Number:"
+                            TextAlignment="MiddleLeft"
+                            SizeF="157,25"
+                            LocationFloat="10,166"
+                            Font="Times New Roman, 9.75pt, style=Bold"
+                            Padding="2,2,0,0,100"
+                            Borders="None" /><Item6
+                            Ref="26"
+                            ControlType="XRLabel"
+                            Name="txtNumber"
+                            TextAlignment="MiddleLeft"
+                            SizeF="157,25"
+                            LocationFloat="10,191"
+                            Padding="2,2,0,0,100"
+                            Borders="Bottom"
+                            ><ExpressionBindings
+                                ><Item1
+                                    Ref="27"
+                                    EventName="BeforePrint"
+                                    PropertyName="Text"
+                                    Expression="[txtNumber]" /></ExpressionBindings></Item6
+                        ><Item7
+                            Ref="28"
+                            ControlType="XRCheckBox"
+                            Name="chkCheckbox"
+                            Text="Checkbox"
+                            SizeF="315,25"
+                            LocationFloat="10,224"
+                            Padding="2,2,0,0,100"
+                            ><GlyphOptions Ref="29" Size="13,13" /><ExpressionBindings
+                                ><Item1
+                                    Ref="30"
+                                    EventName="BeforePrint"
+                                    PropertyName="CheckBoxState"
+                                    Expression="IIF([chkCheckbox] == 'true', True, False)" /></ExpressionBindings></Item7
+                        ><Item8
+                            Ref="31"
+                            ControlType="XRLabel"
+                            Name="label_cmbSelect"
+                            Text="Select:"
+                            TextAlignment="MiddleLeft"
+                            SizeF="472,25"
+                            LocationFloat="10,257"
+                            Font="Times New Roman, 9.75pt, style=Bold"
+                            Padding="2,2,0,0,100"
+                            Borders="None" /><Item9
+                            Ref="32"
+                            ControlType="XRLabel"
+                            Name="cmbSelect"
+                            TextAlignment="MiddleLeft"
+                            SizeF="472,25"
+                            LocationFloat="10,282"
+                            Padding="2,2,0,0,100"
+                            Borders="Bottom"
+                            ><ExpressionBindings
+                                ><Item1
+                                    Ref="33"
+                                    EventName="BeforePrint"
+                                    PropertyName="Text"
+                                    Expression="[cmbSelect]" /></ExpressionBindings></Item9
+                        ><Item10
+                            Ref="34"
+                            ControlType="XRLabel"
+                            Name="label_rdoRadio"
+                            Text="Radio:"
+                            TextAlignment="MiddleLeft"
+                            SizeF="630,25"
+                            LocationFloat="10,315"
+                            Font="Times New Roman, 9.75pt, style=Bold"
+                            Padding="2,2,0,0,100"
+                            Borders="None" /><Item11
+                            Ref="35"
+                            ControlType="XRPanel"
+                            Name="radioPanel_rdoRadio"
+                            CanShrink="true"
+                            SizeF="630,75"
+                            LocationFloat="10,340"
+                            Padding="2,2,0,0,100"
+                            ><Controls
+                                ><Item1
+                                    Ref="36"
+                                    ControlType="XRCheckBox"
+                                    Name="radio_rdoRadio_1"
+                                    Text="1"
+                                    SizeF="630,25"
+                                    LocationFloat="0,0"
+                                    Padding="2,2,0,0,100"
+                                    ><GlyphOptions Ref="37" Size="13,13" /><ExpressionBindings
+                                        ><Item1
+                                            Ref="38"
+                                            EventName="BeforePrint"
+                                            PropertyName="CheckBoxState"
+                                            Expression="IIF([rdoRadio] == '1Val', True, False)" /></ExpressionBindings></Item1
+                                ><Item2
+                                    Ref="39"
+                                    ControlType="XRCheckBox"
+                                    Name="radio_rdoRadio_2"
+                                    Text="2"
+                                    SizeF="630,25"
+                                    LocationFloat="0,25"
+                                    Padding="2,2,0,0,100"
+                                    ><GlyphOptions Ref="40" Size="13,13" /><ExpressionBindings
+                                        ><Item1
+                                            Ref="41"
+                                            EventName="BeforePrint"
+                                            PropertyName="CheckBoxState"
+                                            Expression="IIF([rdoRadio] == '2Val', True, False)" /></ExpressionBindings></Item2
+                                ><Item3
+                                    Ref="42"
+                                    ControlType="XRCheckBox"
+                                    Name="radio_rdoRadio_3"
+                                    Text="3"
+                                    SizeF="630,25"
+                                    LocationFloat="0,50"
+                                    Padding="2,2,0,0,100"
+                                    ><GlyphOptions Ref="43" Size="13,13" /><ExpressionBindings
+                                        ><Item1
+                                            Ref="44"
+                                            EventName="BeforePrint"
+                                            PropertyName="CheckBoxState"
+                                            Expression="IIF([rdoRadio] == '3Val', True, False)" /></ExpressionBindings></Item3></Controls></Item11
+                        ><Item12
+                            Ref="45"
+                            ControlType="XRLabel"
+                            Name="button"
+                            SizeF="630,25"
+                            LocationFloat="10,423"
+                            Visible="false"
+                            ><ExpressionBindings
+                                ><Item1
+                                    Ref="46"
+                                    EventName="BeforePrint"
+                                    PropertyName="Text"
+                                    Expression="[button]" /></ExpressionBindings></Item12></Controls></Item7
+                ><Item8
+                    Ref="47"
+                    ControlType="XRPanel"
+                    Name="advancedFieldsPanel"
+                    CanShrink="true"
+                    SizeF="650,826"
+                    LocationFloat="0,768"
+                    Padding="2,2,0,0,100"
+                    Borders="None"
+                    ><Controls
+                        ><Item1
+                            Ref="48"
+                            ControlType="XRLabel"
+                            Name="label_fileUpload1"
+                            Text="File Upload"
+                            TextAlignment="MiddleLeft"
+                            SizeF="472,25"
+                            LocationFloat="10,25"
+                            Font="Times New Roman, 9.75pt, style=Bold"
+                            Padding="2,2,0,0,100"
+                            Borders="None" /><Item2
+                            Ref="49"
+                            ControlType="XRLabel"
+                            Name="fileUpload1"
+                            TextAlignment="MiddleLeft"
+                            SizeF="472,25"
+                            LocationFloat="10,50"
+                            Padding="2,2,0,0,100"
+                            Borders="Bottom"
+                            ><ExpressionBindings
+                                ><Item1
+                                    Ref="50"
+                                    EventName="BeforePrint"
+                                    PropertyName="Text"
+                                    Expression="[fileUpload1]" /></ExpressionBindings></Item2
+                        ><Item3
+                            Ref="51"
+                            ControlType="XRLabel"
+                            Name="label_txtEmail"
+                            Text="Email:"
+                            TextAlignment="MiddleLeft"
+                            SizeF="472,25"
+                            LocationFloat="10,83"
+                            Font="Times New Roman, 9.75pt, style=Bold"
+                            Padding="2,2,0,0,100"
+                            Borders="None" /><Item4
+                            Ref="52"
+                            ControlType="XRLabel"
+                            Name="txtEmail"
+                            TextAlignment="MiddleLeft"
+                            SizeF="472,25"
+                            LocationFloat="10,108"
+                            Padding="2,2,0,0,100"
+                            Borders="Bottom"
+                            ><ExpressionBindings
+                                ><Item1
+                                    Ref="53"
+                                    EventName="BeforePrint"
+                                    PropertyName="Text"
+                                    Expression="[txtEmail]" /></ExpressionBindings></Item4
+                        ><Item5
+                            Ref="54"
+                            ControlType="XRLabel"
+                            Name="label_569e5b9b-2075-4a0a-bd6c-9a3a42471b3b"
+                            Text="Nested form"
+                            TextAlignment="MiddleLeft"
+                            SizeF="630,25"
+                            LocationFloat="10,141"
+                            Font="Times New Roman, 9.75pt, style=Bold"
+                            Padding="2,2,0,0,100"
+                            Borders="None" /><Item6
+                            Ref="55"
+                            ControlType="XRLabel"
+                            Name="label_txtURL"
+                            Text="URL:"
+                            TextAlignment="MiddleLeft"
+                            SizeF="472,25"
+                            LocationFloat="10,224"
+                            Font="Times New Roman, 9.75pt, style=Bold"
+                            Padding="2,2,0,0,100"
+                            Borders="None" /><Item7
+                            Ref="56"
+                            ControlType="XRLabel"
+                            Name="txtURL"
+                            TextAlignment="MiddleLeft"
+                            SizeF="472,25"
+                            LocationFloat="10,249"
+                            Padding="2,2,0,0,100"
+                            Borders="Bottom"
+                            ><ExpressionBindings
+                                ><Item1
+                                    Ref="57"
+                                    EventName="BeforePrint"
+                                    PropertyName="Text"
+                                    Expression="[txtURL]" /></ExpressionBindings></Item7
+                        ><Item8
+                            Ref="58"
+                            ControlType="XRLabel"
+                            Name="label_txtPhoneNumber"
+                            Text="Phone Number:"
+                            TextAlignment="MiddleLeft"
+                            SizeF="472,25"
+                            LocationFloat="10,282"
+                            Font="Times New Roman, 9.75pt, style=Bold"
+                            Padding="2,2,0,0,100"
+                            Borders="None" /><Item9
+                            Ref="59"
+                            ControlType="XRLabel"
+                            Name="txtPhoneNumber"
+                            TextAlignment="MiddleLeft"
+                            SizeF="472,25"
+                            LocationFloat="10,307"
+                            Padding="2,2,0,0,100"
+                            Borders="Bottom"
+                            ><ExpressionBindings
+                                ><Item1
+                                    Ref="60"
+                                    EventName="BeforePrint"
+                                    PropertyName="Text"
+                                    Expression="[txtPhoneNumber]" /></ExpressionBindings></Item9
+                        ><Item10
+                            Ref="61"
+                            ControlType="XRLabel"
+                            Name="label_txtAddress"
+                            Text="Address:"
+                            TextAlignment="MiddleLeft"
+                            SizeF="472,25"
+                            LocationFloat="10,340"
+                            Font="Times New Roman, 9.75pt, style=Bold"
+                            Padding="2,2,0,0,100"
+                            Borders="None" /><Item11
+                            Ref="62"
+                            ControlType="XRLabel"
+                            Name="txtAddress"
+                            Multiline="true"
+                            TextAlignment="BottomLeft"
+                            SizeF="472,50"
+                            LocationFloat="10,365"
+                            Padding="2,2,0,0,100"
+                            Borders="Bottom"
+                            ><ExpressionBindings
+                                ><Item1
+                                    Ref="63"
+                                    EventName="BeforePrint"
+                                    PropertyName="Text"
+                                    Expression="[txtAddress]" /></ExpressionBindings></Item11
+                        ><Item12
+                            Ref="64"
+                            ControlType="XRLabel"
+                            Name="label_txtDateTime"
+                            Text="Date Time:"
+                            TextAlignment="MiddleLeft"
+                            SizeF="315,25"
+                            LocationFloat="10,423"
+                            Font="Times New Roman, 9.75pt, style=Bold"
+                            Padding="2,2,0,0,100"
+                            Borders="None" /><Item13
+                            Ref="65"
+                            ControlType="XRLabel"
+                            Name="txtDateTime"
+                            TextAlignment="MiddleLeft"
+                            SizeF="315,25"
+                            LocationFloat="10,448"
+                            Padding="2,2,0,0,100"
+                            Borders="Bottom"
+                            ><ExpressionBindings
+                                ><Item1
+                                    Ref="66"
+                                    EventName="BeforePrint"
+                                    PropertyName="Text"
+                                    Expression="FormatString('{0:MM/dd/yyyy hh:mm tt}', [txtDateTime])" /></ExpressionBindings></Item13
+                        ><Item14
+                            Ref="67"
+                            ControlType="XRLabel"
+                            Name="label_txtDay"
+                            Text="Day:"
+                            TextAlignment="MiddleLeft"
+                            SizeF="472,25"
+                            LocationFloat="10,481"
+                            Font="Times New Roman, 9.75pt, style=Bold"
+                            Padding="2,2,0,0,100"
+                            Borders="None" /><Item15
+                            Ref="68"
+                            ControlType="XRLabel"
+                            Name="txtDay"
+                            TextAlignment="MiddleLeft"
+                            SizeF="472,25"
+                            LocationFloat="10,506"
+                            Padding="2,2,0,0,100"
+                            Borders="Bottom"
+                            ><ExpressionBindings
+                                ><Item1
+                                    Ref="69"
+                                    EventName="BeforePrint"
+                                    PropertyName="Text"
+                                    Expression="[txtDay]" /></ExpressionBindings></Item15
+                        ><Item16
+                            Ref="70"
+                            ControlType="XRLabel"
+                            Name="label_txtTime"
+                            Text="Time:"
+                            TextAlignment="MiddleLeft"
+                            SizeF="472,25"
+                            LocationFloat="10,539"
+                            Font="Times New Roman, 9.75pt, style=Bold"
+                            Padding="2,2,0,0,100"
+                            Borders="None" /><Item17
+                            Ref="71"
+                            ControlType="XRLabel"
+                            Name="txtTime"
+                            TextAlignment="MiddleLeft"
+                            SizeF="472,25"
+                            LocationFloat="10,564"
+                            Padding="2,2,0,0,100"
+                            Borders="Bottom"
+                            ><ExpressionBindings
+                                ><Item1
+                                    Ref="72"
+                                    EventName="BeforePrint"
+                                    PropertyName="Text"
+                                    Expression="[txtTime]" /></ExpressionBindings></Item17
+                        ><Item18
+                            Ref="73"
+                            ControlType="XRLabel"
+                            Name="label_txtCurrency"
+                            Text="Currency:"
+                            TextAlignment="MiddleLeft"
+                            SizeF="472,25"
+                            LocationFloat="10,597"
+                            Font="Times New Roman, 9.75pt, style=Bold"
+                            Padding="2,2,0,0,100"
+                            Borders="None" /><Item19
+                            Ref="74"
+                            ControlType="XRLabel"
+                            Name="txtCurrency"
+                            TextAlignment="MiddleLeft"
+                            SizeF="472,25"
+                            LocationFloat="10,622"
+                            Padding="2,2,0,0,100"
+                            Borders="Bottom"
+                            ><ExpressionBindings
+                                ><Item1
+                                    Ref="75"
+                                    EventName="BeforePrint"
+                                    PropertyName="Text"
+                                    Expression="[txtCurrency]" /></ExpressionBindings></Item19
+                        ><Item20
+                            Ref="76"
+                            ControlType="XRLabel"
+                            Name="label_sigSignature"
+                            Text="Signature:"
+                            TextAlignment="MiddleLeft"
+                            SizeF="315,25"
+                            LocationFloat="10,655"
+                            Font="Times New Roman, 9.75pt, style=Bold"
+                            Padding="2,2,0,0,100"
+                            Borders="None" /><Item21
+                            Ref="77"
+                            ControlType="XRPictureBox"
+                            Name="sigSignature"
+                            Padding="2,2,0,0,100"
+                            Sizing="ZoomImage"
+                            SizeF="315,100"
+                            LocationFloat="10,680"
+                            ><ExpressionBindings
+                                ><Item1
+                                    Ref="78"
+                                    EventName="BeforePrint"
+                                    PropertyName="ImageSource"
+                                    Expression="[sigSignature]" /></ExpressionBindings></Item21></Controls></Item8
+                ><Item9
+                    Ref="79"
+                    ControlType="XRPanel"
+                    Name="layoutPanel"
+                    CanShrink="true"
+                    SizeF="650,1123"
+                    LocationFloat="0,1609"
+                    Padding="2,2,0,0,100"
+                    Borders="None"
+                    ><Controls
+                        ><Item1
+                            Ref="80"
+                            ControlType="XRPanel"
+                            Name="tab_tab2"
+                            CanShrink="true"
+                            SizeF="630,101"
+                            LocationFloat="10,823"
+                            Padding="2,2,0,0,100"
+                            Borders="None"
+                            ><Controls
+                                ><Item1
+                                    Ref="81"
+                                    ControlType="XRLabel"
+                                    Name="label_tab2_label"
+                                    Text="Tab 1"
+                                    TextAlignment="MiddleLeft"
+                                    SizeF="465,25"
+                                    LocationFloat="5,0"
+                                    Font="Times New Roman, 9.75pt, style=Bold"
+                                    Padding="2,2,0,0,100"
+                                    Borders="None" /><Item2
+                                    Ref="82"
+                                    ControlType="XRLabel"
+                                    Name="html1"
+                                    AllowMarkupText="true"
+                                    Text="<B>TAB 1 CONTENT</B>"
+                                    TextAlignment="TopLeft"
+                                    SizeF="610,30"
+                                    LocationFloat="10,25"
+                                    Padding="2,2,0,0,100"
+                                    Borders="None" /></Controls></Item1
+                        ><Item2
+                            Ref="83"
+                            ControlType="XRPanel"
+                            Name="tab_tab3"
+                            CanShrink="true"
+                            SizeF="630,101"
+                            LocationFloat="10,939"
+                            Padding="2,2,0,0,100"
+                            Borders="None"
+                            ><Controls
+                                ><Item1
+                                    Ref="84"
+                                    ControlType="XRLabel"
+                                    Name="label_tab3_label"
+                                    Text="Tab 2"
+                                    TextAlignment="MiddleLeft"
+                                    SizeF="465,25"
+                                    LocationFloat="5,0"
+                                    Font="Times New Roman, 9.75pt, style=Bold"
+                                    Padding="2,2,0,0,100"
+                                    Borders="None" /><Item2
+                                    Ref="85"
+                                    ControlType="XRLabel"
+                                    Name="html2"
+                                    AllowMarkupText="true"
+                                    Text="<i>TAB 2 CONTENT</i>"
+                                    TextAlignment="TopLeft"
+                                    SizeF="610,30"
+                                    LocationFloat="10,25"
+                                    Padding="2,2,0,0,100"
+                                    Borders="None" /></Controls></Item2
+                        ><Item3
+                            Ref="86"
+                            ControlType="XRTable"
+                            Name="columns"
+                            KeepTogether="true"
+                            AnchorVertical="Top"
+                            AnchorHorizontal="Both"
+                            SizeF="630,179"
+                            LocationFloat="10,96"
+                            Padding="0,0,0,0,96"
+                            ><Rows
+                                ><Item1
+                                    Ref="87"
+                                    ControlType="XRTableRow"
+                                    Name="columnsRow_1759163478474"
+                                    Weight="0.14743589743589744"
+                                    ><Cells
+                                        ><Item1
+                                            Ref="88"
+                                            ControlType="XRTableCell"
+                                            Name="column_1"
+                                            Weight="0.5"
+                                            TextAlignment="TopLeft"
+                                            Padding="8,8,8,8,96"
+                                            Borders="None"
+                                            ><Controls
+                                                ><Item1
+                                                    Ref="89"
+                                                    ControlType="XRLabel"
+                                                    Name="label_txtColumn1Field1"
+                                                    Text="Column 1 Field 1"
+                                                    TextAlignment="MiddleLeft"
+                                                    SizeF="145,25"
+                                                    LocationFloat="8,0"
+                                                    Font="Times New Roman, 9.75pt, style=Bold"
+                                                    Padding="2,2,0,0,100"
+                                                    Borders="None" /><Item2
+                                                    Ref="90"
+                                                    ControlType="XRLabel"
+                                                    Name="txtColumn1Field1"
+                                                    TextAlignment="MiddleLeft"
+                                                    SizeF="145,25"
+                                                    LocationFloat="8,25"
+                                                    Padding="2,2,0,0,100"
+                                                    Borders="Bottom"
+                                                    ><ExpressionBindings
+                                                        ><Item1
+                                                            Ref="91"
+                                                            EventName="BeforePrint"
+                                                            PropertyName="Text"
+                                                            Expression="[txtColumn1Field1]" /></ExpressionBindings></Item2
+                                                ><Item3
+                                                    Ref="92"
+                                                    ControlType="XRLabel"
+                                                    Name="label_txtColumn1Field2"
+                                                    Text="Column 1 Field 2"
+                                                    TextAlignment="MiddleLeft"
+                                                    SizeF="145,25"
+                                                    LocationFloat="8,58"
+                                                    Font="Times New Roman, 9.75pt, style=Bold"
+                                                    Padding="2,2,0,0,100"
+                                                    Borders="None" /><Item4
+                                                    Ref="93"
+                                                    ControlType="XRLabel"
+                                                    Name="txtColumn1Field2"
+                                                    TextAlignment="MiddleLeft"
+                                                    SizeF="145,25"
+                                                    LocationFloat="8,83"
+                                                    Padding="2,2,0,0,100"
+                                                    Borders="Bottom"
+                                                    ><ExpressionBindings
+                                                        ><Item1
+                                                            Ref="94"
+                                                            EventName="BeforePrint"
+                                                            PropertyName="Text"
+                                                            Expression="[txtColumn1Field2]" /></ExpressionBindings></Item4></Controls></Item1
+                                        ><Item2
+                                            Ref="95"
+                                            ControlType="XRTableCell"
+                                            Name="column_2"
+                                            Weight="0.5"
+                                            TextAlignment="TopLeft"
+                                            Padding="8,8,8,8,96"
+                                            Borders="None"
+                                            ><Controls
+                                                ><Item1
+                                                    Ref="96"
+                                                    ControlType="XRLabel"
+                                                    Name="label_txtColumn2Field1"
+                                                    Text="Column 2 Field 1"
+                                                    TextAlignment="MiddleLeft"
+                                                    SizeF="145,25"
+                                                    LocationFloat="8,0"
+                                                    Font="Times New Roman, 9.75pt, style=Bold"
+                                                    Padding="2,2,0,0,100"
+                                                    Borders="None" /><Item2
+                                                    Ref="97"
+                                                    ControlType="XRLabel"
+                                                    Name="txtColumn2Field1"
+                                                    TextAlignment="MiddleLeft"
+                                                    SizeF="145,25"
+                                                    LocationFloat="8,25"
+                                                    Padding="2,2,0,0,100"
+                                                    Borders="Bottom"
+                                                    ><ExpressionBindings
+                                                        ><Item1
+                                                            Ref="98"
+                                                            EventName="BeforePrint"
+                                                            PropertyName="Text"
+                                                            Expression="[txtColumn2Field1]" /></ExpressionBindings></Item2
+                                                ><Item3
+                                                    Ref="99"
+                                                    ControlType="XRCheckBox"
+                                                    Name="chkColumn2Field2"
+                                                    Text="Column 2 Field 2"
+                                                    SizeF="97,25"
+                                                    LocationFloat="8,58"
+                                                    Padding="2,2,0,0,100"
+                                                    ><GlyphOptions
+                                                        Ref="100"
+                                                        Size="13,13" /><ExpressionBindings
+                                                        ><Item1
+                                                            Ref="101"
+                                                            EventName="BeforePrint"
+                                                            PropertyName="CheckBoxState"
+                                                            Expression="IIF([chkColumn2Field2] == 'true', True, False)" /></ExpressionBindings></Item3></Controls></Item2
+                                        ><Item3
+                                            Ref="102"
+                                            ControlType="XRTableCell"
+                                            Name="column_3"
+                                            Weight="0.5"
+                                            TextAlignment="TopLeft"
+                                            Padding="8,8,8,8,96"
+                                            Borders="None"
+                                            ><Controls
+                                                ><Item1
+                                                    Ref="103"
+                                                    ControlType="XRLabel"
+                                                    Name="htmlTestElement"
+                                                    AllowMarkupText="true"
+                                                    Text="<b>Bold Text</b><br>
+<i>Slanted Text</i><bR>
+<h1>BIG Text</h1>
+<p style=&quot;color: blue;&quot;>Blue Text</p>"
+                                                    TextAlignment="TopLeft"
+                                                    SizeF="194,141"
+                                                    LocationFloat="8,0"
+                                                    Padding="2,2,0,0,100"
+                                                    Borders="None" /></Controls></Item3></Cells></Item1></Rows></Item3
+                        ><Item4
+                            Ref="104"
+                            ControlType="XRPanel"
+                            Name="fieldset"
+                            CanShrink="true"
+                            SizeF="630,204"
+                            LocationFloat="10,290"
+                            Padding="2,2,0,0,100"
+                            Borders="None"
+                            ><Controls
+                                ><Item1
+                                    Ref="105"
+                                    ControlType="XRLabel"
+                                    Name="label_txtFieldsetField1"
+                                    Text="Fieldset Field 1"
+                                    TextAlignment="MiddleLeft"
+                                    SizeF="457,25"
+                                    LocationFloat="10,0"
+                                    Font="Times New Roman, 9.75pt, style=Bold"
+                                    Padding="2,2,0,0,100"
+                                    Borders="None" /><Item2
+                                    Ref="106"
+                                    ControlType="XRLabel"
+                                    Name="txtFieldsetField1"
+                                    TextAlignment="MiddleLeft"
+                                    SizeF="457,25"
+                                    LocationFloat="10,25"
+                                    Padding="2,2,0,0,100"
+                                    Borders="Bottom"
+                                    ><ExpressionBindings
+                                        ><Item1
+                                            Ref="107"
+                                            EventName="BeforePrint"
+                                            PropertyName="Text"
+                                            Expression="[txtFieldsetField1]" /></ExpressionBindings></Item2
+                                ><Item3
+                                    Ref="108"
+                                    ControlType="XRLabel"
+                                    Name="label_txtaFieldsetField2"
+                                    Text="Fieldset Field 2"
+                                    TextAlignment="MiddleLeft"
+                                    SizeF="457,25"
+                                    LocationFloat="10,58"
+                                    Font="Times New Roman, 9.75pt, style=Bold"
+                                    Padding="2,2,0,0,100"
+                                    Borders="None" /><Item4
+                                    Ref="109"
+                                    ControlType="XRLabel"
+                                    Name="txtaFieldsetField2"
+                                    Multiline="true"
+                                    TextAlignment="BottomLeft"
+                                    SizeF="457,50"
+                                    LocationFloat="10,83"
+                                    Padding="2,2,0,0,100"
+                                    Borders="Bottom"
+                                    ><ExpressionBindings
+                                        ><Item1
+                                            Ref="110"
+                                            EventName="BeforePrint"
+                                            PropertyName="Text"
+                                            Expression="[txtaFieldsetField2]" /></ExpressionBindings></Item4
+                                ><Item5
+                                    Ref="111"
+                                    ControlType="XRCheckBox"
+                                    Name="chkFieldsetField3"
+                                    Text="Fieldset Field 3"
+                                    SizeF="305,25"
+                                    LocationFloat="10,141"
+                                    Padding="2,2,0,0,100"
+                                    ><GlyphOptions Ref="112" Size="13,13" /><ExpressionBindings
+                                        ><Item1
+                                            Ref="113"
+                                            EventName="BeforePrint"
+                                            PropertyName="CheckBoxState"
+                                            Expression="IIF([chkFieldsetField3] == 'true', True, False)" /></ExpressionBindings></Item5></Controls></Item4
+                        ><Item5
+                            Ref="114"
+                            ControlType="XRPanel"
+                            Name="panel"
+                            CanShrink="true"
+                            SizeF="630,179"
+                            LocationFloat="10,509"
+                            Padding="2,2,0,0,100"
+                            Borders="None"
+                            ><Controls
+                                ><Item1
+                                    Ref="115"
+                                    ControlType="XRLabel"
+                                    Name="label_txtPanelField1"
+                                    Text="Panel Field 1"
+                                    TextAlignment="MiddleLeft"
+                                    SizeF="457,25"
+                                    LocationFloat="10,25"
+                                    Font="Times New Roman, 9.75pt, style=Bold"
+                                    Padding="2,2,0,0,100"
+                                    Borders="None" /><Item2
+                                    Ref="116"
+                                    ControlType="XRLabel"
+                                    Name="txtPanelField1"
+                                    TextAlignment="MiddleLeft"
+                                    SizeF="457,25"
+                                    LocationFloat="10,50"
+                                    Padding="2,2,0,0,100"
+                                    Borders="Bottom"
+                                    ><ExpressionBindings
+                                        ><Item1
+                                            Ref="117"
+                                            EventName="BeforePrint"
+                                            PropertyName="Text"
+                                            Expression="[txtPanelField1]" /></ExpressionBindings></Item2
+                                ><Item3
+                                    Ref="118"
+                                    ControlType="XRLabel"
+                                    Name="label_cmbPanelField2"
+                                    Text="Panel Field 2"
+                                    TextAlignment="MiddleLeft"
+                                    SizeF="457,25"
+                                    LocationFloat="10,83"
+                                    Font="Times New Roman, 9.75pt, style=Bold"
+                                    Padding="2,2,0,0,100"
+                                    Borders="None" /><Item4
+                                    Ref="119"
+                                    ControlType="XRLabel"
+                                    Name="cmbPanelField2"
+                                    TextAlignment="MiddleLeft"
+                                    SizeF="457,25"
+                                    LocationFloat="10,108"
+                                    Padding="2,2,0,0,100"
+                                    Borders="Bottom"
+                                    ><ExpressionBindings
+                                        ><Item1
+                                            Ref="120"
+                                            EventName="BeforePrint"
+                                            PropertyName="Text"
+                                            Expression="[cmbPanelField2]" /></ExpressionBindings></Item4></Controls></Item5
+                        ><Item6
+                            Ref="121"
+                            ControlType="XRTable"
+                            Name="table"
+                            SizeF="630,105"
+                            LocationFloat="10,703"
+                            Padding="2,2,0,0,100"
+                            Borders="None"
+                            ><Rows
+                                ><Item1
+                                    Ref="122"
+                                    ControlType="XRTableRow"
+                                    Name="tableRow_1"
+                                    Weight="1"
+                                    ><Cells
+                                        ><Item1
+                                            Ref="123"
+                                            ControlType="XRTableCell"
+                                            Name="cell_1_1"
+                                            Weight="0.33333333333333331"
+                                            TextAlignment="MiddleLeft"
+                                            Padding="5,5,0,0,100"
+                                            Borders="None" /><Item2
+                                            Ref="124"
+                                            ControlType="XRTableCell"
+                                            Name="cell_1_2"
+                                            Weight="0.33333333333333331"
+                                            TextAlignment="MiddleLeft"
+                                            Padding="5,5,0,0,100"
+                                            Borders="None" /><Item3
+                                            Ref="125"
+                                            ControlType="XRTableCell"
+                                            Name="cell_1_3"
+                                            Weight="0.33333333333333331"
+                                            TextAlignment="MiddleLeft"
+                                            Padding="5,5,0,0,100"
+                                            Borders="None" /></Cells></Item1
+                                ><Item2
+                                    Ref="126"
+                                    ControlType="XRTableRow"
+                                    Name="tableRow_2"
+                                    Weight="1"
+                                    ><Cells
+                                        ><Item1
+                                            Ref="127"
+                                            ControlType="XRTableCell"
+                                            Name="cell_2_1"
+                                            Weight="0.33333333333333331"
+                                            TextAlignment="MiddleLeft"
+                                            Padding="5,5,0,0,100"
+                                            Borders="None" /><Item2
+                                            Ref="128"
+                                            ControlType="XRTableCell"
+                                            Name="cell_2_2"
+                                            Weight="0.33333333333333331"
+                                            TextAlignment="MiddleLeft"
+                                            Padding="5,5,0,0,100"
+                                            Borders="None" /><Item3
+                                            Ref="129"
+                                            ControlType="XRTableCell"
+                                            Name="cell_2_3"
+                                            Weight="0.33333333333333331"
+                                            TextAlignment="MiddleLeft"
+                                            Padding="5,5,0,0,100"
+                                            Borders="None" /></Cells></Item2
+                                ><Item3
+                                    Ref="130"
+                                    ControlType="XRTableRow"
+                                    Name="tableRow_3"
+                                    Weight="1"
+                                    ><Cells
+                                        ><Item1
+                                            Ref="131"
+                                            ControlType="XRTableCell"
+                                            Name="cell_3_1"
+                                            Weight="0.33333333333333331"
+                                            TextAlignment="MiddleLeft"
+                                            Padding="5,5,0,0,100"
+                                            Borders="None" /><Item2
+                                            Ref="132"
+                                            ControlType="XRTableCell"
+                                            Name="cell_3_2"
+                                            Weight="0.33333333333333331"
+                                            TextAlignment="MiddleLeft"
+                                            Padding="5,5,0,0,100"
+                                            Borders="None" /><Item3
+                                            Ref="133"
+                                            ControlType="XRTableCell"
+                                            Name="cell_3_3"
+                                            Weight="0.33333333333333331"
+                                            TextAlignment="MiddleLeft"
+                                            Padding="5,5,0,0,100"
+                                            Borders="None" /></Cells></Item3></Rows></Item6
+                        ><Item7
+                            Ref="134"
+                            ControlType="XRPanel"
+                            Name="wellComponent"
+                            CanShrink="true"
+                            SizeF="630,63"
+                            LocationFloat="10,1055"
+                            Padding="10,10,10,10,100"
+                            Borders="All"
+                            BorderWidth="1" /><Item8
+                            Ref="135"
+                            ControlType="XRLabel"
+                            Name="label_layoutPanel"
+                            Text="Layout Panel"
+                            TextAlignment="MiddleLeft"
+                            SizeF="480,25"
+                            LocationFloat="5,0"
+                            Font="Times New Roman, 9.75pt, style=Bold"
+                            Padding="2,2,0,0,100"
+                            Borders="None" /></Controls></Item9></Controls></Item3
+        ><Item4 Ref="136" ControlType="DetailReportBand" Name="DetailReport1" Level="0"
+            ><Bands><Item1 Ref="137" ControlType="DetailBand" Name="Detail1" /></Bands></Item4
+        ><Item5 Ref="138" ControlType="BottomMarginBand" Name="BottomMargin" HeightF="40" /></Bands
+    ><ParameterPanelLayoutItems
+        ><Item1 Ref="139" LayoutItemType="Parameter" Parameter="#Ref-3" /><Item2
+            Ref="140"
+            LayoutItemType="Parameter"
+            Parameter="#Ref-4" /></ParameterPanelLayoutItems
+></XtraReportsLayoutSerializer>

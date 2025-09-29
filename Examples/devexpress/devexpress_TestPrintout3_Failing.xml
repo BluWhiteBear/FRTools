@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="utf-8"?><XtraReportsLayoutSerializer
+    SerializerVersion="23.2.5.0"
+    ControlType="DevExpress.XtraReports.UI.XtraReport, DevExpress.XtraReports.v23.2, Version=23.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a"
+    Name="Report"
+    DisplayName="Form Extract;Form Extract;false;false;00000000-0000-0000-0000-000000000000;00000000-0000-0000-0000-000000000000"
+    Margins="40, 40, 40, 40"
+    PageWidth="850"
+    PageHeight="1100"
+    Version="23.2"
+    DataMember="Root"
+    Ref="0"
+    ><Extensions Ref="1"
+        ><Item1
+            Key="DataSerializationExtension"
+            Value="DevExpress.XtraReports.Web.ReportDesigner.DefaultDataSerializer"
+            Ref="2"
+        ></Item1></Extensions
+    ><Parameters Ref="3"
+        ><Item1
+            ControlType="Parameter"
+            Description="FormDataGUID"
+            Name="FormDataGUID"
+            Type="#Ref-3"
+            ValueInfo="00000000-0000-0000-0000-000000000000"
+            Ref="4"
+        ></Item1
+        ><Item2
+            ControlType="Parameter"
+            Description="ObjectGUID"
+            Name="ObjectGUID"
+            Type="#Ref-3"
+            ValueInfo="00000000-0000-0000-0000-000000000000"
+            Ref="5"
+        ></Item2></Parameters
+    ><Bands Ref="6"
+        ><Item1 ControlType="TopMarginBand" Name="TopMargin" HeightF="40" Ref="7"></Item1
+        ><Item2 ControlType="PageHeaderBand" Name="PageHeader" HeightF="50" Ref="8"
+            ><Controls
+                ><Item1
+                    ControlType="XRLabel"
+                    Name="headerLabel"
+                    Text="Form Extract"
+                    TextAlignment="MiddleCenter"
+                    SizeF="769.987,30"
+                    LocationFloat="0,0"
+                    Font="Times New Roman, 14pt, style=Bold"
+                    Padding="2,2,0,0,100"
+                    Ref="9"
+                ></Item1></Controls></Item2
+        ><Item3 ControlType="DetailBand" Name="Detail" HeightF="830" Ref="10"
+            ><Controls
+                ><Item2
+                    ControlType="XRPanel"
+                    Name="pnlMain"
+                    CanShrink="true"
+                    Borders="None"
+                    Padding="2,2,0,0,100"
+                    SizeF="650,121"
+                    LocationFloat="0,60"
+                    Ref="11"
+                    ><Controls
+                        ><Item3
+                            ControlType="XRLabel"
+                            Name="label_pnlMain"
+                            Text="pnlMain"
+                            SizeF="480,25"
+                            LocationFloat="5,0"
+                            Font="Times New Roman, 9.75pt, style=Bold"
+                            TextAlignment="MiddleLeft"
+                            Borders="None"
+                            Padding="2,2,0,0,100"
+                            Ref="12"
+                        ></Item3
+                        ><Item1
+                            ControlType="XRTable"
+                            Name="columns"
+                            AnchorHorizontal="Both"
+                            AnchorVertical="Top"
+                            Padding="0,0,0,0,96"
+                            SizeF="630,229"
+                            LocationFloat="10,25"
+                            KeepTogether="true"
+                            Ref="13"
+                            ><Rows
+                                ><Item1
+                                    ControlType="XRTableRow"
+                                    Name="columnsRow_1759178749853"
+                                    Ref="14"
+                                    ><Cells
+                                        ><Item1
+                                            ControlType="XRTableCell"
+                                            Name="column_1"
+                                            Weight="0.5"
+                                            Padding="8,8,8,8,96"
+                                            Borders="None"
+                                            TextAlignment="TopLeft"
+                                            Ref="15"
+                                            ><Controls
+                                                ><Item1
+                                                    ControlType="XRLabel"
+                                                    Name="label_cmbProgram"
+                                                    Text="Select the program for which you would like to extract billing records:"
+                                                    SizeF="224,25"
+                                                    LocationFloat="8,0"
+                                                    Font="Times New Roman, 9.75pt, style=Bold"
+                                                    TextAlignment="MiddleLeft"
+                                                    Borders="None"
+                                                    Padding="2,2,0,0,100"
+                                                    Ref="16"
+                                                ></Item1
+                                                ><Item2
+                                                    ControlType="XRLabel"
+                                                    Name="cmbProgram"
+                                                    TextAlignment="MiddleLeft"
+                                                    Borders="Bottom"
+                                                    Padding="2,2,0,0,100"
+                                                    SizeF="224,25"
+                                                    LocationFloat="8,25"
+                                                    Ref="17"
+                                                    ><ExpressionBindings Ref="18"
+                                                        ><Item1
+                                                            EventName="BeforePrint"
+                                                            PropertyName="Text"
+                                                            Expression="[cmbProgram]"
+                                                            Ref="19"
+                                                        ></Item1></ExpressionBindings></Item2
+                                                ><Item3
+                                                    ControlType="XRPanel"
+                                                    Name="fieldset"
+                                                    CanShrink="true"
+                                                    Borders="None"
+                                                    Padding="2,2,0,0,100"
+                                                    SizeF="299,436"
+                                                    LocationFloat="8,58"
+                                                    Ref="20"
+                                                    ><Controls
+                                                        ><Item1
+                                                            ControlType="XRLabel"
+                                                            Name="label_cmbMonth"
+                                                            Text="Month for which to generate billing:"
+                                                            SizeF="209,25"
+                                                            LocationFloat="10,0"
+                                                            Font="Times New Roman, 9.75pt, style=Bold"
+                                                            TextAlignment="MiddleLeft"
+                                                            Borders="None"
+                                                            Padding="2,2,0,0,100"
+                                                            Ref="21"
+                                                        ></Item1
+                                                        ><Item2
+                                                            ControlType="XRLabel"
+                                                            Name="cmbMonth"
+                                                            TextAlignment="MiddleLeft"
+                                                            Borders="Bottom"
+                                                            Padding="2,2,0,0,100"
+                                                            SizeF="209,25"
+                                                            LocationFloat="10,25"
+                                                            Ref="22"
+                                                            ><ExpressionBindings Ref="23"
+                                                                ><Item1
+                                                                    EventName="BeforePrint"
+                                                                    PropertyName="Text"
+                                                                    Expression="[cmbMonth]"
+                                                                    Ref="24"
+                                                                ></Item1></ExpressionBindings></Item2
+                                                        ><Item3
+                                                            ControlType="XRLabel"
+                                                            Name="label_cmbYear"
+                                                            Text="Year for which to generate billing:"
+                                                            SizeF="209,25"
+                                                            LocationFloat="10,58"
+                                                            Font="Times New Roman, 9.75pt, style=Bold"
+                                                            TextAlignment="MiddleLeft"
+                                                            Borders="None"
+                                                            Padding="2,2,0,0,100"
+                                                            Ref="25"
+                                                        ></Item3
+                                                        ><Item4
+                                                            ControlType="XRLabel"
+                                                            Name="cmbYear"
+                                                            TextAlignment="MiddleLeft"
+                                                            Borders="Bottom"
+                                                            Padding="2,2,0,0,100"
+                                                            SizeF="209,25"
+                                                            LocationFloat="10,83"
+                                                            Ref="26"
+                                                            ><ExpressionBindings Ref="27"
+                                                                ><Item1
+                                                                    EventName="BeforePrint"
+                                                                    PropertyName="Text"
+                                                                    Expression="[cmbYear]"
+                                                                    Ref="28"
+                                                                ></Item1></ExpressionBindings></Item4
+                                                        ><Item5
+                                                            ControlType="XRLabel"
+                                                            Name="label_rdoResident1_NotForReporting"
+                                                            Text="Residents to include:"
+                                                            SizeF="279,25"
+                                                            LocationFloat="10,116"
+                                                            Font="Times New Roman, 9.75pt, style=Bold"
+                                                            TextAlignment="MiddleLeft"
+                                                            Borders="None"
+                                                            Padding="2,2,0,0,100"
+                                                            Ref="29" /><Item6
+                                                            ControlType="XRPanel"
+                                                            Name="radioPanel_rdoResident1_NotForReporting"
+                                                            TextAlignment="MiddleLeft"
+                                                            Padding="2,2,0,0,100"
+                                                            CanShrink="true"
+                                                            SizeF="279,50"
+                                                            LocationFloat="10,141"
+                                                            Ref="30"
+                                                            ><Controls
+                                                                ><Item1
+                                                                    ControlType="XRCheckBox"
+                                                                    Name="radio_rdoResident1_NotForReporting_1"
+                                                                    Padding="2,2,0,0,100"
+                                                                    GlyphOptions="[object Object]"
+                                                                    Text="All residents active during the billing period"
+                                                                    SizeF="279,25"
+                                                                    LocationFloat="0,0"
+                                                                    Ref="31"
+                                                                    ><ExpressionBindings Ref="32"
+                                                                        ><Item1
+                                                                            EventName="BeforePrint"
+                                                                            PropertyName="CheckBoxState"
+                                                                            Expression="IIF([rdoResident1_NotForReporting] == 'All residents active during the billing period', True, False)"
+                                                                            Ref="33"
+                                                                        ></Item1></ExpressionBindings></Item1
+                                                                ><Item2
+                                                                    ControlType="XRCheckBox"
+                                                                    Name="radio_rdoResident1_NotForReporting_2"
+                                                                    Padding="2,2,0,0,100"
+                                                                    GlyphOptions="[object Object]"
+                                                                    Text="Only include the residents selected below"
+                                                                    SizeF="279,25"
+                                                                    LocationFloat="0,25"
+                                                                    Ref="34"
+                                                                    ><ExpressionBindings Ref="35"
+                                                                        ><Item1
+                                                                            EventName="BeforePrint"
+                                                                            PropertyName="CheckBoxState"
+                                                                            Expression="IIF([rdoResident1_NotForReporting] == 'Only include the residents selected below', True, False)"
+                                                                            Ref="36"
+                                                                        ></Item1></ExpressionBindings></Item2></Controls></Item6
+                                                        ><Item7
+                                                            ControlType="XRLabel"
+                                                            Name="label_cmbInclude"
+                                                            Text="cmbInclude"
+                                                            SizeF="209,25"
+                                                            LocationFloat="10,199"
+                                                            Font="Times New Roman, 9.75pt, style=Bold"
+                                                            TextAlignment="MiddleLeft"
+                                                            Borders="None"
+                                                            Padding="2,2,0,0,100"
+                                                            Ref="37" /><Item8
+                                                            ControlType="XRLabel"
+                                                            Name="cmbInclude"
+                                                            TextAlignment="MiddleLeft"
+                                                            Borders="Bottom"
+                                                            Padding="2,2,0,0,100"
+                                                            SizeF="209,25"
+                                                            LocationFloat="10,224"
+                                                            Ref="38"
+                                                            ><ExpressionBindings Ref="39"
+                                                                ><Item1
+                                                                    EventName="BeforePrint"
+                                                                    PropertyName="Text"
+                                                                    Expression="[cmbInclude]"
+                                                                    Ref="40"
+                                                                ></Item1></ExpressionBindings></Item8
+                                                        ><Item9
+                                                            ControlType="XRLabel"
+                                                            Name="label_rdoResident2_NotForReporting"
+                                                            Text="rdoResident2_NotForReporting"
+                                                            SizeF="279,25"
+                                                            LocationFloat="10,257"
+                                                            Font="Times New Roman, 9.75pt, style=Bold"
+                                                            TextAlignment="MiddleLeft"
+                                                            Borders="None"
+                                                            Padding="2,2,0,0,100"
+                                                            Ref="41" /><Item10
+                                                            ControlType="XRPanel"
+                                                            Name="radioPanel_rdoResident2_NotForReporting"
+                                                            TextAlignment="MiddleLeft"
+                                                            Padding="2,2,0,0,100"
+                                                            CanShrink="true"
+                                                            SizeF="279,25"
+                                                            LocationFloat="10,282"
+                                                            Ref="42"
+                                                            ><Controls
+                                                                ><Item1
+                                                                    ControlType="XRCheckBox"
+                                                                    Name="radio_rdoResident2_NotForReporting_1"
+                                                                    Padding="2,2,0,0,100"
+                                                                    GlyphOptions="[object Object]"
+                                                                    Text="Exclude the residents selected below"
+                                                                    SizeF="279,25"
+                                                                    LocationFloat="0,0"
+                                                                    Ref="43"
+                                                                    ><ExpressionBindings Ref="44"
+                                                                        ><Item1
+                                                                            EventName="BeforePrint"
+                                                                            PropertyName="CheckBoxState"
+                                                                            Expression="IIF([rdoResident2_NotForReporting] == 'Exclude the residents selected below', True, False)"
+                                                                            Ref="45"
+                                                                        ></Item1></ExpressionBindings></Item1></Controls></Item10
+                                                        ><Item11
+                                                            ControlType="XRLabel"
+                                                            Name="label_cmbExclude"
+                                                            Text="cmbExclude"
+                                                            SizeF="209,25"
+                                                            LocationFloat="10,315"
+                                                            Font="Times New Roman, 9.75pt, style=Bold"
+                                                            TextAlignment="MiddleLeft"
+                                                            Borders="None"
+                                                            Padding="2,2,0,0,100"
+                                                            Ref="46" /><Item12
+                                                            ControlType="XRLabel"
+                                                            Name="cmbExclude"
+                                                            TextAlignment="MiddleLeft"
+                                                            Borders="Bottom"
+                                                            Padding="2,2,0,0,100"
+                                                            SizeF="209,25"
+                                                            LocationFloat="10,340"
+                                                            Ref="47"
+                                                            ><ExpressionBindings Ref="48"
+                                                                ><Item1
+                                                                    EventName="BeforePrint"
+                                                                    PropertyName="Text"
+                                                                    Expression="[cmbExclude]"
+                                                                    Ref="49"
+                                                                ></Item1></ExpressionBindings></Item12
+                                                        ><Item13
+                                                            ControlType="XRLabel"
+                                                            Name="generateBilling"
+                                                            Visible="false"
+                                                            SizeF="279,25"
+                                                            LocationFloat="10,373"
+                                                            Ref="50"
+                                                            ><ExpressionBindings Ref="51"
+                                                                ><Item1
+                                                                    EventName="BeforePrint"
+                                                                    PropertyName="Text"
+                                                                    Expression="[generateBilling]"
+                                                                    Ref="52"
+                                                                ></Item1></ExpressionBindings></Item13></Controls></Item3
+                                                ><Item4
+                                                    ControlType="XRLabel"
+                                                    Name="label_txtaGenerateError"
+                                                    Text="txtaGenerateError"
+                                                    SizeF="224,25"
+                                                    LocationFloat="8,509"
+                                                    Font="Times New Roman, 9.75pt, style=Bold"
+                                                    TextAlignment="MiddleLeft"
+                                                    Borders="None"
+                                                    Padding="2,2,0,0,100"
+                                                    Ref="53"
+                                                ></Item4
+                                                ><Item5
+                                                    ControlType="XRLabel"
+                                                    Name="txtaGenerateError"
+                                                    TextAlignment="BottomLeft"
+                                                    Multiline="true"
+                                                    Borders="Bottom"
+                                                    Padding="2,2,0,0,100"
+                                                    SizeF="224,50"
+                                                    LocationFloat="8,534"
+                                                    Ref="54"
+                                                    ><ExpressionBindings Ref="55"
+                                                        ><Item1
+                                                            EventName="BeforePrint"
+                                                            PropertyName="Text"
+                                                            Expression="[txtaGenerateError]"
+                                                            Ref="56"
+                                                        ></Item1></ExpressionBindings></Item5></Controls></Item1
+                                        ><Item2
+                                            ControlType="XRTableCell"
+                                            Name="column_2"
+                                            Weight="0.5"
+                                            Padding="8,8,8,8,96"
+                                            Borders="None"
+                                            TextAlignment="TopLeft"
+                                            Ref="57"
+                                            ><Controls></Controls></Item2></Cells></Item1></Rows></Item1></Controls></Item2></Controls></Item3
+        ><Item4
+            ControlType="BottomMarginBand"
+            Name="BottomMargin"
+            HeightF="40"
+            Ref="58"
+        ></Item4></Bands
+    ><ParameterPanelLayoutItems
+        ><Item1 ControlType="Parameter" Parameter="#Ref-3" Ref="59"></Item1
+        ><Item2
+            ControlType="Parameter"
+            Parameter="#Ref-4"
+            Ref="60"
+        ></Item2></ParameterPanelLayoutItems
+></XtraReportsLayoutSerializer>
