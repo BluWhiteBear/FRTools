@@ -1,7 +1,7 @@
 // Constants
 const VERSION_INFO = {
-  version: '0.3.2',
-  updated: '09/29/2025',
+  version: '0.3.3',
+  updated: '10/01/2025',
   devexpressVersion: '23.2.5.0'
 };
 
@@ -33,6 +33,139 @@ class DevExpressConverter {
     devExpressJson: null, // For storing the generated JSON
     warnings: [] // For storing conversion warnings
   };
+
+  static countComponents(components) {
+    if (!components) return 0;
+    
+    let count = components.length;
+    for (const component of components) {
+      if (component.components) {
+        count += this.countComponents(component.components);
+      }
+      if (component.columns) {
+        for (const col of component.columns) {
+          if (col.components) {
+            count += this.countComponents(col.components);
+          }
+        }
+      }
+    }
+    return count;
+  }
+
+  static countDataSources(formioData) {
+    let dataSources = ['Main Form Table']; // Start with main form table
+    
+    if (!formioData) return dataSources.length;
+    
+    // // Check for root level grid
+    // if (formioData.Grid?.dataGrid?.DBTableName) {
+    //   dataSources.push(`Root Grid: ${formioData.Grid.dataGrid.DBTableName}`);
+    //   console.log('Found root level grid:', formioData.Grid.dataGrid.DBTableName);
+    // }
+    
+    const checkComponent = (component) => {
+      if (!component) return;
+      
+      const key = component.key || 'unnamed';
+      
+      // Count datagrids with DBName
+      if (component.type === 'datagrid' && component.DBName) {
+        dataSources.push(`Datagrid: ${key} (${component.DBName})`);
+        console.log('Found datagrid:', { key, dbName: component.DBName });
+      }
+      
+      // Count formgrids with DBName
+      if (component.type === 'formgrid' && component.DBName) {
+        dataSources.push(`Formgrid: ${key} (${component.DBName})`);
+        console.log('Found formgrid:', { key, dbName: component.DBName });
+      }
+      
+      // Count nested forms with DBName
+      if (component.type === 'nestedsubform' && component.DBName) {
+        dataSources.push(`Nested Form: ${key} (${component.DBName})`);
+        console.log('Found nested form:', { key, dbName: component.DBName });
+      }
+      
+      // Recursively check nested components
+      if (component.components) {
+        component.components.forEach(checkComponent);
+      }
+      
+      // Check components in columns
+      if (component.columns) {
+        component.columns.forEach(col => {
+          if (col.components) {
+            col.components.forEach(checkComponent);
+          }
+        });
+      }
+    };
+    
+    // Process all components
+    if (formioData.components) {
+      formioData.components.forEach(checkComponent);
+    }
+    
+    console.log('All Data Sources:', dataSources);
+    return dataSources.length;
+  }
+
+  static findDataGridComponents(formioData, results = []) {
+    if (!formioData) return results;
+    
+    // First check the Grid property for datagrid info
+    if (formioData.Grid && formioData.Grid.dataGrid && formioData.Grid.dataGrid.DBTableName) {
+      // For root-level datagrids, this is the only place we need to look
+      return [{
+        DBName: formioData.Grid.dataGrid.DBTableName,
+        type: 'datagrid'
+      }];
+    }
+    
+    // Only check components if there was no root-level grid
+    const components = formioData.components;
+    if (!components) return results;
+    
+    for (const component of components) {
+      if (component.type === 'datagrid' && component.DBName) {
+        results.push(component);
+      }
+      // Recursively check nested components
+      if (component.components) {
+        this.findDataGridComponents({ components: component.components }, results);
+      }
+    }
+    return results;
+  }
+
+  static findFormGridComponents(formioData, results = []) {
+    if (!formioData) return results;
+
+    // First check the Grid property for formgrid info
+    if (formioData.Grid && formioData.Grid.formGrid && formioData.Grid.formGrid.DBTableName) {
+      // For root-level formgrids, this is the only place we need to look
+      return [{
+        DBName: formioData.Grid.formGrid.DBTableName,
+        type: 'formgrid'
+      }];
+    }
+
+    // Only check components if there was no root-level grid
+    const components = formioData.components;
+    if (!components) return results;
+
+    for (const component of components) {
+      if (component.type === 'formgrid' && component.DBName) {
+        results.push(component);
+      }
+      // Recursively check nested components
+      if (component.components) {
+        this.findFormGridComponents({ components: component.components }, results);
+      }
+    }
+    return results;
+  }
 
   static initialize() {
     this.state.devExpressJson = null;
@@ -1029,18 +1162,6 @@ const Utils = {  escapeXml(unsafe) {
   },
       validateXmlOutput(xml) {
     try {
-      // Import validator 
-      if (!this.validator) {
-        import('./validator.js').then(({validator}) => {
-          this.validator = validator;
-        });
-      }
-
-      // If validator is ready, use it, otherwise fallback to basic validation
-      if (this.validator) {
-        return this.validator.validateDevExpressXml(xml);
-      }
-
       // Fallback basic validation
       const validationResults = [];
       
@@ -1210,34 +1331,110 @@ const Utils = {  escapeXml(unsafe) {
     const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const timeZoneAbbr = moment.tz(timeZone).zoneAbbr();
     
-    // Get the table name without [dbo]. prefix
+    // Parse FormioTemplate if needed
+    let formioTemplate;
+    if (typeof formioData.FormioTemplate === 'string') {
+      try {
+        formioTemplate = JSON.parse(formioData.FormioTemplate);
+        console.log('Parsed FormioTemplate:', formioTemplate);
+      } catch (error) {
+        console.error('Failed to parse FormioTemplate:', error);
+        formioTemplate = {};
+      }
+    } else {
+      formioTemplate = formioData.FormioTemplate || {};
+    }
+    
+    // Get the table name without [dbo]. or ct_ prefixes
     const fullTableName = formioData.TableName || '[dbo].[DefaultTable]';
-    const tableName = fullTableName.replace(/^\[dbo\]\./i, '');
-    const procedureName = `[cstm_${tableName.replace(/[\[\]]/g, '')}_Printout]`;
-  
-    const sql = 
-    `
-    create or alter procedure ${procedureName}
-      @FormDataGUID uniqueidentifier = null,
-      @OwnerObjectGUID uniqueidentifier = null
-    as
-      /*
-        This procedure was generated by version ${VERSION_INFO.version} of
-        the Formio to DevExpress converter tool on ${generateDate} at ${generateTime} ${timeZoneAbbr}
-        It is not intended for direct use and should be modified as needed.
-      */
+    const tableName = fullTableName.replace(/^\[dbo\]\./i, '').replace(/^\[?ct_/i, '');
+    const procedureName = `cstm_${tableName.replace(/[\[\]]/g, '')}`;
 
-      set nocount on;
-      select
-        ownCon.first
-        ,ownCon.last
-        ,main.*
-      from ${fullTableName} main
-      join Contact ownCon with(NOLOCK) on ownCon.ContactGUID = main.__ownerobjectguid
-      where main.__forminstanceguid = @FormDataGUID
-      and main.__ownerobjectguid = @OwnerObjectGUID
-    GO
-    `;
+    // Debug logging for datagrids
+    console.log('Found data grids:', DevExpressConverter.findDataGridComponents(formioData));
+
+    const sql = 
+`
+/* MAIN FORM PROCEDURE */
+create or alter procedure [${procedureName}_Printout]
+  @FormDataGUID uniqueidentifier = null,
+  @OwnerObjectGUID uniqueidentifier = null
+as
+  /*
+    This procedure was generated by version ${VERSION_INFO.version} of the Formio to DevExpress converter tool on ${generateDate} at ${generateTime} ${timeZoneAbbr}
+    It is not intended for direct use and should be modified as needed.
+  */
+
+  set nocount on;
+  select
+    ownCon.first
+    ,ownCon.last
+    ,main.*
+  from ${fullTableName} main
+  join Contact ownCon with(NOLOCK) on ownCon.ContactGUID = main.__ownerobjectguid
+  where main.__forminstanceguid = @FormDataGUID
+  and main.__ownerobjectguid = @OwnerObjectGUID
+GO
+
+
+
+
+${DevExpressConverter.findDataGridComponents(formioTemplate).map((grid, index) => 
+`
+/* DATA GRID PROCEDURE: datagrid${index} */
+create or alter procedure [${procedureName}_datagrid${index}]
+  @FormDataGUID uniqueidentifier = null,
+  @OwnerObjectGUID uniqueidentifier = null
+as
+  /*
+    This procedure was generated by version ${VERSION_INFO.version} of the Formio to DevExpress converter tool on ${generateDate} at ${generateTime} ${timeZoneAbbr}
+    It is not intended for direct use and should be modified as needed.
+  */
+
+  set nocount on;
+  select
+    ownCon.first
+    ,ownCon.last
+    ,main.*
+    ,datagrid${index}.*
+
+  from ${fullTableName} main
+  join Contact ownCon with(NOLOCK) on ownCon.ContactGUID = main.__ownerobjectguid
+  left join ${grid.DBName} datagrid${index} with(NOLOCK) on datagrid${index}.__forminstanceguid = main.__forminstanceguid
+  where main.__forminstanceguid = @FormDataGUID
+  and main.__ownerobjectguid = @OwnerObjectGUID
+GO
+`
+).join('\n')}
+
+
+${DevExpressConverter.findFormGridComponents(formioTemplate).map((grid, index) => 
+`
+/* FORM GRID PROCEDURE: formgrid${index} */
+create or alter procedure [${procedureName}_formgrid${index}]
+  @FormDataGUID uniqueidentifier = null,
+  @OwnerObjectGUID uniqueidentifier = null
+as
+  /*
+    This procedure was generated by version ${VERSION_INFO.version} of the Formio to DevExpress converter tool on ${generateDate} at ${generateTime} ${timeZoneAbbr}
+    It is not intended for direct use and should be modified as needed.
+  */
+
+  set nocount on;
+  select
+    ownCon.first
+    ,ownCon.last
+    ,main.*
+    ,formgrid${index}.*
+  from ${fullTableName} main
+  join Contact ownCon with(NOLOCK) on ownCon.ContactGUID = main.__ownerobjectguid
+  left join ${grid.DBName} formgrid${index} with(NOLOCK) on formgrid${index}.__forminstanceguid = main.__forminstanceguid
+  where main.__forminstanceguid = @FormDataGUID
+  and main.__ownerobjectguid = @OwnerObjectGUID
+GO
+`
+).join('\n')}
+`;
   
     // Update SQL preview
     const previewContainer = document.getElementById('sql-rendered');
@@ -1394,6 +1591,13 @@ const UIHandlers = {
           if (formioTemplate.components) {
             formioTemplate.components = formioTemplate.components.map(c => ComponentCleaner.cleanComponent(c));
           }
+
+          // Update Form Information section
+          document.getElementById('formTitle').textContent = jsonData.FormName || 'N/A';
+          document.getElementById('departmentName').textContent = jsonData.DepartmentName || 'N/A';
+          document.getElementById('formGuid').textContent = jsonData.FormDefinitionGuid || 'N/A';
+          document.getElementById('componentCount').textContent = DevExpressConverter.countComponents(formioTemplate.components) || '0';
+          document.getElementById('dataSourceCount').textContent = DevExpressConverter.countDataSources(formioTemplate) || '1';
   
           // Create Form.io preview
           const formContainer = document.getElementById('formio-rendered');

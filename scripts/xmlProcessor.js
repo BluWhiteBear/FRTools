@@ -21,11 +21,20 @@ class XMLNode {
     static needsRef(type) {
         // List of node types that typically need refs in DevExpress XML
         const refTypes = [
+            // Root and structural elements
             'XtraReportsLayoutSerializer',
-            'Item1', 'Item2', 'Item3', 'Item4',  // Common item patterns
             'Extensions', 'Parameters', 'Bands',
             'TopMarginBand', 'PageHeaderBand', 'DetailBand', 'BottomMarginBand',
-            'StylePriority', 'ExpressionBindings', 'GlyphOptions'
+            'StylePriority', 'ExpressionBindings', 'GlyphOptions',
+            
+            // Item patterns (used in collections)
+            'Item1', 'Item2', 'Item3', 'Item4',
+            
+            // DevExpress Controls
+            'XRLabel', 'XRCheckBox', 'XRRichText',
+            'XRTable', 'XRTableRow', 'XRTableCell',
+            'XRPanel', 'XRSubreport', 'XRPictureBox',
+            'Controls', 'Rows', 'Cells'
         ];
         return refTypes.includes(type);
     }

@@ -224,6 +224,50 @@ export const DevExpressDefinitions = {
                 }
             }
         },
+        formgrid: {
+            controlType: 'XRLabel',
+            defaultHeight: 50,
+            requiresLabel: true,
+            attributes: {
+                TextAlignment: 'MiddleLeft',
+                Padding: '2,2,0,0,100'
+            },
+            // Will be rendered as two tables - one for headers and one for form field values
+            headerTable: {
+                controlType: 'XRTable',
+                attributes: {
+                    Borders: 'All',
+                    BackColor: 'Gainsboro',
+                    Padding: '2,2,0,0,100'
+                },
+                rowAttributes: {
+                    Weight: '1',
+                    BackColor: 'Gainsboro'
+                },
+                cellAttributes: {
+                    Padding: '5,5,5,5,100',
+                    Borders: 'All', 
+                    TextAlignment: 'MiddleLeft',
+                    Font: 'Arial, 10pt, style=Bold'
+                }
+            },
+            keysTable: {
+                controlType: 'XRTable',
+                attributes: {
+                    Borders: 'All',
+                    Padding: '2,2,0,0,100'
+                },
+                rowAttributes: {
+                    Weight: '1'
+                },
+                cellAttributes: {
+                    Padding: '5,5,5,5,100',
+                    Borders: 'All',
+                    TextAlignment: 'MiddleLeft',
+                    Font: 'Consolas, 9pt'
+                }
+            }
+        },
         radio: {
             controlType: 'XRPanel',
             defaultHeight: 25,

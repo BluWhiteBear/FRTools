@@ -105,6 +105,10 @@ export class ComponentProcessor {
             case 'datagrid':
                 nodes.push(...this.processDataGrid(component, containerWidth, xOffset));
                 break;
+
+            case 'formgrid':
+                nodes.push(...this.processFormGrid(component, containerWidth, xOffset));
+                break;
                 
             default:
                 // Handle regular fields (label + value pair)
@@ -550,8 +554,12 @@ export class ComponentProcessor {
             headerCellsNode.addChild(cellNode);
         });
 
+        const headerTableItemNum = this.xmlProcessor.currentItemNum;
         nodes.push(headerTableNode);
         this.currentY += 25; // Just move down by the height of the header row
+
+        // Increment the item number for the keys table to ensure uniqueness
+        this.xmlProcessor.currentItemNum = headerTableItemNum + 1;
 
         // Create keys table
         const keysTableNode = this.xmlProcessor.createItemNode(undefined, 'XRTable', {
@@ -833,5 +841,135 @@ export class ComponentProcessor {
         
         // Add padding at top and bottom
         return maxHeight + (DevExpressDefinitions.commonAttributes.spacing.sectionSpacing * 2);
+    }
+
+    processFormGrid(component, containerWidth, xOffset) {
+        // Skip if formgrid component is hidden
+        if (this.isHidden(component)) {
+            this.xmlProcessor.currentItemNum++;
+            return [];
+        }
+
+        const nodes = [];
+        const def = DevExpressHelpers.getComponentDef(component.type || 'formgrid');
+        
+        // First create the label if required
+        if (def.requiresLabel) {
+            nodes.push(this.createLabelNode(component, containerWidth, xOffset));
+            this.currentY += 25; // Label height
+        }
+
+        // For formgrids, we get field information from the Form Fields property
+        const fields = component.formFields || [];
+        
+        // If no fields found, return early
+        if (!fields.length) {
+            console.warn(`No fields found in formgrid component ${component.key || 'unknown'}`);
+            return nodes;
+        }
+        
+        // Create header table
+        const headerTableNode = this.xmlProcessor.createItemNode(undefined, 'XRTable', {
+            Name: `${component.key}_headers` || `formgrid_headers_${Date.now()}`,
+            ...def.headerTable.attributes,
+            SizeF: `${containerWidth},25`,
+            LocationFloat: `${xOffset},${this.currentY}`
+        });
+
+        // Create header rows container 
+        const headerRowsNode = this.xmlProcessor.buildNode('Rows', {});
+        headerTableNode.addChild(headerRowsNode);
+        
+        // Save current item number state
+        const savedItemNum = this.xmlProcessor.currentItemNum;
+        this.xmlProcessor.currentItemNum = 0;
+
+        // Create header row
+        const headerRowNode = this.xmlProcessor.createItemNode(1, 'XRTableRow', {
+            Name: `${component.key}_headerRow` || `formgrid_headerRow_${Date.now()}`,
+            ...def.headerTable.rowAttributes
+        });
+        headerRowsNode.addChild(headerRowNode);
+
+        // Create header cells container
+        const headerCellsNode = this.xmlProcessor.buildNode('Cells', {});
+        headerRowNode.addChild(headerCellsNode);
+
+        // Reset item numbering for header cells
+        this.xmlProcessor.currentItemNum = 0;
+
+        // Filter out button fields first
+        const validFields = fields.filter(field => field.type !== 'button');
+        
+        // Create header cells with field labels
+        validFields.forEach((field, index) => {
+            const cellNode = this.xmlProcessor.createItemNode(index + 1, 'XRTableCell', {
+                Name: `header_${field.key}`,
+                Text: field.label || field.key,
+                Weight: (1 / validFields.length).toString(),
+                ...def.headerTable.cellAttributes
+            });
+            headerCellsNode.addChild(cellNode);
+        });
+
+        const headerTableItemNum = this.xmlProcessor.currentItemNum;
+        nodes.push(headerTableNode);
+        this.currentY += 25; // Just move down by the height of the header row
+
+        // Increment the item number for the data table to ensure uniqueness
+        this.xmlProcessor.currentItemNum = headerTableItemNum + 1;
+
+        // Create data table
+        const dataTableNode = this.xmlProcessor.createItemNode(undefined, 'XRTable', {
+            Name: `${component.key}_data` || `formgrid_data_${Date.now()}`,
+            ...def.keysTable.attributes,
+            SizeF: `${containerWidth},25`,
+            LocationFloat: `${xOffset},${this.currentY}`
+        });
+
+        // Create data rows container
+        const dataRowsNode = this.xmlProcessor.buildNode('Rows', {});
+        dataTableNode.addChild(dataRowsNode);
+
+        // Create data row
+        const dataRowNode = this.xmlProcessor.createItemNode(1, 'XRTableRow', {
+            Name: `${component.key}_dataRow` || `formgrid_dataRow_${Date.now()}`,
+            ...def.keysTable.rowAttributes
+        });
+        dataRowsNode.addChild(dataRowNode);
+
+        // Create data cells container
+        const dataCellsNode = this.xmlProcessor.buildNode('Cells', {});
+        dataRowNode.addChild(dataCellsNode);
+
+        // Reset item numbering for data cells
+        this.xmlProcessor.currentItemNum = 0;
+
+        // Create data cells with field values
+        validFields.forEach((field, index) => {
+            const cellNode = this.xmlProcessor.createItemNode(index + 1, 'XRTableCell', {
+                Name: `data_${field.key}`,
+                Weight: (1 / validFields.length).toString(),
+                ...def.keysTable.cellAttributes
+            });
+
+            // Add expression binding for the data field
+            const expressionBindings = this.xmlProcessor.createExpressionBindings({
+                eventName: 'BeforePrint',
+                propertyName: 'Text',
+                expression: `[${field.key}]`
+            });
+            cellNode.addChild(expressionBindings);
+
+            dataCellsNode.addChild(cellNode);
+        });
+
+        nodes.push(dataTableNode);
+        this.currentY += 25 + DevExpressDefinitions.commonAttributes.spacing.sectionSpacing; 
+
+        // Restore original item number
+        this.xmlProcessor.currentItemNum = savedItemNum;
+
+        return nodes;
     }
 }

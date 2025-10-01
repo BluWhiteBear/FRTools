@@ -207,9 +207,9 @@
             </Item1>
             <Item2 ControlType="XRLabel" Name="content" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="630,25" LocationFloat="10,63" Text="&lt;p&gt;&lt;i&gt;Content Component&lt;/i&gt;&lt;/p&gt;" Ref="107">
             </Item2>
-            <Item3 ControlType="XRTable" Name="columns" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="630,175" LocationFloat="10,96" KeepTogether="true" Ref="108">
+            <Item3 ControlType="XRTable" Name="columns" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="630,179" LocationFloat="10,96" KeepTogether="true" Ref="108">
               <Rows>
-                <Item1 ControlType="XRTableRow" Name="columnsRow_1759349770350" Ref="109">
+                <Item1 ControlType="XRTableRow" Name="columnsRow_1759353358862" Ref="109">
                   <Cells>
                     <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.5" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="110">
                       <Controls>
@@ -251,7 +251,7 @@
                     </Item2>
                     <Item3 ControlType="XRTableCell" Name="column_3" Weight="0.5" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="127">
                       <Controls>
-                        <Item1 ControlType="XRLabel" Name="htmlTestElement" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="194,137" LocationFloat="8,0" Text="&lt;b&gt;Bold Text&lt;/b&gt;&lt;br&gt;
+                        <Item1 ControlType="XRLabel" Name="htmlTestElement" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="194,141" LocationFloat="8,0" Text="&lt;b&gt;Bold Text&lt;/b&gt;&lt;br&gt;
 &lt;i&gt;Slanted Text&lt;/i&gt;&lt;bR&gt;
 &lt;h1&gt;BIG Text&lt;/h1&gt;
 &lt;p style=&amp;quot;color: blue;&amp;quot;&gt;Blue Text&lt;/p&gt;" Ref="128">
@@ -262,7 +262,7 @@
                 </Item1>
               </Rows>
             </Item3>
-            <Item4 ControlType="XRPanel" Name="fieldset" CanShrink="true" Borders="None" Padding="2,2,0,0,100" SizeF="630,204" LocationFloat="10,286" Ref="129">
+            <Item4 ControlType="XRPanel" Name="fieldset" CanShrink="true" Borders="None" Padding="2,2,0,0,100" SizeF="630,204" LocationFloat="10,290" Ref="129">
               <Controls>
                 <Item1 ControlType="XRLabel" Name="label_txtFieldsetField1" Text="Fieldset Field 1" SizeF="457,25" LocationFloat="10,0" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="130">
                 </Item1>
@@ -288,7 +288,7 @@
                 </Item5>
               </Controls>
             </Item4>
-            <Item5 ControlType="XRPanel" Name="panel" CanShrink="true" Borders="None" Padding="2,2,0,0,100" SizeF="630,179" LocationFloat="10,505" Ref="141">
+            <Item5 ControlType="XRPanel" Name="panel" CanShrink="true" Borders="None" Padding="2,2,0,0,100" SizeF="630,179" LocationFloat="10,509" Ref="141">
               <Controls>
                 <Item6 ControlType="XRLabel" Name="label_panel" Text="Panel" SizeF="465,25" LocationFloat="15,0" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="142" />
                 <Item1 ControlType="XRLabel" Name="label_txtPanelField1" Text="Panel Field 1" SizeF="457,25" LocationFloat="10,25" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="143">
@@ -309,7 +309,7 @@
                 </Item4>
               </Controls>
             </Item5>
-            <Item6 ControlType="XRTable" Name="table" Borders="None" Padding="2,2,0,0,100" SizeF="630,105" LocationFloat="10,699" Ref="151">
+            <Item6 ControlType="XRTable" Name="table" Borders="None" Padding="2,2,0,0,100" SizeF="630,105" LocationFloat="10,703" Ref="151">
               <Rows>
                 <Item1 ControlType="XRTableRow" Name="tableRow_1" Weight="1" Ref="152">
                   <Cells>
@@ -343,7 +343,7 @@
                 </Item3>
               </Rows>
             </Item6>
-            <Item1 ControlType="XRPanel" Name="tab_tab2" CanShrink="true" Borders="None" Padding="2,2,0,0,100" SizeF="630,101" LocationFloat="10,819" Ref="164">
+            <Item1 ControlType="XRPanel" Name="tab_tab2" CanShrink="true" Borders="None" Padding="2,2,0,0,100" SizeF="630,101" LocationFloat="10,823" Ref="164">
               <Controls>
                 <Item1 ControlType="XRLabel" Name="label_tab2_label" Text="Tab 1" SizeF="465,25" LocationFloat="5,0" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="165">
                 </Item1>
@@ -351,7 +351,7 @@
                 </Item2>
               </Controls>
             </Item1>
-            <Item2 ControlType="XRPanel" Name="tab_tab3" CanShrink="true" Borders="None" Padding="2,2,0,0,100" SizeF="630,101" LocationFloat="10,935" Ref="167">
+            <Item2 ControlType="XRPanel" Name="tab_tab3" CanShrink="true" Borders="None" Padding="2,2,0,0,100" SizeF="630,101" LocationFloat="10,939" Ref="167">
               <Controls>
                 <Item1 ControlType="XRLabel" Name="label_tab3_label" Text="Tab 2" SizeF="465,25" LocationFloat="5,0" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="168">
                 </Item1>
@@ -359,7 +359,7 @@
                 </Item2>
               </Controls>
             </Item2>
-            <Item9 ControlType="XRPanel" Name="wellComponent" CanShrink="true" Borders="All" BorderWidth="1" Padding="10,10,10,10,100" SizeF="630,63" LocationFloat="10,1051" Ref="170">
+            <Item9 ControlType="XRPanel" Name="wellComponent" CanShrink="true" Borders="All" BorderWidth="1" Padding="10,10,10,10,100" SizeF="630,63" LocationFloat="10,1055" Ref="170">
               <Controls>
                 <Item10 ControlType="XRLabel" Name="label_wellComponent" Text="Well Component" SizeF="465,25" LocationFloat="15,0" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="171" />
               </Controls>
@@ -381,7 +381,7 @@
             </Item1>
           </Rows>
         </Item11>
-        <Item1 ControlType="XRTable" Name="dataGrid_keys" Borders="All" Padding="2,2,0,0,100" SizeF="650,25" LocationFloat="0,2772" Ref="178">
+        <Item2 ControlType="XRTable" Name="dataGrid_keys" Borders="All" Padding="2,2,0,0,100" SizeF="650,25" LocationFloat="0,2772" Ref="178">
           <Rows>
             <Item1 ControlType="XRTableRow" Name="dataGrid_keysRow" Weight="1" Ref="179">
               <Cells>
@@ -406,16 +406,57 @@
               </Cells>
             </Item1>
           </Rows>
-        </Item1>
+        </Item2>
+        <Item12 ControlType="XRLabel" Name="label_formgrid" Text="Form Grid" SizeF="650,25" LocationFloat="0,2812" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="189" />
+        <Item13 ControlType="XRTable" Name="formgrid_headers" Borders="All" BackColor="Gainsboro" Padding="2,2,0,0,100" SizeF="650,25" LocationFloat="0,2837" Ref="190">
+          <Rows>
+            <Item1 ControlType="XRTableRow" Name="formgrid_headerRow" Weight="1" BackColor="Gainsboro" Ref="191">
+              <Cells>
+                <Item1 ControlType="XRTableCell" Name="header_dfField1" Text="dfField1" Weight="0.3333333333333333" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Arial, 10pt, style=Bold" Ref="192">
+                </Item1>
+                <Item2 ControlType="XRTableCell" Name="header_dfField2" Text="dfField2" Weight="0.3333333333333333" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Arial, 10pt, style=Bold" Ref="193">
+                </Item2>
+                <Item3 ControlType="XRTableCell" Name="header_btn_view" Text="View" Weight="0.3333333333333333" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Arial, 10pt, style=Bold" Ref="194">
+                </Item3>
+              </Cells>
+            </Item1>
+          </Rows>
+        </Item13>
+        <Item2 ControlType="XRTable" Name="formgrid_keys" Borders="All" Padding="2,2,0,0,100" SizeF="650,25" LocationFloat="0,2862" Ref="195">
+          <Rows>
+            <Item1 ControlType="XRTableRow" Name="formgrid_keysRow" Weight="1" Ref="196">
+              <Cells>
+                <Item1 ControlType="XRTableCell" Name="key_dfField1" Weight="0.3333333333333333" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Consolas, 9pt" Ref="197">
+                  <ExpressionBindings Ref="198">
+                    <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[dfField1]" Ref="199">
+                    </Item1>
+                  </ExpressionBindings>
+                </Item1>
+                <Item2 ControlType="XRTableCell" Name="key_dfField2" Weight="0.3333333333333333" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Consolas, 9pt" Ref="200">
+                  <ExpressionBindings Ref="201">
+                    <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[dfField2]" Ref="202">
+                    </Item1>
+                  </ExpressionBindings>
+                </Item2>
+                <Item3 ControlType="XRTableCell" Name="key_btn_view" Weight="0.3333333333333333" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Consolas, 9pt" Ref="203">
+                  <ExpressionBindings Ref="204">
+                    <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[btn_view]" Ref="205">
+                    </Item1>
+                  </ExpressionBindings>
+                </Item3>
+              </Cells>
+            </Item1>
+          </Rows>
+        </Item2>
       </Controls>
     </Item3>
-    <Item4 ControlType="BottomMarginBand" Name="BottomMargin" HeightF="40" Ref="189">
+    <Item4 ControlType="BottomMarginBand" Name="BottomMargin" HeightF="40" Ref="206">
     </Item4>
   </Bands>
   <ParameterPanelLayoutItems>
-    <Item1 ControlType="Parameter" Parameter="#Ref-3" Ref="190">
+    <Item1 ControlType="Parameter" Parameter="#Ref-3" Ref="207">
     </Item1>
-    <Item2 ControlType="Parameter" Parameter="#Ref-4" Ref="191">
+    <Item2 ControlType="Parameter" Parameter="#Ref-4" Ref="208">
     </Item2>
   </ParameterPanelLayoutItems>
 </XtraReportsLayoutSerializer>>
