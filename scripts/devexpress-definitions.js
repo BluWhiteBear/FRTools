@@ -1,5 +1,4 @@
 export const DevExpressDefinitions = {
-
     // Component Support Status:
     /*
         === Basic Fields ===
@@ -9,6 +8,7 @@ export const DevExpressDefinitions = {
         Checkbox: Boolean input | FULLY SUPPORTED
         Select: Dropdown/Select/Combobox input | FULLY SUPPORTED
         Radio: Radio button group input | FULLY SUPPORTED
+        Button: Button input | NOT SUPPORTED
 
         === Advanced Fields ===
         Nested Form: Subform/nested form input | PARTIALLY SUPPORTED
@@ -33,11 +33,11 @@ export const DevExpressDefinitions = {
         Well: Simple container with border | FULLY SUPPORTED
 
         === Data Components ===
-        Form Grid: Grid of Dialog forms | NOT SUPPORTED
+        Form Grid: Grid of Dialog forms | PARTIALLY SUPPORTED
         Hidden: ???? | NOT SUPPORTED
         Container: ???? | NOT SUPPORTED
         Data Map: ???? | NOT SUPPORTED
-        Data Grid: Grid of data from external table | NOT SUPPORTED
+        Data Grid: Grid of data from external table | PARTIALLY SUPPORTED
         Edit Grid: ???? | NOT SUPPORTED
         Tree: ???? | NOT SUPPORTED
     */
@@ -82,23 +82,297 @@ export const DevExpressDefinitions = {
     */
     
     
-    // Base component types and their DevExpress equivalents
-    componentTypes: {
-        nestedsubform: {
+    // Data Field Component Definitions
+    componentTypes: 
+    {
+        // === Basic Fields ===
+        textfield: 
+        {
+            controlType: 'XRLabel',
+            defaultHeight: 25,
+            widthMultiplier: 0.75,
+            requiresLabel: true,
+            attributes: 
+            {
+                TextAlignment: 'MiddleLeft',
+                Borders: 'Bottom',
+                Padding: '2,2,0,0,100'
+            }
+        },
+
+        textarea: 
+        {
+            controlType: 'XRLabel',
+            defaultHeight: 50,
+            widthMultiplier: 0.75,
+            requiresLabel: true,
+            attributes: 
+            {
+                TextAlignment: 'BottomLeft',
+                Multiline: 'true',
+                Borders: 'Bottom',
+                Padding: '2,2,0,0,100'
+            }
+        },
+
+        number: 
+        {
+            controlType: 'XRLabel',
+            defaultHeight: 25,
+            widthMultiplier: 0.25,
+            requiresLabel: true,
+            attributes: 
+            {
+                TextAlignment: 'MiddleLeft',
+                Borders: 'Bottom',
+                Padding: '2,2,0,0,100'
+            }
+        },
+
+        checkbox: 
+        {
+            controlType: 'XRCheckBox',
+            defaultHeight: 25,
+            widthMultiplier: 0.5,
+            requiresLabel: false,
+            attributes: 
+            {
+                Padding: '2,2,0,0,100',
+                GlyphOptions: 
+                {
+                    Size: '13,13'
+                }
+            },
+            useTextAsLabel: true,
+            expression: (key) => `IIF([${key}] == 'true', True, False)`
+        },
+
+        select: 
+        {
+            controlType: 'XRLabel',
+            defaultHeight: 25,
+            widthMultiplier: 0.75,
+            requiresLabel: true,
+            attributes: 
+            {
+                TextAlignment: 'MiddleLeft',
+                Borders: 'Bottom',
+                Padding: '2,2,0,0,100'
+            },
+            expression: (key) => `[${key}]`
+        },
+
+        radio: 
+        {
+            controlType: 'XRPanel',
+            defaultHeight: 25,
+            requiresLabel: true,
+            calculateHeight: (options) => options.values.length * 25,
+            attributes: 
+            {
+                TextAlignment: 'MiddleLeft',
+                Padding: '2,2,0,0,100',
+                CanShrink: 'true'
+            },
+
+            child: // Each option in a radio button group is a checkbox with special expression logic
+            {
+                controlType: 'XRCheckBox',
+                defaultHeight: 25,
+                widthMultiplier: 0.5,
+                requiresLabel: false,
+                attributes: 
+                {
+                    Padding: '2,2,0,0,100',
+                    GlyphOptions: 
+                    {
+                        Size: '13,13'
+                    }
+                },
+                useTextAsLabel: true,
+                expressionTransform: (key, value) => `IIF([${key}] == '${value}', True, False)`
+            }
+        },
+
+        button: // Not supported in reports
+        {
+            controlType: 'XRLabel',
+            defaultHeight: 25,
+            requiresLabel: false,
+            attributes: 
+            {
+                Visible: 'false', // Buttons aren't rendered in reports, so we hide them. We still need a placeholder.
+            }
+        },
+
+        // === Advanced Fields ===
+        fileupload: // Not supported in reports
+        {
+            controlType: 'XRLabel',
+            defaultHeight: 25,
+            requiresLabel: false,
+            attributes: 
+            {
+                Visible: 'false', // File upload controls aren't rendered in reports, so we hide them. We still need a placeholder.
+            }
+        },
+
+        nestedsubform: 
+        {
             controlType: 'XRSubreport',
             defaultHeight: 50,
             requiresLabel: true,
-            attributes: {
+            attributes: 
+            {
                 ReportSourceId: "0",
                 SizeF: "650,50",
                 GenerateOwnPages: "true"
             }
         },
-        htmlelement: {
+
+        email: 
+        {
+            controlType: 'XRLabel',
+            defaultHeight: 25,
+            widthMultiplier: 0.75,
+            requiresLabel: true,
+            attributes: 
+            {
+                TextAlignment: 'MiddleLeft',
+                Borders: 'Bottom',
+                Padding: '2,2,0,0,100'
+            },
+            expression: (key) => `[${key}]`
+        },
+
+        url: 
+        {
+            controlType: 'XRLabel',
+            defaultHeight: 25,
+            widthMultiplier: 0.75,
+            requiresLabel: true,
+            attributes: 
+            {
+                TextAlignment: 'MiddleLeft',
+                Borders: 'Bottom',
+                Padding: '2,2,0,0,100'
+            },
+            expression: (key) => `[${key}]`
+        },
+
+        phoneNumber: 
+        {
+            controlType: 'XRLabel',
+            defaultHeight: 25,
+            widthMultiplier: 0.75,
+            requiresLabel: true,
+            attributes: 
+            {
+                TextAlignment: 'MiddleLeft',
+                Borders: 'Bottom',
+                Padding: '2,2,0,0,100'
+            },
+            expression: (key) => `[${key}]`
+        },
+
+        address: 
+        {
+            controlType: 'XRLabel',
+            defaultHeight: 25,
+            widthMultiplier: 0.75,
+            requiresLabel: true,
+            attributes: 
+            {
+                TextAlignment: 'MiddleLeft',
+                Multiline: 'true',
+                Borders: 'Bottom',
+                Padding: '2,2,0,0,100'
+            },
+            expression: (key) => `[${key}]`
+        },
+
+        datetime: 
+        {
+            controlType: 'XRLabel',
+            defaultHeight: 25,
+            widthMultiplier: 0.5,
+            requiresLabel: true,
+            attributes: 
+            {
+                TextAlignment: 'MiddleLeft',
+                Borders: 'Bottom',
+                Padding: '2,2,0,0,100'
+            },
+            expression: (key) => `FormatString('{0:MM/dd/yyyy hh:mm tt}', [${key}])`
+        },
+
+        day: 
+        {
+            controlType: 'XRLabel',
+            defaultHeight: 25,
+            widthMultiplier: 0.5,
+            requiresLabel: true,
+            attributes: 
+            {
+                TextAlignment: 'MiddleLeft',
+                Borders: 'Bottom',
+                Padding: '2,2,0,0,100'
+            },
+            expression: (key) => `FormatString('{0:MM/dd/yyyy}', [${key}])`
+        },
+
+        time: 
+        {
+            controlType: 'XRLabel',
+            defaultHeight: 25,
+            widthMultiplier: 0.5,
+            requiresLabel: true,
+            attributes: 
+            {
+                TextAlignment: 'MiddleLeft',
+                Borders: 'Bottom',
+                Padding: '2,2,0,0,100'
+            },
+            expression: (key) => `FormatString('{0:hh:mm tt}', [${key}])`
+        },
+
+        currency: 
+        {
+            controlType: 'XRLabel',
+            defaultHeight: 25,
+            widthMultiplier: 0.25,
+            requiresLabel: true,
+            attributes: 
+            {
+                TextAlignment: 'MiddleLeft',
+                Borders: 'Bottom',
+                Padding: '2,2,0,0,100'
+            },
+            expression: (key) => `FormatString('{0:C}', [${key}])`
+        },
+
+        signature: 
+        {
+            controlType: 'XRPictureBox',
+            defaultHeight: 100,
+            widthMultiplier: 0.5,
+            requiresLabel: true,
+            attributes: 
+            {
+                Sizing: 'ZoomImage',
+                Padding: '2,2,0,0,100'
+            },
+            expression: key => `[${key}]`
+        },
+
+        // === Layout Components ===
+        htmlelement: 
+        {
             controlType: 'XRLabel',
             defaultHeight: 25,
             requiresLabel: false,
-            attributes: {
+            attributes: 
+            {
                 TextAlignment: 'TopLeft',
                 Borders: 'None',
                 Padding: '2,2,0,0,100',
@@ -107,11 +381,14 @@ export const DevExpressDefinitions = {
             },
             useContentAsText: true
         },
-        content: {
+
+        content: 
+        {
             controlType: 'XRLabel',
             defaultHeight: 25,
             requiresLabel: false,
-            attributes: {
+            attributes: 
+            {
                 TextAlignment: 'TopLeft',
                 Borders: 'None',
                 Padding: '2,2,0,0,100',
@@ -120,103 +397,56 @@ export const DevExpressDefinitions = {
             },
             useHtmlAsText: true
         },
-        textfield: {
-            controlType: 'XRLabel',
-            defaultHeight: 25,
-            widthMultiplier: 0.75,
-            requiresLabel: true,
-            attributes: {
-                TextAlignment: 'MiddleLeft',
-                Borders: 'Bottom',
-                Padding: '2,2,0,0,100'
-            }
-        },
-        textarea: {
-            controlType: 'XRLabel',
-            defaultHeight: 50,
-            widthMultiplier: 0.75,
-            requiresLabel: true,
-            attributes: {
-                TextAlignment: 'BottomLeft',
-                Multiline: 'true',
-                Borders: 'Bottom',
-                Padding: '2,2,0,0,100'
-            }
-        },
-        number: {
-            controlType: 'XRLabel',
-            defaultHeight: 25,
-            widthMultiplier: 0.25,
-            requiresLabel: true,
-            attributes: {
-                TextAlignment: 'MiddleLeft',
-                Borders: 'Bottom',
-                Padding: '2,2,0,0,100'
-            }
-        },
-        checkbox: {
-            controlType: 'XRCheckBox',
-            defaultHeight: 25,
-            widthMultiplier: 0.5,
-            requiresLabel: false,
-            attributes: {
-                Padding: '2,2,0,0,100',
-                GlyphOptions: {
-                    Size: '13,13'
-                }
-            },
-            useTextAsLabel: true,
-            expression: (key) => `IIF([${key}] == 'true', True, False)`
-        },
-        select: {
-            controlType: 'XRLabel',
-            defaultHeight: 25,
-            widthMultiplier: 0.75,
-            requiresLabel: true,
-            attributes: {
-                TextAlignment: 'MiddleLeft',
-                Borders: 'Bottom',
-                Padding: '2,2,0,0,100'
-            },
-            expression: (key) => `[${key}]`
-        },
-        datagrid: {
+
+        // === Data Components ===
+        datagrid: 
+        {
             controlType: 'XRLabel',
             defaultHeight: 50,
             requiresLabel: true,
-            attributes: {
+            attributes: 
+            {
                 TextAlignment: 'MiddleLeft',
                 Padding: '2,2,0,0,100'
             },
-            // Will be rendered as two tables - one for headers and one for field keys
-            headerTable: {
+
+            headerTable: // Contains the column labels
+            {
                 controlType: 'XRTable',
-                attributes: {
+                attributes: 
+                {
                     Borders: 'All',
                     BackColor: 'Gainsboro',
                     Padding: '2,2,0,0,100'
                 },
-                rowAttributes: {
+                rowAttributes: 
+                {
                     Weight: '1',
                     BackColor: 'Gainsboro'
                 },
-                cellAttributes: {
+                cellAttributes: 
+                {
                     Padding: '5,5,5,5,100',
                     Borders: 'All',
                     TextAlignment: 'MiddleLeft',
                     Font: 'Arial, 10pt, style=Bold'
                 }
             },
-            keysTable: {
+
+            keysTable: // Contains the field keys for data binding
+            {
                 controlType: 'XRTable',
-                attributes: {
+                attributes: 
+                {
                     Borders: 'All',
                     Padding: '2,2,0,0,100'
                 },
-                rowAttributes: {
+                rowAttributes: 
+                {
                     Weight: '1'
                 },
-                cellAttributes: {
+                cellAttributes: 
+                {
                     Padding: '5,5,5,5,100',
                     Borders: 'All',
                     TextAlignment: 'MiddleLeft',
@@ -224,43 +454,55 @@ export const DevExpressDefinitions = {
                 }
             }
         },
-        formgrid: {
+
+        formgrid: 
+        {
             controlType: 'XRLabel',
             defaultHeight: 50,
             requiresLabel: true,
-            attributes: {
+            attributes: 
+            {
                 TextAlignment: 'MiddleLeft',
                 Padding: '2,2,0,0,100'
             },
-            // Will be rendered as two tables - one for headers and one for form field values
-            headerTable: {
+
+            headerTable: // Contains the column labels
+            {
                 controlType: 'XRTable',
-                attributes: {
+                attributes: 
+                {
                     Borders: 'All',
                     BackColor: 'Gainsboro',
                     Padding: '2,2,0,0,100'
                 },
-                rowAttributes: {
+                rowAttributes: 
+                {
                     Weight: '1',
                     BackColor: 'Gainsboro'
                 },
-                cellAttributes: {
+                cellAttributes: 
+                {
                     Padding: '5,5,5,5,100',
                     Borders: 'All', 
                     TextAlignment: 'MiddleLeft',
                     Font: 'Arial, 10pt, style=Bold'
                 }
             },
-            keysTable: {
+
+            keysTable: // Contains the field keys for data binding
+            {
                 controlType: 'XRTable',
-                attributes: {
+                attributes: 
+                {
                     Borders: 'All',
                     Padding: '2,2,0,0,100'
                 },
-                rowAttributes: {
+                rowAttributes: 
+                {
                     Weight: '1'
                 },
-                cellAttributes: {
+                cellAttributes: 
+                {
                     Padding: '5,5,5,5,100',
                     Borders: 'All',
                     TextAlignment: 'MiddleLeft',
@@ -268,253 +510,118 @@ export const DevExpressDefinitions = {
                 }
             }
         },
-        radio: {
-            controlType: 'XRPanel',
-            defaultHeight: 25,
-            requiresLabel: true,
-            calculateHeight: (options) => options.values.length * 25,
-            attributes: {
-                TextAlignment: 'MiddleLeft',
-                Padding: '2,2,0,0,100',
-                CanShrink: 'true'
-            },
-            child: {
-                controlType: 'XRCheckBox',
-                defaultHeight: 25,
-                widthMultiplier: 0.5,
-                requiresLabel: false,
-                attributes: {
-                    Padding: '2,2,0,0,100',
-                    GlyphOptions: {
-                        Size: '13,13'
-                    }
-                },
-                useTextAsLabel: true,
-                expressionTransform: (key, value) => `IIF([${key}] == '${value}', True, False)`
-            }
-        },
-        datetime: {
-            controlType: 'XRLabel',
-            defaultHeight: 25,
-            widthMultiplier: 0.5,
-            requiresLabel: true,
-            attributes: {
-                TextAlignment: 'MiddleLeft',
-                Borders: 'Bottom',
-                Padding: '2,2,0,0,100'
-            },
-            expression: (key) => `FormatString('{0:MM/dd/yyyy hh:mm tt}', [${key}])`
-        },
-        day: {
-            controlType: 'XRLabel',
-            defaultHeight: 25,
-            widthMultiplier: 0.5,
-            requiresLabel: true,
-            attributes: {
-                TextAlignment: 'MiddleLeft',
-                Borders: 'Bottom',
-                Padding: '2,2,0,0,100'
-            },
-            expression: (key) => `FormatString('{0:MM/dd/yyyy}', [${key}])`
-        },
-        time: {
-            controlType: 'XRLabel',
-            defaultHeight: 25,
-            widthMultiplier: 0.5,
-            requiresLabel: true,
-            attributes: {
-                TextAlignment: 'MiddleLeft',
-                Borders: 'Bottom',
-                Padding: '2,2,0,0,100'
-            },
-            expression: (key) => `FormatString('{0:hh:mm tt}', [${key}])`
-        },
-        currency: {
-            controlType: 'XRLabel',
-            defaultHeight: 25,
-            widthMultiplier: 0.25,
-            requiresLabel: true,
-            attributes: {
-                TextAlignment: 'MiddleLeft',
-                Borders: 'Bottom',
-                Padding: '2,2,0,0,100'
-            },
-            expression: (key) => `FormatString('{0:C}', [${key}])`
-        },
-        signature: {
-            controlType: 'XRPictureBox',
-            defaultHeight: 100,
-            widthMultiplier: 0.5,
-            requiresLabel: true,
-            attributes: {
-                Sizing: 'ZoomImage',
-                Padding: '2,2,0,0,100'
-            },
-            expression: key => `[${key}]`
-        },
-        picture: {
-            controlType: 'XRPictureBox',
-            defaultHeight: 100,
-            widthMultiplier: 0.5,
-            requiresLabel: false,
-            attributes: {
-                Sizing: 'ZoomImage',
-                Padding: '2,2,0,0,100'
-            },
-            expression: key => `[${key}]`
-        },
-        email: {
-            controlType: 'XRLabel',
-            defaultHeight: 25,
-            widthMultiplier: 0.75,
-            requiresLabel: true,
-            attributes: {
-                TextAlignment: 'MiddleLeft',
-                Borders: 'Bottom',
-                Padding: '2,2,0,0,100'
-            },
-            expression: (key) => `[${key}]`
-        },
-        url: {
-            controlType: 'XRLabel',
-            defaultHeight: 25,
-            widthMultiplier: 0.75,
-            requiresLabel: true,
-            attributes: {
-                TextAlignment: 'MiddleLeft',
-                Borders: 'Bottom',
-                Padding: '2,2,0,0,100'
-            },
-            expression: (key) => `[${key}]`
-        },
-        phoneNumber: {
-            controlType: 'XRLabel',
-            defaultHeight: 25,
-            widthMultiplier: 0.75,
-            requiresLabel: true,
-            attributes: {
-                TextAlignment: 'MiddleLeft',
-                Borders: 'Bottom',
-                Padding: '2,2,0,0,100'
-            },
-            expression: (key) => `[${key}]`
-        },
-        address: {
-            controlType: 'XRLabel',
-            defaultHeight: 25,
-            widthMultiplier: 0.75,
-            requiresLabel: true,
-            attributes: {
-                TextAlignment: 'MiddleLeft',
-                Multiline: 'true',
-                Borders: 'Bottom',
-                Padding: '2,2,0,0,100'
-            },
-            expression: (key) => `[${key}]`
-        },
-        button: {
-            // Buttons are NOT supported, and should be skipped in rendering. We create a hidden placeholder.
-            controlType: 'XRLabel',
-            defaultHeight: 25,
-            requiresLabel: false,
-            attributes: {
-                Visible: 'false',
-                SizeF: '0,0'
-            }
-        }
     },
 
-    // Container components
-    containerTypes: {
-        fieldset: {
+    // Container Component Definitions
+    containerTypes: 
+    {
+        fieldset: 
+        {
             controlType: 'XRPanel',
-            attributes: {
+            attributes: 
+            {
                 CanShrink: 'true',
                 Borders: 'None',
                 Padding: '2,2,0,0,100'
             },
             calculateHeight: (components, spacing) => {
-                return components.reduce((total, comp) => 
-                    total + (comp.defaultHeight || 25) + spacing, 0);
+                return components.reduce((total, comp) => total + (comp.defaultHeight || 25) + spacing, 0);
             }
         },
-        panel: {
+
+        panel:
+        {
             controlType: 'XRPanel',
-            attributes: {
+            attributes: 
+            {
                 CanShrink: 'true',
                 Borders: 'None',
                 Padding: '2,2,0,0,100'
             },
-            // Updated to handle nested panels better
             calculateHeight: (components, spacing) => {
                 if (!components) return 0;
+
                 return components.reduce((total, comp) => {
                     let height = comp.defaultHeight || 25;
-                    // Add extra spacing for nested panels
-                    if (comp.type === 'panel' || comp.type === 'fieldset') {
-                        height += spacing * 2; // Extra padding for nested containers
+
+                    if (comp.type === 'panel' || comp.type === 'fieldset')
+                    {
+                        height += spacing * 2;
                     }
+
                     return total + height + spacing;
                 }, 0);
             }
         },
-        well: {
+
+        well: 
+        {
             controlType: 'XRPanel',
-            attributes: {
+            attributes: 
+            {
                 CanShrink: 'true',
                 Borders: 'All',
                 BorderWidth: '1',
-                Padding: '10,10,10,10,100'  // Extra padding to account for border
+                Padding: '10,10,10,10,100'
             },
             calculateHeight: (components, spacing) => {
-                return components.reduce((total, comp) => 
-                    total + (comp.defaultHeight || 25) + spacing, 0);
+                return components.reduce((total, comp) => total + (comp.defaultHeight || 25) + spacing, 0);
             }
         },
-        tabs: {
+
+        tabs: 
+        {
             controlType: 'XRPanel',
-            attributes: {
+            attributes:
+            {
                 CanShrink: 'true',
                 Borders: 'None',
                 Padding: '2,2,0,0,100'
             },
             calculateHeight: (components, spacing) => {
-                // For tabs, we sum up the height of each tab's components
-                // Each tab gets spacing between it and the next
                 return components.reduce((total, tabComponents) => {
-                    const tabHeight = tabComponents.reduce((tabTotal, comp) => 
-                        tabTotal + (comp.defaultHeight || 25) + spacing, 0);
+                    const tabHeight = tabComponents.reduce((tabTotal, comp) => tabTotal + (comp.defaultHeight || 25) + spacing, 0);
+
                     return total + tabHeight + spacing;
                 }, 0);
             }
         },
-        columns: {
+
+        columns: 
+        {
             controlType: 'XRTable',
-            attributes: {
+            attributes: 
+            {
                 AnchorHorizontal: 'Both',
                 AnchorVertical: 'Top',
                 Padding: '0,0,0,0,96'
             },
-            rowAttributes: {
+            rowAttributes: 
+            {
                 Weight: '1'
             },
-            cellAttributes: {
+            cellAttributes: 
+            {
                 Padding: '8,8,8,8,96',
                 Borders: 'None',
                 TextAlignment: 'TopLeft',
                 Weight: '0.5'
             }
         },
+
         table: {
             controlType: 'XRTable',
-            attributes: {
+            attributes: 
+            {
                 Borders: 'None',
                 Padding: '2,2,0,0,100'
             },
-            rowAttributes: {
+            rowAttributes: 
+            {
                 Weight: '1'
             },
-            cellAttributes: {
+            cellAttributes: 
+            {
                 Padding: '5,5,0,0,100',
                 Borders: 'None',
                 TextAlignment: 'MiddleLeft'
@@ -522,53 +629,337 @@ export const DevExpressDefinitions = {
         }
     },
 
-    // Label styles
-    labelStyles: {
-        default: {
-            Font: 'Times New Roman, 9.75pt, style=Bold',
-            TextAlignment: 'MiddleLeft',
-            Borders: 'None',
-            Padding: '2,2,0,0,100'
-        },
-        header: {
-            Font: 'Times New Roman, 14pt, style=Bold',
-            TextAlignment: 'MiddleCenter',
-            Padding: '2,2,0,0,100'
+    // Predefined styles that can be referenced by components
+    styles: 
+    {
+        labels: {
+            default: // Used on field labels unless overridden
+            {
+                Font: 'Times New Roman, 9.75pt, style=Bold',
+                TextAlignment: 'MiddleLeft',
+                Borders: 'None',
+                Padding: '2,2,0,0,100'
+            },
+
+            header: // Used on Report Header
+            {
+                Font: 'Times New Roman, 14pt, style=Bold',
+                TextAlignment: 'MiddleCenter',
+                Padding: '2,2,0,0,100'
+            },
         }
     },
 
-    // Common attribute sets that can be reused
-    commonAttributes: {
-        spacing: {
+    // Predefined attribute combinations
+    commonAttributes:
+    {
+        spacing: 
+        {
             labelSpacing: 2,
             componentSpacing: 8,
             sectionSpacing: 15
         },
-        borders: {
+
+        borders: 
+        {
             none: 'None',
             bottom: 'Bottom',
             all: 'All',
             leftRightBottom: 'Left, Right, Bottom'
         },
-        alignment: {
+
+        alignment: 
+        {
             middleLeft: 'MiddleLeft',
             middleCenter: 'MiddleCenter',
             middleRight: 'MiddleRight',
             topLeft: 'TopLeft',
             topCenter: 'TopCenter'
         }
+    },
+
+    // XML Templates for each component type
+    templates: {
+        // === Fields ===
+        textfield: {
+            template: (component, context, { itemNum, componentWidth, xOffset, currentY }) => `
+                <Item${itemNum} ControlType="XRLabel" 
+                Name="${context.escapeXml(component.key || `textfield${itemNum}`)}"
+                Text="${context.escapeXml(component.label || '')}"
+                SizeF="${componentWidth},${context.LAYOUT.INPUT_HEIGHT}"
+                LocationFloat="${xOffset},${currentY}"
+                Padding="2,2,0,0,100">
+                <ExpressionBindings>
+                    <Item1 Ref="${context.getNextRef()}" EventName="BeforePrint" 
+                        PropertyName="Text" 
+                        Expression="${context.getTypeCastedFieldExpression(component)}" />
+                </ExpressionBindings>
+                <StylePriority UseTextAlignment="true" />
+                </Item${itemNum}>`
+        },
+
+        htmlelement: {
+            template: (component, context, { itemNum, componentWidth, xOffset, currentY }) => `
+                <Item${itemNum} ControlType="XRLabel" 
+                Name="${context.escapeXml(component.key || `html${itemNum}`)}"
+                Text="${context.escapeXml(component.content)}"
+                SizeF="${componentWidth},${context.LAYOUT.INPUT_HEIGHT}"
+                LocationFloat="${xOffset},${currentY}"
+                Padding="2,2,0,0,100"
+                AllowMarkupText="true"/>`
+        },
+
+        richtext: {
+            template: (component, context, { itemNum, componentWidth, xOffset, currentY }) => `
+                <Item${itemNum} ControlType="XRRichText" 
+                Name="${context.escapeXml(component.key || `richText${itemNum}`)}"
+                SizeF="${componentWidth},${context.LAYOUT.INPUT_HEIGHT * 2}"
+                LocationFloat="${xOffset},${currentY}"
+                Font="${context.LAYOUT.DEFAULT_FONT}"
+                Padding="2,2,0,0,100">
+                <ExpressionBindings>
+                    <Item1 Ref="${context.getNextRef()}" EventName="BeforePrint" 
+                        PropertyName="Html" Expression="[${component.key}]" />
+                </ExpressionBindings>
+                </Item${itemNum}>`
+        },
+
+        checkbox: {
+            template: (component, context, { itemNum, componentWidth, xOffset, currentY }) => `
+                <Item${itemNum} ControlType="XRCheckBox" 
+                Name="${context.escapeXml(component.key || `checkbox${itemNum}`)}"
+                Text="${context.escapeXml(component.label || '')}"
+                SizeF="${componentWidth},${context.LAYOUT.INPUT_HEIGHT}"
+                LocationFloat="${xOffset},${currentY}"
+                Padding="2,2,0,0,100"
+                Borders="None">
+                <GlyphOptions Ref="${context.getNextRef()}" Size="13,13"/>
+                <ExpressionBindings>
+                    <Item1 Ref="${context.getNextRef()}" EventName="BeforePrint" 
+                        PropertyName="CheckState" 
+                        Expression="IIF(ISNULL([${context.escapeXml(component.key)}], False), False, ToBoolean([${context.escapeXml(component.key)}]))" />
+                </ExpressionBindings>
+                <StylePriority Ref="${context.getNextRef()}" UseBorders="false" UseTextAlignment="true" />
+                </Item${itemNum}>`
+        },
+
+        datetime: {
+            template: (component, context, { itemNum, componentWidth, xOffset, currentY }) => `
+                <Item${itemNum} ControlType="XRLabel" 
+                Name="${context.escapeXml(component.key || `date${itemNum}`)}"
+                Text="FormatDateTime(ToDateTime([${context.escapeXml(component.key)}]), 'g')"
+                SizeF="${componentWidth},${context.LAYOUT.INPUT_HEIGHT}"
+                LocationFloat="${xOffset},${currentY}"
+                TextAlignment="MiddleLeft"
+                Padding="2,2,0,0,100">
+                <StylePriority Ref="${context.getNextRef()}" UseTextAlignment="false" />
+                </Item${itemNum}>`
+        },
+
+        picturebox: {
+            template: (component, context, { itemNum, componentWidth, xOffset, currentY }) => {
+                const def = DevExpressHelpers.getComponentDef(component.type);
+                const exprBindings = def.expressionBindings?.map((binding, i) => `
+                    <Item${i + 1} Ref="${context.getNextRef()}" 
+                        EventName="${binding.eventName}" 
+                        PropertyName="${binding.propertyName}" 
+                        Expression="${binding.expression(component.key)}" />`).join('\n          ') || '';
+                
+                return `<Item${itemNum} ControlType="XRPictureBox" 
+                    Name="${context.escapeXml(component.key || `picture${itemNum}`)}"
+                    SizeF="${componentWidth},${context.LAYOUT.INPUT_HEIGHT}"
+                    LocationFloat="${xOffset},${currentY}"
+                    Padding="2,2,0,0,100"
+                    Sizing="ZoomImage">
+                    <ExpressionBindings>
+                        ${exprBindings}
+                    </ExpressionBindings>
+                    </Item${itemNum}>`;
+            }
+        },
+
+        barcode: {
+            template: (component, context, { itemNum, componentWidth, xOffset, currentY }) => `
+                <Item${itemNum} ControlType="XRBarCode" 
+                Name="${context.escapeXml(component.key || `barcode${itemNum}`)}"
+                SizeF="${componentWidth},${context.LAYOUT.INPUT_HEIGHT}"
+                LocationFloat="${xOffset},${currentY}"
+                Padding="2,2,0,0,100"
+                Symbology="QRCode"
+                AutoModule="true"
+                TextAlignment="MiddleCenter">
+                <ExpressionBindings>
+                    <Item1 Ref="${context.getNextRef()}" EventName="BeforePrint" 
+                        PropertyName="Text" Expression="[${component.key}]" />
+                </ExpressionBindings>
+                <StylePriority Ref="${context.getNextRef()}" UseTextAlignment="true" />
+                </Item${itemNum}>`
+        },
+
+        datagrid: {
+            template: (component, context, { itemNum, componentWidth, xOffset, currentY }) => `
+                <Item${itemNum} ControlType="XRTable" 
+                Name="${context.escapeXml(component.key || `datagrid${itemNum}`)}"
+                SizeF="${componentWidth},${context.TABLE_LAYOUT.HEADER_HEIGHT + context.TABLE_LAYOUT.ROW_HEIGHT}"
+                LocationFloat="${xOffset},${currentY}"
+                Padding="2,2,0,0,100"
+                Borders="All">
+                <Rows>
+                    <Item1 ControlType="XRTableRow" Name="headerRow_${itemNum}" Weight="1">
+                        <Cells>
+                            ${component.components?.map((col, index) => `
+                                <Item${index + 1} ControlType="XRTableCell" 
+                                Name="headerCell_${index + 1}_${itemNum}"
+                                Text="${context.escapeXml(col.label || '')}"
+                                Weight="${1/component.components.length}"
+                                Padding="${context.TABLE_LAYOUT.CELL_PADDING},${context.TABLE_LAYOUT.CELL_PADDING},0,0,96"
+                                ${Object.entries(DevExpressDefinitions.labelStyles.default).map(([key, value]) => `${key}="${value}"`).join('\n                                ')}>
+                                <StylePriority UseFont="true" UseTextAlignment="true" UseBackColor="true" />
+                                </Item${index + 1}>`).join('\n')}
+                        </Cells>
+                    </Item1>
+                    <Item2 ControlType="XRTableRow" Name="detailRow_${itemNum}" Weight="1">
+                        <Cells>
+                            ${component.components?.map((col, index) => `
+                                <Item${index + 1} ControlType="XRTableCell" 
+                                Name="detailCell_${index + 1}_${itemNum}"
+                                Weight="${1/component.components.length}"
+                                Padding="${context.TABLE_LAYOUT.CELL_PADDING},${context.TABLE_LAYOUT.CELL_PADDING},0,0,96">
+                                <ExpressionBindings>
+                                    <Item1 Ref="${context.getNextRef()}" EventName="BeforePrint" 
+                                        PropertyName="Text" Expression="[${context.escapeXml(col.key)}]" />
+                                </ExpressionBindings>
+                                <StylePriority UseTextAlignment="true" />
+                                </Item${index + 1}>`).join('\n')}
+                        </Cells>
+                    </Item2>
+                </Rows>
+                <StylePriority Ref="${context.getNextRef()}" UseBorders="false" />
+                </Item${itemNum}>`
+        },
+
+        // === Layout Components ===
+        panel: {
+            template: (component, context, { panelItemNum, componentWidth, totalHeight, xOffset, currentY, nestedContext }) => `
+                <Item${panelItemNum} ControlType="XRPanel" 
+                Name="${context.escapeXml(component.key || `panel${panelItemNum}`)}"
+                CanShrink="true"
+                SizeF="${componentWidth},${totalHeight}"
+                LocationFloat="${xOffset},${currentY}"
+                Padding="2,2,0,0,100"
+                Borders="Left, Right, Bottom">
+                <Controls>
+                    ${component.label ? context.generateLabel(component, nestedContext) : ''}
+                    ${component.components ? 
+                    context.processNestedComponents(
+                        component.components,
+                        context.getNextRef(),
+                        componentWidth - (context.LAYOUT.MARGIN * 2),
+                        context.LAYOUT.MARGIN,
+                        component.label ? context.LAYOUT.LABEL_HEIGHT + context.LAYOUT.VERTICAL_SPACING : 0,
+                        nestedContext
+                    ) : ''}
+                </Controls>
+                <StylePriority Ref="${context.getNextRef()}" UseBorders="false" />
+                </Item${panelItemNum}>`
+        },
+
+        table: {
+            template: (component, context, { itemNum, componentWidth, xOffset, currentY }) => {
+                const rows = (component.rows || []).map((row, rowIndex) => {
+                    const rowItemNum = context.itemCounter++;
+                    const cells = (row.cells || []).map((cell, cellIndex) => {
+                        const cellItemNum = context.itemCounter++;
+                        const cellWeight = (1/row.cells.length).toFixed(4);
+                        return `<Item${cellItemNum} ControlType="XRTableCell" 
+                            Name="cell_${cellItemNum}" 
+                            Weight="${cellWeight}" 
+                            Text="${context.escapeXml(cell.content || '')}" 
+                            Padding="${context.TABLE_LAYOUT.CELL_PADDING},${context.TABLE_LAYOUT.CELL_PADDING},0,0,96"/>`;
+                    }).join('');
+                    return `<Item${rowItemNum} ControlType="XRTableRow" 
+                        Name="row_${rowItemNum}" 
+                        Weight="1"><Cells>${cells}</Cells></Item${rowItemNum}>`;
+                }).join('');
+                
+                return `<Item${itemNum} ControlType="XRTable" 
+                    Name="${context.escapeXml(component.key || `table${itemNum}`)}" 
+                    SizeF="${componentWidth},${component.rows?.length * context.TABLE_LAYOUT.ROW_HEIGHT || context.TABLE_LAYOUT.ROW_HEIGHT}" 
+                    LocationFloat="${xOffset},${currentY}" 
+                    Padding="${context.TABLE_LAYOUT.CELL_PADDING},${context.TABLE_LAYOUT.CELL_PADDING},0,0,96" 
+                    Borders="All"><Rows>${rows}</Rows></Item${itemNum}>`;
+            }
+        },
+
+        pagebreak: {
+            template: (component, context, { itemNum, xOffset, currentY }) => `
+                <Item${itemNum} ControlType="XRPageBreak" 
+                Name="pageBreak${itemNum}"
+                LocationFloat="${xOffset},${currentY}" />`
+        },
+
+        columns: {
+            template: (component, context, { itemNum, componentWidth, xOffset, currentY, visibleColumns, columnWeights, columnWidths }) => `
+                <Item${itemNum} ControlType="XRTable" 
+                Name="${context.escapeXml(component.key || `columns${itemNum}`)}"
+                SizeF="${componentWidth},${context.columnsHeight}"
+                LocationFloat="${xOffset},${currentY}"
+                AnchorHorizontal="Both"
+                AnchorVertical="Top"
+                Padding="0,0,0,0,96">
+                <Rows>
+                    <Item1 ControlType="XRTableRow" Name="columnsRow_${itemNum}" Weight="1">
+                        <Cells>
+                            ${visibleColumns.map((col, colIndex) => {
+                                const visibleComponents = (col.components || [])
+                                    .filter(comp => context.isComponentVisible(comp));
+                                let cellContent = '';
+                                let currentCellY = 0;
+
+                                visibleComponents.forEach(comp => {
+                                    const componentHeight = context.calculateComponentHeight(comp);
+                                    cellContent += context.processNestedComponents(
+                                        [comp], 
+                                        context.getNextRef() + (1000 * (colIndex + 1)), 
+                                        columnWidths[colIndex], 
+                                        0, 
+                                        currentCellY
+                                    );
+                                    currentCellY += componentHeight + context.LAYOUT.VERTICAL_GAP;
+                                });
+
+                                return `<Item${colIndex + 1} ControlType="XRTableCell" 
+                                    Name="column_${colIndex + 1}"
+                                    Weight="${columnWeights[colIndex] / 100}"
+                                    Padding="8,8,8,8,96"
+                                    Borders="None"
+                                    TextAlignment="TopLeft">
+                                    <Controls>
+                                        ${cellContent}
+                                    </Controls>
+                                    </Item${colIndex + 1}>`;
+                            }).join('\n')}
+                        </Cells>
+                    </Item1>
+                </Rows>
+                <StylePriority Ref="${context.getNextRef()}" UsePadding="false" />
+                </Item${itemNum}>`
+        },
     }
 };
 
-// Helper functions for working with the definitions
 export const DevExpressHelpers = {
-    // Get component definition with fallback to default
-    getComponentDef(type) {
+
+    getComponentDef(type)
+    {
         const def = DevExpressDefinitions.componentTypes[type];
-        if (!def) {
-            // Add warning about unhandled component type
+
+        if (!def)
+        {
             const DevExpressConverter = window.DevExpressConverter;
-            if (DevExpressConverter && DevExpressConverter.state) {
+
+            if (DevExpressConverter && DevExpressConverter.state)
+            {
                 const component = window.currentComponent || {};
                 DevExpressConverter.state.warnings = DevExpressConverter.state.warnings || [];
                 DevExpressConverter.state.warnings.push({
@@ -581,48 +972,53 @@ export const DevExpressHelpers = {
                     }
                 });
             }
+
             return DevExpressDefinitions.componentTypes.textfield;
         }
+
         return def;
     },
 
-    // Get container definition
-    getContainerDef(type) {
+    getContainerDef(type)
+    {
         return DevExpressDefinitions.containerTypes[type];
     },
 
-    // Get label style
-    getLabelStyle(style = 'default') {
-        return DevExpressDefinitions.labelStyles[style];
+    getLabelStyle(style = 'default')
+    {
+        return DevExpressDefinitions.styles.labels[style];
     },
 
-    // Calculate component width with multiplier
-    calculateComponentWidth(width, componentDef) {
-        if (!componentDef || typeof width !== 'number') {
+    calculateComponentWidth(width, componentDef) 
+    {
+        if (!componentDef || typeof width !== 'number') 
+        {
             return width;
         }
 
         const multiplier = componentDef.widthMultiplier;
-        if (typeof multiplier !== 'number') {
+
+        if (typeof multiplier !== 'number')
+        {
             return width;
         }
 
-        // Ensure multiplier is between 0 and 1
         const clampedMultiplier = Math.max(0, Math.min(1, multiplier));
-        // Floor the result to avoid floating point issues
+
         return Math.floor(width * clampedMultiplier);
     },
 
-    // Combine attributes with defaults
-    combineAttributes(baseAttrs, additionalAttrs) {
+    combineAttributes(baseAttrs, additionalAttrs) 
+    {
         return { ...baseAttrs, ...additionalAttrs };
     },
 
-    // Calculate total height for a component including its label if needed
-    calculateComponentHeight(component) {
+    calculateComponentHeight(component) 
+    {
         const def = this.getComponentDef(component.type);
         const labelHeight = def.requiresLabel ? 25 : 0;
         const spacing = DevExpressDefinitions.commonAttributes.spacing.componentSpacing;
+
         return def.defaultHeight + labelHeight + spacing;
     }
 };

@@ -57,7 +57,7 @@
 						</Item6>
 						<Item7 ControlType="XRCheckBox" Name="chkCheckbox" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="315,25" LocationFloat="10,224" Text="Checkbox" Ref="31">
 							<ExpressionBindings>
-								<Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkCheckbox] == &apos;true&apos;, True, False)" Ref="32"></Item1>
+								<Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkCheckbox] == 'true', True, False)" Ref="32"></Item1>
 							</ExpressionBindings>
 						</Item7>
 						<Item8 ControlType="XRLabel" Name="label_cmbSelect" Text="Select:" SizeF="472,25" LocationFloat="10,257" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="33" />
@@ -71,17 +71,17 @@
 							<Controls>
 								<Item1 ControlType="XRCheckBox" Name="radio_rdoRadio_1" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="1" SizeF="630,25" LocationFloat="0,0" Ref="38">
 									<ExpressionBindings>
-										<Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([rdoRadio] == &apos;1Val&apos;, True, False)" Ref="39"></Item1>
+										<Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([rdoRadio] == '1Val', True, False)" Ref="39"></Item1>
 									</ExpressionBindings>
 								</Item1>
 								<Item2 ControlType="XRCheckBox" Name="radio_rdoRadio_2" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="2" SizeF="630,25" LocationFloat="0,25" Ref="40">
 									<ExpressionBindings>
-										<Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([rdoRadio] == &apos;2Val&apos;, True, False)" Ref="41"></Item1>
+										<Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([rdoRadio] == '2Val', True, False)" Ref="41"></Item1>
 									</ExpressionBindings>
 								</Item2>
 								<Item3 ControlType="XRCheckBox" Name="radio_rdoRadio_3" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="3" SizeF="630,25" LocationFloat="0,50" Ref="42">
 									<ExpressionBindings>
-										<Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([rdoRadio] == &apos;3Val&apos;, True, False)" Ref="43"></Item1>
+										<Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([rdoRadio] == '3Val', True, False)" Ref="43"></Item1>
 									</ExpressionBindings>
 								</Item3>
 							</Controls>
@@ -135,25 +135,25 @@
 						<Item11 ControlType="XRLabel" Name="label_txtDateTime" Text="Date Time:" SizeF="315,25" LocationFloat="10,373" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="66" />
 						<Item12 ControlType="XRLabel" Name="txtDateTime" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="315,25" LocationFloat="10,398" Ref="67">
 							<ExpressionBindings>
-								<Item1 EventName="BeforePrint" PropertyName="Text" Expression="FormatString(&apos;{0:MM/dd/yyyy hh:mm tt}&apos;, [txtDateTime])" Ref="68"></Item1>
+								<Item1 EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0:MM/dd/yyyy hh:mm tt}', [txtDateTime])" Ref="68"></Item1>
 							</ExpressionBindings>
 						</Item12>
 						<Item13 ControlType="XRLabel" Name="label_txtDay" Text="Day:" SizeF="315,25" LocationFloat="10,431" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="69" />
 						<Item14 ControlType="XRLabel" Name="txtDay" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="315,25" LocationFloat="10,456" Ref="70">
 							<ExpressionBindings>
-								<Item1 EventName="BeforePrint" PropertyName="Text" Expression="FormatString(&apos;{0:MM/dd/yyyy}&apos;, [txtDay])" Ref="71"></Item1>
+								<Item1 EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0:MM/dd/yyyy}', [txtDay])" Ref="71"></Item1>
 							</ExpressionBindings>
 						</Item14>
 						<Item15 ControlType="XRLabel" Name="label_txtTime" Text="Time:" SizeF="315,25" LocationFloat="10,489" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="72" />
 						<Item16 ControlType="XRLabel" Name="txtTime" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="315,25" LocationFloat="10,514" Ref="73">
 							<ExpressionBindings>
-								<Item1 EventName="BeforePrint" PropertyName="Text" Expression="FormatString(&apos;{0:hh:mm tt}&apos;, [txtTime])" Ref="74"></Item1>
+								<Item1 EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0:hh:mm tt}', [txtTime])" Ref="74"></Item1>
 							</ExpressionBindings>
 						</Item16>
 						<Item17 ControlType="XRLabel" Name="label_txtCurrency" Text="Currency:" SizeF="157,25" LocationFloat="10,547" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="75" />
 						<Item18 ControlType="XRLabel" Name="txtCurrency" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="157,25" LocationFloat="10,572" Ref="76">
 							<ExpressionBindings>
-								<Item1 EventName="BeforePrint" PropertyName="Text" Expression="FormatString(&apos;{0:C}&apos;, [txtCurrency])" Ref="77"></Item1>
+								<Item1 EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0:C}', [txtCurrency])" Ref="77"></Item1>
 							</ExpressionBindings>
 						</Item18>
 						<Item19 ControlType="XRLabel" Name="label_sigSignature" Text="Signature:" SizeF="315,25" LocationFloat="10,605" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="78" />
@@ -171,7 +171,7 @@
 						<Item2 ControlType="XRLabel" Name="content" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="630,25" LocationFloat="10,63" Text="&lt;p&gt;&lt;i&gt;Content Component&lt;/i&gt;&lt;/p&gt;" Ref="84"></Item2>
 						<Item3 ControlType="XRTable" Name="columns" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="630,179" LocationFloat="10,96" KeepTogether="true" Ref="85">
 							<Rows>
-								<Item1 ControlType="XRTableRow" Name="columnsRow_1759436882444" Ref="86">
+								<Item1 ControlType="XRTableRow" Name="columnsRow_1759434945832" Ref="86">
 									<Cells>
 										<Item1 ControlType="XRTableCell" Name="column_1" Weight="0.5" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="87">
 											<Controls>
@@ -199,17 +199,14 @@
 												</Item2>
 												<Item3 ControlType="XRCheckBox" Name="chkColumn2Field2" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="97,25" LocationFloat="8,58" Text="Column 2 Field 2" Ref="98">
 													<ExpressionBindings>
-														<Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkColumn2Field2] == &apos;true&apos;, True, False)" Ref="99"></Item1>
+														<Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkColumn2Field2] == 'true', True, False)" Ref="99"></Item1>
 													</ExpressionBindings>
 												</Item3>
 											</Controls>
 										</Item2>
 										<Item3 ControlType="XRTableCell" Name="column_3" Weight="0.5" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="100">
 											<Controls>
-												<Item1 ControlType="XRLabel" Name="htmlTestElement" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="194,141" LocationFloat="8,0" Text="&lt;b&gt;Bold Text&lt;/b&gt;&lt;br&gt;
-&lt;i&gt;Slanted Text&lt;/i&gt;&lt;bR&gt;
-&lt;h1&gt;BIG Text&lt;/h1&gt;
-&lt;p style=&amp;quot;color: blue;&amp;quot;&gt;Blue Text&lt;/p&gt;" Ref="101"></Item1>
+												<Item1 ControlType="XRLabel" Name="htmlTestElement" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="194,141" LocationFloat="8,0" Text="&lt;b&gt;Bold Text&lt;/b&gt;&lt;br&gt;&#xA;&lt;i&gt;Slanted Text&lt;/i&gt;&lt;bR&gt;&#xA;&lt;h1&gt;BIG Text&lt;/h1&gt;&#xA;&lt;p style=&amp;quot;color: blue;&amp;quot;&gt;Blue Text&lt;/p&gt;" Ref="101"></Item1>
 											</Controls>
 										</Item3>
 									</Cells>
@@ -232,7 +229,7 @@
 								</Item4>
 								<Item5 ControlType="XRCheckBox" Name="chkFieldsetField3" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="305,25" LocationFloat="10,141" Text="Fieldset Field 3" Ref="109">
 									<ExpressionBindings>
-										<Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkFieldsetField3] == &apos;true&apos;, True, False)" Ref="110"></Item1>
+										<Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkFieldsetField3] == 'true', True, False)" Ref="110"></Item1>
 									</ExpressionBindings>
 								</Item5>
 							</Controls>
