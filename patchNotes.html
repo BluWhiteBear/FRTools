@@ -29,8 +29,8 @@
         <!-- Latest Version -->
         <div class="card mb-4 bg-dark">
             <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                <h2 class="h5 mb-0 text-light"><a href="tool_printoutFromForm.html" class="text-info">Printout From Form</a> | Version 0.3.4</h2>
-                <small class="text-light">October 2, 2025</small>
+                <h2 class="h5 mb-0 text-light"><a href="tool_printoutFromForm.html" class="text-info">Printout From Form</a> | Version 0.3.5</h2>
+                <small class="text-light">October 3, 2025</small>
             </div>
             <div class="card-body">
                 <!-- <h3 class="h6 text-light">New Features</h3>
@@ -41,12 +41,28 @@
                 <h3 class="h6 mt-3 text-light">Improvements</h3>
                 <ul class="text-light">
                     <li>Improved code comments and documentation</li>
-                    <li>Moved element XML definitions out of tool_printoutFromForm.js and into devexpress-definitions.js for improved maintainability</li>
+                    <li>Now generates SQL Queries for FormGrid components</li>
+                    <li>Fixed an issue causing DataGrid SQL generation to fail on subsequent DataGrids when more than one was present on a form</li>
+                    <li>Form and Data Grid SQL generation now utilizes the API keys of the grids as table aliases instead of relying on indexing</li>
                 </ul>
             </div>
         </div>
 
         <!-- Previous Versions -->
+        <div class="card mb-4 bg-dark">
+            <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <h2 class="h5 mb-0 text-light"><a href="tool_printoutFromForm.html" class="text-info">Printout From Form</a> | Version 0.3.4</h2>
+                <small class="text-light">October 2, 2025</small>
+            </div>
+            <div class="card-body">
+                <h3 class="h6 mt-3 text-light">Improvements</h3>
+                <ul class="text-light">
+                    <li>Improved code comments and documentation</li>
+                    <li>Moved element XML definitions out of tool_printoutFromForm.js and into devexpress-definitions.js for improved maintainability</li>
+                </ul>
+            </div>
+        </div>
+
         <div class="card mb-4 bg-dark">
             <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
                 <h2 class="h5 mb-0 text-light"><a href="tool_printoutFromForm.html" class="text-info">Printout From Form</a> | Version 0.3.3</h2>

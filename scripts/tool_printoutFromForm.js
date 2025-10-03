@@ -1,6 +1,6 @@
 // Constants
 const VERSION_INFO = {
-    version: '0.3.4',
+    version: '0.3.5',
     updated: '10/02/2025',
     devexpressVersion: '23.2.5.0'
 };
@@ -75,33 +75,33 @@ class DevExpressConverter
             if (component.type === 'datagrid' && component.DBName)
             {
                 dataSources.push(`Datagrid: ${key} (${component.DBName})`);
-                console.log('Found datagrid:',
-                {
-                    key,
-                    dbName: component.DBName
-                });
+                // console.log('Found datagrid:',
+                // {
+                //     key,
+                //     dbName: component.DBName
+                // });
             }
 
             // Count formgrids with DBName
             if (component.type === 'formgrid' && component.DBName)
             {
                 dataSources.push(`Formgrid: ${key} (${component.DBName})`);
-                console.log('Found formgrid:',
-                {
-                    key,
-                    dbName: component.DBName
-                });
+                // console.log('Found formgrid:',
+                // {
+                //     key,
+                //     dbName: component.DBName
+                // });
             }
 
             // Count nested forms with DBName
             if (component.type === 'nestedsubform' && component.DBName)
             {
                 dataSources.push(`Nested Form: ${key} (${component.DBName})`);
-                console.log('Found nested form:',
-                {
-                    key,
-                    dbName: component.DBName
-                });
+                // console.log('Found nested form:',
+                // {
+                //     key,
+                //     dbName: component.DBName
+                // });
             }
 
             // Recursively check nested components
@@ -137,26 +137,58 @@ class DevExpressConverter
     {
         if (!formioData) return results;
 
-        // First check the Grid property for datagrid info
-        if (formioData.Grid && formioData.Grid.dataGrid && formioData.Grid.dataGrid.DBTableName)
-        {
-            // For root-level datagrids, this is the only place we need to look
-            return [
-            {
-                DBName: formioData.Grid.dataGrid.DBTableName,
-                type: 'datagrid'
-            }];
+        // Debug logging
+        if (formioData.Grid) {
+            // console.log('Grid property found:', {
+            //     hasDataGrid: !!formioData.Grid.dataGrid,
+            //     hasFormGrid: !!formioData.Grid.formGrid,
+            //     dataGridDBName: formioData.Grid.dataGrid?.DBTableName,
+            //     formGridDBName: formioData.Grid.formGrid?.DBTableName
+            // });
         }
 
-        // Only check components if there was no root-level grid
+        // First check the Grid property for datagrid info
+        if (formioData.Grid?.dataGrid?.DBTableName && !formioData.Grid?.formGrid)
+        {
+            //console.log('Found root-level datagrid:', formioData.Grid.dataGrid);
+            // Add root-level datagrid to results
+            results.push({
+                DBName: formioData.Grid.dataGrid.DBTableName,
+                type: 'datagrid',
+                key: formioData.Grid.dataGrid.key || 'mainGrid'  // Use 'mainGrid' as fallback for root grid
+            });
+        }
+
+        // Check components for additional datagrids
         const components = formioData.components;
         if (!components) return results;
 
         for (const component of components)
         {
-            if (component.type === 'datagrid' && component.DBName)
+            // Debug log any grid-like components
+            if (component.type?.includes('grid') || component.DBName) {
+                // console.log('Examining potential grid component:', {
+                //     key: component.key,
+                //     type: component.type,
+                //     DBName: component.DBName,
+                //     isFormGrid: !!component.formGrid,
+                //     component: component
+                // });
+            }
+
+            // Make sure this is a pure datagrid and not a formgrid
+            const isDataGrid = component.type === 'datagrid' && 
+                             component.DBName && 
+                             !component.IsFormGrid; // Use IsFormGrid property to distinguish between grid types
+                             
+            if (isDataGrid)
             {
-                results.push(component);
+                // Make sure we always have a valid key
+                const safeKey = component.key || `grid_${results.length + 1}`;
+                results.push({
+                    ...component,
+                    key: safeKey
+                });
             }
             // Recursively check nested components
             if (component.components)
@@ -174,26 +206,79 @@ class DevExpressConverter
     {
         if (!formioData) return results;
 
-        // First check the Grid property for formgrid info
-        if (formioData.Grid && formioData.Grid.formGrid && formioData.Grid.formGrid.DBTableName)
-        {
-            // For root-level formgrids, this is the only place we need to look
-            return [
-            {
-                DBName: formioData.Grid.formGrid.DBTableName,
-                type: 'formgrid'
-            }];
+        // Debug logging
+        if (formioData.Grid) {
+            // console.log('FormGrid - Grid property found:', {
+            //     hasDataGrid: !!formioData.Grid.dataGrid,
+            //     hasFormGrid: !!formioData.Grid.formGrid,
+            //     dataGridDBName: formioData.Grid.dataGrid?.DBTableName,
+            //     formGridDBName: formioData.Grid.formGrid?.DBTableName
+            // });
         }
 
-        // Only check components if there was no root-level grid
+        // First check the Grid property for formgrid info
+        if (formioData.Grid?.formGrid?.DBTableName)
+        {
+            //console.log('Found root-level formgrid:', formioData.Grid.formGrid);
+            // Add root-level formgrid to results
+            results.push({
+                DBName: formioData.Grid.formGrid.DBTableName,
+                type: 'formgrid',
+                key: formioData.Grid.formGrid.key || 'mainFormGrid'  // Use 'mainFormGrid' as fallback for root grid
+            });
+        }
+
+        // Check components for additional formgrids
         const components = formioData.components;
         if (!components) return results;
 
         for (const component of components)
         {
-            if (component.type === 'formgrid' && component.DBName)
+            // Debug log any form or grid-like components
+            if (component.type?.includes('grid') || component.type?.includes('form') || component.DBName) {
+                // console.log('FormGrid - Examining potential component:', {
+                //     key: component.key,
+                //     type: component.type,
+                //     DBName: component.DBName,
+                //     isFormGrid: !!component.formGrid,
+                //     hasForm: component.type?.includes('form'),
+                //     component: component
+                // });
+            }
+
+            // Check if this is a formgrid using the IsFormGrid property
+            const isFormGrid = component.DBName && component.IsFormGrid;
+            
+            if (isFormGrid) {
+                // Look for the View button in the components to get the dialog form table
+                let dialogFormTable = null;
+                if (component.components) {
+                    const viewButton = component.components.find(c => 
+                        c.type === 'button' && 
+                        c.key === 'btn_view' && 
+                        c.Form_DBTable
+                    );
+                    if (viewButton) {
+                        dialogFormTable = viewButton.Form_DBTable;
+                    }
+                }
+                // Include the dialogFormTable in the component data
+                const gridData = {
+                    ...component,
+                    dialogFormTable: dialogFormTable
+                };
+                results.push(gridData);
+                continue;
+            }
+
+            if (isFormGrid)
             {
-                results.push(component);
+                // Make sure we always have a valid key
+                const safeKey = component.key || `fg_${results.length + 1}`;
+                results.push({
+                    ...component,
+                    key: safeKey
+                });
             }
             // Recursively check nested components
             if (component.components)
@@ -333,7 +418,8 @@ class DevExpressConverter
             const nestedContext = {
                 ...context,
                 parentVisible: isVisible,
-                getNextRef: FieldGenerator.getNextRef
+                getNextRef: FieldGenerator.getNextRef,
+                itemCounter: 1  // Reset item counter for panel children
             };
 
             const contentHeight = component.components?.length ?
@@ -854,7 +940,7 @@ class DevExpressConverter
             // Validate input components
             if (!components || !Array.isArray(components))
             {
-                console.log('No components to process or invalid components array');
+                console.warn('No components to process or invalid components array');
                 return '';
             }
 
@@ -903,7 +989,7 @@ class DevExpressConverter
                 {
                     const componentHeight = this.calculateComponentHeight(component);
                     currentY += componentHeight + LAYOUT.VERTICAL_SPACING;
-                    console.log(`Component processed, new Y: ${currentY}`);
+                    //console.log(`Component processed, new Y: ${currentY}`);
                 }
 
                 return result || '';
@@ -1091,8 +1177,8 @@ class DevExpressConverter
             const xmlTemplateFunc = generateMinimalXmlTemplate();
             let xmlTemplate = xmlTemplateFunc(formioData);
 
-            console.log("XML template generated, length:", xmlTemplate.length);
-            console.log("XML preview:", xmlTemplate.substring(0, 200) + "...");
+            //console.log("XML template generated, length:", xmlTemplate.length);
+            //console.log("XML preview:", xmlTemplate.substring(0, 200) + "...");
 
             // Clean XML - remove unnecessary whitespace but preserve structure
             // Clean and validate XML before compressing
@@ -1103,7 +1189,7 @@ class DevExpressConverter
                 .trim();
 
             const initialValidation = Utils.validateXmlOutput(xmlTemplate);
-            console.log("Initial XML validation results:", initialValidation);
+            //console.log("Initial XML validation results:", initialValidation);
 
             if (initialValidation.some(result => result.startsWith("ERROR")))
             {
@@ -1135,7 +1221,7 @@ class DevExpressConverter
                     binaryString += String.fromCharCode(byte);
                 });
                 base64Template = btoa(binaryString);
-                console.log('XML compressed successfully, base64 length:', base64Template.length);
+                //console.log('XML compressed successfully, base64 length:', base64Template.length);
 
                 // Attempt to decode the template as a final validation
                 try
@@ -1147,8 +1233,8 @@ class DevExpressConverter
                     }
                     else
                     {
-                        console.log('Template validation successful - decoded content length:',
-                            decodedTemplate.content.length);
+                        // console.log('Template validation successful - decoded content length:',
+                        //     decodedTemplate.content.length);
 
                         // Look for specific field bindings in the decoded XML to verify fields are present
                         const fieldBindings = decodedTemplate.content.match(/Expression="\[(.*?)\]"/g) || [];
@@ -1392,8 +1478,8 @@ const Utils = {
             }
 
             // Debug base64 input
-            console.log('Base64 template length:', base64Template.length);
-            console.log('Base64 template start:', base64Template.substring(0, 50));
+            //console.log('Base64 template length:', base64Template.length);
+            //console.log('Base64 template start:', base64Template.substring(0, 50));
 
             // Convert base64 to binary array
             const binaryStr = atob(base64Template);
@@ -1404,8 +1490,8 @@ const Utils = {
             }
 
             // Debug compressed bytes
-            console.log('Compressed bytes length:', bytes.length);
-            console.log('First few bytes:', Array.from(bytes.slice(0, 10)));
+            //console.log('Compressed bytes length:', bytes.length);
+            //console.log('First few bytes:', Array.from(bytes.slice(0, 10)));
 
             // Decompress with error handling
             let decompressed;
@@ -1423,8 +1509,8 @@ const Utils = {
             }
 
             // Debug decompressed content
-            console.log('Decompressed length:', decompressed?.length);
-            console.log('Decompressed start:', decompressed?.substring(0, 100));
+            //console.log('Decompressed length:', decompressed?.length);
+            //console.log('Decompressed start:', decompressed?.substring(0, 100));
 
             // Validate XML structure 
             if (!decompressed?.startsWith('<?xml'))
@@ -1481,10 +1567,13 @@ const Utils = {
         const procedureName = `cstm_${tableName.replace(/[\[\]]/g, '')}`;
 
         // Debug logging for datagrids
-        console.log('Found data grids:', DevExpressConverter.findDataGridComponents(formioData));
+        //console.log('Found data grids:', DevExpressConverter.findDataGridComponents(formioData));
 
-        const sql =
-            `
+        // Build the SQL string in parts
+        let sqlParts = [];
+
+        // Main procedure
+        sqlParts.push(`
 /* MAIN FORM PROCEDURE */
 create or alter procedure [${procedureName}_Printout]
   @FormDataGUID uniqueidentifier = null,
@@ -1504,15 +1593,16 @@ as
   join Contact ownCon with(NOLOCK) on ownCon.ContactGUID = main.__ownerobjectguid
   where main.__forminstanceguid = @FormDataGUID
   and main.__ownerobjectguid = @OwnerObjectGUID
-GO
+GO`);
 
-
-
-
-${DevExpressConverter.findDataGridComponents(formioTemplate).map((grid, index) => 
-`
-/* DATA GRID PROCEDURE: datagrid${index} */
-create or alter procedure [${procedureName}_datagrid${index}]
+        // Data grid procedures
+        const dataGrids = DevExpressConverter.findDataGridComponents(formioTemplate);
+        if (dataGrids.length > 0) {
+            dataGrids.forEach(grid => {
+                const safeKey = grid.key.replace(/[^a-zA-Z0-9_]/g, '_');
+                sqlParts.push(`
+/* DATA GRID PROCEDURE: ${grid.key} */
+create or alter procedure [${procedureName}_${safeKey}]
   @FormDataGUID uniqueidentifier = null,
   @OwnerObjectGUID uniqueidentifier = null
 as
@@ -1526,22 +1616,25 @@ as
     ownCon.first
     ,ownCon.last
     ,main.*
-    ,datagrid${index}.*
+    ,${safeKey}.*
 
   from ${fullTableName} main
   join Contact ownCon with(NOLOCK) on ownCon.ContactGUID = main.__ownerobjectguid
-  left join ${grid.DBName} datagrid${index} with(NOLOCK) on datagrid${index}.__forminstanceguid = main.__forminstanceguid
+  left join ${grid.DBName} ${safeKey} with(NOLOCK) on ${safeKey}.__forminstanceguid = main.__forminstanceguid
   where main.__forminstanceguid = @FormDataGUID
   and main.__ownerobjectguid = @OwnerObjectGUID
-GO
-`
-).join('\n')}
+GO`);
+            });
+        }
 
-
-${DevExpressConverter.findFormGridComponents(formioTemplate).map((grid, index) => 
-`
-/* FORM GRID PROCEDURE: formgrid${index} */
-create or alter procedure [${procedureName}_formgrid${index}]
+        // Form grid procedures
+        const formGrids = DevExpressConverter.findFormGridComponents(formioTemplate);
+        if (formGrids.length > 0) {
+            formGrids.forEach(grid => {
+                const safeKey = grid.key.replace(/[^a-zA-Z0-9_]/g, '_');
+                sqlParts.push(`
+/* FORM GRID PROCEDURE: ${grid.key} */
+create or alter procedure [${procedureName}_${safeKey}]
   @FormDataGUID uniqueidentifier = null,
   @OwnerObjectGUID uniqueidentifier = null
 as
@@ -1552,19 +1645,18 @@ as
 
   set nocount on;
   select
-    ownCon.first
-    ,ownCon.last
-    ,main.*
-    ,formgrid${index}.*
+    ${grid.dialogFormTable ? 'dialog.*' : ''}
   from ${fullTableName} main
   join Contact ownCon with(NOLOCK) on ownCon.ContactGUID = main.__ownerobjectguid
-  left join ${grid.DBName} formgrid${index} with(NOLOCK) on formgrid${index}.__forminstanceguid = main.__forminstanceguid
+  left join ${grid.DBName} ${safeKey} with(NOLOCK) on ${safeKey}.__forminstanceguid = main.__forminstanceguid
+  ${grid.dialogFormTable ? `left join ${grid.dialogFormTable} dialog with(NOLOCK) on dialog.__forminstanceguid = ${safeKey}.[view]` : ''}
   where main.__forminstanceguid = @FormDataGUID
   and main.__ownerobjectguid = @OwnerObjectGUID
-GO
-`
-).join('\n')}
-`;
+GO`);
+            });
+        }
+
+        const sql = sqlParts.join('\n\n');
 
         // Update SQL preview
         const previewContainer = document.getElementById('sql-rendered');
@@ -1719,7 +1811,7 @@ const UIHandlers = {
                     let formioTemplate;
                     if (typeof jsonData.FormioTemplate === 'string')
                     {
-                        console.log("FormioTemplate is a string, attempting to parse...");
+                        //console.log("FormioTemplate is a string, attempting to parse...");
                         try
                         {
                             formioTemplate = JSON.parse(jsonData.FormioTemplate);
@@ -1741,7 +1833,7 @@ const UIHandlers = {
                     }
                     else
                     {
-                        console.log("FormioTemplate is already an object");
+                        //console.log("FormioTemplate is already an object");
                         formioTemplate = jsonData.FormioTemplate;
                     }
 
@@ -1889,7 +1981,7 @@ const UIHandlers = {
     {
         if (!DevExpressConverter.state.devExpressJson)
         {
-            console.log('No JSON data available');
+            console.error('No JSON data available');
             return;
         }
 
@@ -1911,7 +2003,7 @@ const UIHandlers = {
     {
         if (!DevExpressConverter.state.devExpressJson)
         {
-            console.log('No JSON data available');
+            console.error('No JSON data available');
             return;
         }
 
@@ -1938,11 +2030,11 @@ const UIHandlers = {
 
     copyXML()
     {
-        const xml = document.getElementById('devexpress-rendered').textContent; // Changed from devexpress-xml
+        const xml = document.getElementById('devexpress-rendered').textContent;
         navigator.clipboard.writeText(xml)
             .then(() =>
             {
-                const btn = document.getElementById('copyXmlBtn'); // Changed from copyXMLBtn
+                const btn = document.getElementById('copyXmlBtn');
                 btn.textContent = 'Copied!';
                 setTimeout(() => btn.textContent = 'Copy XML', 2000);
             })
@@ -1955,7 +2047,7 @@ const UIHandlers = {
         navigator.clipboard.writeText(sql)
             .then(() =>
             {
-                const btn = document.getElementById('copySqlBtn'); // Changed from copySQLBtn
+                const btn = document.getElementById('copySqlBtn');
                 btn.textContent = 'Copied!';
                 setTimeout(() => btn.textContent = 'Copy SQL', 2000);
             })
@@ -2459,7 +2551,7 @@ function generateMinimalXmlTemplate()
             processor.createItemNode(3, "DetailBand",
             {
                 Name: "Detail",
-                HeightF: "830"
+                HeightF: `${Math.ceil(DevExpressConverter.core.calculateNestedHeight(componentProcessor.components || [])) + (LAYOUT.VERTICAL_SPACING * 2)}` // Calculate height including nested components
             }),
             processor.createItemNode(4, "BottomMarginBand",
             {
