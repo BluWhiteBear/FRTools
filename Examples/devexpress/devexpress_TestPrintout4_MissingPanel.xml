@@ -1,392 +1,501 @@
 <?xml version="1.0" encoding="utf-8"?>
 <XtraReportsLayoutSerializer SerializerVersion="23.2.5.0" ControlType="DevExpress.XtraReports.UI.XtraReport, DevExpress.XtraReports.v23.2, Version=23.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" Name="Report" DisplayName="FormIO2DevExpressTestForm1;FormIO2DevExpressTestForm1;false;false;00000000-0000-0000-0000-000000000000;00000000-0000-0000-0000-000000000000" Margins="40, 40, 40, 40" PageWidth="850" PageHeight="1100" Version="23.2" DataMember="Root" Ref="0">
-	<Extensions Ref="1">
-		<Item1 Key="DataSerializationExtension" Value="DevExpress.XtraReports.Web.ReportDesigner.DefaultDataSerializer" Ref="2"></Item1>
-	</Extensions>
-	<Parameters Ref="3">
-		<Item1 ControlType="Parameter" Description="FormDataGUID" Name="FormDataGUID" Type="#Ref-3" ValueInfo="00000000-0000-0000-0000-000000000000" Ref="4"></Item1>
-		<Item2 ControlType="Parameter" Description="ObjectGUID" Name="ObjectGUID" Type="#Ref-3" ValueInfo="00000000-0000-0000-0000-000000000000" Ref="5"></Item2>
-	</Parameters>
-	<Bands Ref="6">
-		<Item1 ControlType="TopMarginBand" Name="TopMargin" HeightF="40" Ref="7"></Item1>
-		<Item2 ControlType="ReportHeaderBand" Name="ReportHeader" HeightF="50" Ref="8">
-			<Controls>
-				<Item1 ControlType="XRLabel" Name="headerLabel" Text="FormIO2DevExpressTestForm1" TextAlignment="MiddleCenter" SizeF="769.987,30" LocationFloat="0,0" Font="Times New Roman, 14pt, style=Bold" Padding="2,2,0,0,100" Ref="9"></Item1>
-			</Controls>
-		</Item2>
-		<Item3 ControlType="DetailBand" Name="Detail" HeightF="2645" Ref="10">
-			<Controls>
-				<Item1 ControlType="XRPanel" Name="miscFieldsPanel" CanShrink="true" Borders="None" Padding="2,2,0,0,100" SizeF="650,494" LocationFloat="0,10" Ref="11">
-					<Controls>
-						<Item2 ControlType="XRLabel" Name="label_miscFieldsPanel" Text="Basic Fields Panel" SizeF="480,25" LocationFloat="5,0" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="12"></Item2>
-						<Item1 ControlType="XRLabel" Name="label_txtTextField" Text="Text Field:" SizeF="472,25" LocationFloat="10,25" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="13"></Item1>
-						<Item2 ControlType="XRLabel" Name="txtTextField" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="472,25" LocationFloat="10,50" Ref="14">
-							<ExpressionBindings>
-								<Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtTextField]" Ref="15"></Item1>
-							</ExpressionBindings>
-						</Item2>
-						<Item3 ControlType="XRLabel" Name="label_txtaTextArea" Text="Text Area:" SizeF="472,25" LocationFloat="10,83" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="16"></Item3>
-						<Item4 ControlType="XRLabel" Name="txtaTextArea" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="472,50" LocationFloat="10,108" Ref="17">
-							<ExpressionBindings>
-								<Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtaTextArea]" Ref="18"></Item1>
-							</ExpressionBindings>
-						</Item4>
-						<Item5 ControlType="XRLabel" Name="label_txtNumber" Text="Number:" SizeF="157,25" LocationFloat="10,166" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="19" />
-						<Item6 ControlType="XRLabel" Name="txtNumber" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="157,25" LocationFloat="10,191" Ref="20">
-							<ExpressionBindings>
-								<Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtNumber]" Ref="21"></Item1>
-							</ExpressionBindings>
-						</Item6>
-						<Item7 ControlType="XRCheckBox" Name="chkCheckbox" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="315,25" LocationFloat="10,224" Text="Checkbox" Ref="22">
-							<ExpressionBindings>
-								<Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkCheckbox] == 'true', True, False)" Ref="23"></Item1>
-							</ExpressionBindings>
-						</Item7>
-						<Item8 ControlType="XRLabel" Name="label_cmbSelect" Text="Select:" SizeF="472,25" LocationFloat="10,257" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="24" />
-						<Item9 ControlType="XRLabel" Name="cmbSelect" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="472,25" LocationFloat="10,282" Ref="25">
-							<ExpressionBindings>
-								<Item1 EventName="BeforePrint" PropertyName="Text" Expression="[cmbSelect]" Ref="26"></Item1>
-							</ExpressionBindings>
-						</Item9>
-						<Item10 ControlType="XRLabel" Name="label_rdoRadio" Text="Radio:" SizeF="630,25" LocationFloat="10,315" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="27" />
-						<Item11 ControlType="XRPanel" Name="radioPanel_rdoRadio" TextAlignment="MiddleLeft" Padding="2,2,0,0,100" CanShrink="true" SizeF="630,75" LocationFloat="10,340" Ref="28">
-							<Controls>
-								<Item1 ControlType="XRCheckBox" Name="radio_rdoRadio_1" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="1" SizeF="630,25" LocationFloat="0,0" Ref="29">
-									<ExpressionBindings>
-										<Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([rdoRadio] == '1Val', True, False)" Ref="30"></Item1>
-									</ExpressionBindings>
-								</Item1>
-								<Item2 ControlType="XRCheckBox" Name="radio_rdoRadio_2" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="2" SizeF="630,25" LocationFloat="0,25" Ref="31">
-									<ExpressionBindings>
-										<Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([rdoRadio] == '2Val', True, False)" Ref="32"></Item1>
-									</ExpressionBindings>
-								</Item2>
-								<Item3 ControlType="XRCheckBox" Name="radio_rdoRadio_3" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="3" SizeF="630,25" LocationFloat="0,50" Ref="33">
-									<ExpressionBindings>
-										<Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([rdoRadio] == '3Val', True, False)" Ref="34"></Item1>
-									</ExpressionBindings>
-								</Item3>
-							</Controls>
-						</Item11>
-						<Item12 ControlType="XRLabel" Name="button" Visible="false" SizeF="630,25" LocationFloat="10,423" Ref="35">
-							<ExpressionBindings>
-								<Item1 EventName="BeforePrint" PropertyName="Text" Expression="[button]" Ref="36"></Item1>
-							</ExpressionBindings>
-						</Item12>
-					</Controls>
-				</Item1>
-				<Item2 ControlType="XRPanel" Name="advancedFieldsPanel" CanShrink="true" Borders="None" Padding="2,2,0,0,100" SizeF="650,693" LocationFloat="0,519" Ref="37">
-					<Controls>
-						<Item3 ControlType="XRLabel" Name="label_advancedFieldsPanel" Text="Advanced Fields Panel" SizeF="480,25" LocationFloat="5,0" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="38"></Item3>
-						<Item1 ControlType="XRLabel" Name="fileUpload" Visible="false" SizeF="630,25" LocationFloat="10,25" Ref="39">
-							<ExpressionBindings>
-								<Item1 EventName="BeforePrint" PropertyName="Text" Expression="[fileUpload]" Ref="40"></Item1>
-							</ExpressionBindings>
-						</Item1>
-						<Item2 ControlType="XRLabel" Name="label_txtEmail" Text="Email:" SizeF="472,25" LocationFloat="10,58" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="41"></Item2>
-						<Item3 ControlType="XRLabel" Name="txtEmail" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="472,25" LocationFloat="10,83" Ref="42">
-							<ExpressionBindings>
-								<Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtEmail]" Ref="43"></Item1>
-							</ExpressionBindings>
-						</Item3>
-						<Item4 ControlType="XRLabel" Name="label_txtURL" Text="URL:" SizeF="472,25" LocationFloat="10,116" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="44"></Item4>
-						<Item5 ControlType="XRLabel" Name="txtURL" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="472,25" LocationFloat="10,141" Ref="45">
-							<ExpressionBindings>
-								<Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtURL]" Ref="46"></Item1>
-							</ExpressionBindings>
-						</Item5>
-						<Item6 ControlType="XRLabel" Name="label_txtPhoneNumber" Text="Phone Number:" SizeF="472,25" LocationFloat="10,174" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="47" />
-						<Item7 ControlType="XRLabel" Name="txtPhoneNumber" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="472,25" LocationFloat="10,199" Ref="48">
-							<ExpressionBindings>
-								<Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtPhoneNumber]" Ref="49"></Item1>
-							</ExpressionBindings>
-						</Item7>
-						<Item8 ControlType="XRLabel" Name="label_txtAddress" Text="Address:" SizeF="472,25" LocationFloat="10,232" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="50" />
-						<Item9 ControlType="XRLabel" Name="txtAddress" TextAlignment="MiddleLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="472,25" LocationFloat="10,257" Ref="51">
-							<ExpressionBindings>
-								<Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtAddress]" Ref="52"></Item1>
-							</ExpressionBindings>
-						</Item9>
-						<Item10 ControlType="XRLabel" Name="label_txtDateTime" Text="Date Time:" SizeF="315,25" LocationFloat="10,290" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="53" />
-						<Item11 ControlType="XRLabel" Name="txtDateTime" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="315,25" LocationFloat="10,315" Ref="54">
-							<ExpressionBindings>
-								<Item1 EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0:MM/dd/yyyy hh:mm tt}', [txtDateTime])" Ref="55"></Item1>
-							</ExpressionBindings>
-						</Item11>
-						<Item12 ControlType="XRLabel" Name="label_txtDay" Text="Day:" SizeF="315,25" LocationFloat="10,348" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="56" />
-						<Item13 ControlType="XRLabel" Name="txtDay" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="315,25" LocationFloat="10,373" Ref="57">
-							<ExpressionBindings>
-								<Item1 EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0:MM/dd/yyyy}', [txtDay])" Ref="58"></Item1>
-							</ExpressionBindings>
-						</Item13>
-						<Item14 ControlType="XRLabel" Name="label_txtTime" Text="Time:" SizeF="315,25" LocationFloat="10,406" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="59" />
-						<Item15 ControlType="XRLabel" Name="txtTime" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="315,25" LocationFloat="10,431" Ref="60">
-							<ExpressionBindings>
-								<Item1 EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0:hh:mm tt}', [txtTime])" Ref="61"></Item1>
-							</ExpressionBindings>
-						</Item15>
-						<Item16 ControlType="XRLabel" Name="label_txtCurrency" Text="Currency:" SizeF="157,25" LocationFloat="10,464" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="62" />
-						<Item17 ControlType="XRLabel" Name="txtCurrency" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="157,25" LocationFloat="10,489" Ref="63">
-							<ExpressionBindings>
-								<Item1 EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0:C}', [txtCurrency])" Ref="64"></Item1>
-							</ExpressionBindings>
-						</Item17>
-						<Item18 ControlType="XRLabel" Name="label_sigSignature" Text="Signature:" SizeF="315,25" LocationFloat="10,522" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="65" />
-						<Item19 ControlType="XRPictureBox" Name="sigSignature" Sizing="ZoomImage" Padding="2,2,0,0,100" SizeF="315,100" LocationFloat="10,547" Ref="66">
-							<ExpressionBindings>
-								<Item1 EventName="BeforePrint" PropertyName="ImageSource" Expression="[sigSignature]" Ref="67"></Item1>
-							</ExpressionBindings>
-						</Item19>
-					</Controls>
-				</Item2>
-				<Item3 ControlType="XRPanel" Name="layoutPanel" CanShrink="true" Borders="None" Padding="2,2,0,0,100" SizeF="650,1123" LocationFloat="0,1227" Ref="68">
-					<Controls>
-						<Item4 ControlType="XRLabel" Name="label_layoutPanel" Text="Layout Panel" SizeF="480,25" LocationFloat="5,0" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="69"></Item4>
-						<Item1 ControlType="XRLabel" Name="html" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="630,30" LocationFloat="10,25" Text="&lt;b&gt;HTML Component&lt;/b&gt;" Ref="70"></Item1>
-						<Item2 ControlType="XRLabel" Name="content" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="630,25" LocationFloat="10,63" Text="&lt;p&gt;&lt;i&gt;Content Component&lt;/i&gt;&lt;/p&gt;" Ref="71"></Item2>
-						<Item3 ControlType="XRTable" Name="columns" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="630,179" LocationFloat="10,96" KeepTogether="true" Ref="72">
-							<Rows>
-								<Item1 ControlType="XRTableRow" Name="columnsRow_1759512383269" Ref="73">
-									<Cells>
-										<Item1 ControlType="XRTableCell" Name="column_1" Weight="0.5" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="74">
-											<Controls>
-												<Item1 ControlType="XRLabel" Name="label_txtColumn1Field1" Text="Column 1 Field 1" SizeF="145,25" LocationFloat="8,0" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="75"></Item1>
-												<Item2 ControlType="XRLabel" Name="txtColumn1Field1" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="145,25" LocationFloat="8,25" Ref="76">
-													<ExpressionBindings>
-														<Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtColumn1Field1]" Ref="77"></Item1>
-													</ExpressionBindings>
-												</Item2>
-												<Item3 ControlType="XRLabel" Name="label_txtColumn1Field2" Text="Column 1 Field 2" SizeF="145,25" LocationFloat="8,58" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="78"></Item3>
-												<Item4 ControlType="XRLabel" Name="txtColumn1Field2" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="145,25" LocationFloat="8,83" Ref="79">
-													<ExpressionBindings>
-														<Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtColumn1Field2]" Ref="80"></Item1>
-													</ExpressionBindings>
-												</Item4>
-											</Controls>
-										</Item1>
-										<Item2 ControlType="XRTableCell" Name="column_2" Weight="0.5" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="81">
-											<Controls>
-												<Item1 ControlType="XRLabel" Name="label_txtColumn2Field1" Text="Column 2 Field 1" SizeF="145,25" LocationFloat="8,0" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="82"></Item1>
-												<Item2 ControlType="XRLabel" Name="txtColumn2Field1" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="145,25" LocationFloat="8,25" Ref="83">
-													<ExpressionBindings>
-														<Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtColumn2Field1]" Ref="84"></Item1>
-													</ExpressionBindings>
-												</Item2>
-												<Item3 ControlType="XRCheckBox" Name="chkColumn2Field2" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="97,25" LocationFloat="8,58" Text="Column 2 Field 2" Ref="85">
-													<ExpressionBindings>
-														<Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkColumn2Field2] == 'true', True, False)" Ref="86"></Item1>
-													</ExpressionBindings>
-												</Item3>
-											</Controls>
-										</Item2>
-										<Item3 ControlType="XRTableCell" Name="column_3" Weight="0.5" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="87">
-											<Controls>
-												<Item1 ControlType="XRLabel" Name="htmlTestElement" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="194,141" LocationFloat="8,0" Text="&lt;b&gt;Bold Text&lt;/b&gt;&lt;br&gt;&#xA;&lt;i&gt;Slanted Text&lt;/i&gt;&lt;bR&gt;&#xA;&lt;h1&gt;BIG Text&lt;/h1&gt;&#xA;&lt;p style=&amp;quot;color: blue;&amp;quot;&gt;Blue Text&lt;/p&gt;" Ref="88"></Item1>
-											</Controls>
-										</Item3>
-									</Cells>
-								</Item1>
-							</Rows>
-						</Item3>
-						<Item4 ControlType="XRPanel" Name="fieldset" CanShrink="true" Borders="None" Padding="2,2,0,0,100" SizeF="630,204" LocationFloat="10,290" Ref="89">
-							<Controls>
-								<Item1 ControlType="XRLabel" Name="label_txtFieldsetField1" Text="Fieldset Field 1" SizeF="457,25" LocationFloat="10,0" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="90"></Item1>
-								<Item2 ControlType="XRLabel" Name="txtFieldsetField1" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="457,25" LocationFloat="10,25" Ref="91">
-									<ExpressionBindings>
-										<Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtFieldsetField1]" Ref="92"></Item1>
-									</ExpressionBindings>
-								</Item2>
-								<Item3 ControlType="XRLabel" Name="label_txtaFieldsetField2" Text="Fieldset Field 2" SizeF="457,25" LocationFloat="10,58" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="93"></Item3>
-								<Item4 ControlType="XRLabel" Name="txtaFieldsetField2" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="457,50" LocationFloat="10,83" Ref="94">
-									<ExpressionBindings>
-										<Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtaFieldsetField2]" Ref="95"></Item1>
-									</ExpressionBindings>
-								</Item4>
-								<Item5 ControlType="XRCheckBox" Name="chkFieldsetField3" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="305,25" LocationFloat="10,141" Text="Fieldset Field 3" Ref="96">
-									<ExpressionBindings>
-										<Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkFieldsetField3] == 'true', True, False)" Ref="97"></Item1>
-									</ExpressionBindings>
-								</Item5>
-							</Controls>
-						</Item4>
-						<Item5 ControlType="XRPanel" Name="panel" CanShrink="true" Borders="None" Padding="2,2,0,0,100" SizeF="630,179" LocationFloat="10,509" Ref="98">
-							<Controls>
-								<Item6 ControlType="XRLabel" Name="label_panel" Text="Panel" SizeF="465,25" LocationFloat="15,0" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="99" />
-								<Item1 ControlType="XRLabel" Name="label_txtPanelField1" Text="Panel Field 1" SizeF="457,25" LocationFloat="10,25" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="100"></Item1>
-								<Item2 ControlType="XRLabel" Name="txtPanelField1" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="457,25" LocationFloat="10,50" Ref="101">
-									<ExpressionBindings>
-										<Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtPanelField1]" Ref="102"></Item1>
-									</ExpressionBindings>
-								</Item2>
-								<Item3 ControlType="XRLabel" Name="label_cmbPanelField2" Text="Panel Field 2" SizeF="457,25" LocationFloat="10,83" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="103"></Item3>
-								<Item4 ControlType="XRLabel" Name="cmbPanelField2" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="457,25" LocationFloat="10,108" Ref="104">
-									<ExpressionBindings>
-										<Item1 EventName="BeforePrint" PropertyName="Text" Expression="[cmbPanelField2]" Ref="105"></Item1>
-									</ExpressionBindings>
-								</Item4>
-							</Controls>
-						</Item5>
-						<Item6 ControlType="XRTable" Name="table" Borders="None" Padding="2,2,0,0,100" SizeF="630,105" LocationFloat="10,703" Ref="106">
-							<Rows>
-								<Item1 ControlType="XRTableRow" Name="tableRow_1" Weight="1" Ref="107">
-									<Cells>
-										<Item1 ControlType="XRTableCell" Name="cell_1_1" Padding="5,5,0,0,100" Borders="None" TextAlignment="MiddleLeft" Weight="0.3333333333333333" Ref="108"></Item1>
-										<Item2 ControlType="XRTableCell" Name="cell_1_2" Padding="5,5,0,0,100" Borders="None" TextAlignment="MiddleLeft" Weight="0.3333333333333333" Ref="109"></Item2>
-										<Item3 ControlType="XRTableCell" Name="cell_1_3" Padding="5,5,0,0,100" Borders="None" TextAlignment="MiddleLeft" Weight="0.3333333333333333" Ref="110"></Item3>
-									</Cells>
-								</Item1>
-								<Item2 ControlType="XRTableRow" Name="tableRow_2" Weight="1" Ref="111">
-									<Cells>
-										<Item1 ControlType="XRTableCell" Name="cell_2_1" Padding="5,5,0,0,100" Borders="None" TextAlignment="MiddleLeft" Weight="0.3333333333333333" Ref="112"></Item1>
-										<Item2 ControlType="XRTableCell" Name="cell_2_2" Padding="5,5,0,0,100" Borders="None" TextAlignment="MiddleLeft" Weight="0.3333333333333333" Ref="113"></Item2>
-										<Item3 ControlType="XRTableCell" Name="cell_2_3" Padding="5,5,0,0,100" Borders="None" TextAlignment="MiddleLeft" Weight="0.3333333333333333" Ref="114"></Item3>
-									</Cells>
-								</Item2>
-								<Item3 ControlType="XRTableRow" Name="tableRow_3" Weight="1" Ref="115">
-									<Cells>
-										<Item1 ControlType="XRTableCell" Name="cell_3_1" Padding="5,5,0,0,100" Borders="None" TextAlignment="MiddleLeft" Weight="0.3333333333333333" Ref="116"></Item1>
-										<Item2 ControlType="XRTableCell" Name="cell_3_2" Padding="5,5,0,0,100" Borders="None" TextAlignment="MiddleLeft" Weight="0.3333333333333333" Ref="117"></Item2>
-										<Item3 ControlType="XRTableCell" Name="cell_3_3" Padding="5,5,0,0,100" Borders="None" TextAlignment="MiddleLeft" Weight="0.3333333333333333" Ref="118"></Item3>
-									</Cells>
-								</Item3>
-							</Rows>
-						</Item6>
-						<Item1 ControlType="XRPanel" Name="tab_tab2" CanShrink="true" Borders="None" Padding="2,2,0,0,100" SizeF="630,101" LocationFloat="10,823" Ref="119">
-							<Controls>
-								<Item1 ControlType="XRLabel" Name="label_tab2_label" Text="Tab 1" SizeF="465,25" LocationFloat="5,0" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="120"></Item1>
-								<Item2 ControlType="XRLabel" Name="html1" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="610,30" LocationFloat="10,25" Text="&lt;B&gt;TAB 1 CONTENT&lt;/B&gt;" Ref="121"></Item2>
-							</Controls>
-						</Item1>
-						<Item2 ControlType="XRPanel" Name="tab_tab3" CanShrink="true" Borders="None" Padding="2,2,0,0,100" SizeF="630,101" LocationFloat="10,939" Ref="122">
-							<Controls>
-								<Item1 ControlType="XRLabel" Name="label_tab3_label" Text="Tab 2" SizeF="465,25" LocationFloat="5,0" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="123"></Item1>
-								<Item2 ControlType="XRLabel" Name="html2" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="610,30" LocationFloat="10,25" Text="&lt;i&gt;TAB 2 CONTENT&lt;/i&gt;" Ref="124"></Item2>
-							</Controls>
-						</Item2>
-						<Item9 ControlType="XRPanel" Name="wellComponent" CanShrink="true" Borders="All" BorderWidth="1" Padding="10,10,10,10,100" SizeF="630,63" LocationFloat="10,1055" Ref="125">
-							<Controls>
-								<Item10 ControlType="XRLabel" Name="label_wellComponent" Text="Well Component" SizeF="465,25" LocationFloat="15,0" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="126" />
-							</Controls>
-						</Item9>
-					</Controls>
-				</Item3>
-				<Item4 ControlType="XRLabel" Name="label_dgFamily" Text="Family Data Grid" SizeF="650,25" LocationFloat="0,2365" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="127"></Item4>
-				<Item5 ControlType="XRTable" Name="dgFamily_headers" Borders="All" BackColor="Gainsboro" Padding="2,2,0,0,100" SizeF="650,25" LocationFloat="0,2390" Ref="128">
-					<Rows>
-						<Item1 ControlType="XRTableRow" Name="dgFamily_headerRow" Weight="1" BackColor="Gainsboro" Ref="129">
-							<Cells>
-								<Item1 ControlType="XRTableCell" Name="header_name" Text="name" Weight="0.25" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Arial, 10pt, style=Bold" Ref="130"></Item1>
-								<Item2 ControlType="XRTableCell" Name="header_dob" Text="dob" Weight="0.25" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Arial, 10pt, style=Bold" Ref="131"></Item2>
-								<Item3 ControlType="XRTableCell" Name="header_relationshipStatus" Text="relationshipStatus" Weight="0.25" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Arial, 10pt, style=Bold" Ref="132"></Item3>
-								<Item4 ControlType="XRTableCell" Name="header_employedY/N" Text="employedY/N" Weight="0.25" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Arial, 10pt, style=Bold" Ref="133"></Item4>
-							</Cells>
-						</Item1>
-					</Rows>
-				</Item5>
-				<Item2 ControlType="XRTable" Name="dgFamily_keys" Borders="All" Padding="2,2,0,0,100" SizeF="650,25" LocationFloat="0,2415" Ref="134">
-					<Rows>
-						<Item1 ControlType="XRTableRow" Name="dgFamily_keysRow" Weight="1" Ref="135">
-							<Cells>
-								<Item1 ControlType="XRTableCell" Name="key_name" Weight="0.25" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Consolas, 9pt" Ref="136">
-									<ExpressionBindings>
-										<Item1 EventName="BeforePrint" PropertyName="Text" Expression="[name]" Ref="137"></Item1>
-									</ExpressionBindings>
-								</Item1>
-								<Item2 ControlType="XRTableCell" Name="key_dob" Weight="0.25" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Consolas, 9pt" Ref="138">
-									<ExpressionBindings>
-										<Item1 EventName="BeforePrint" PropertyName="Text" Expression="[dob]" Ref="139"></Item1>
-									</ExpressionBindings>
-								</Item2>
-								<Item3 ControlType="XRTableCell" Name="key_relationshipStatus" Weight="0.25" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Consolas, 9pt" Ref="140">
-									<ExpressionBindings>
-										<Item1 EventName="BeforePrint" PropertyName="Text" Expression="[relationshipStatus]" Ref="141"></Item1>
-									</ExpressionBindings>
-								</Item3>
-								<Item4 ControlType="XRTableCell" Name="key_employedY/N" Weight="0.25" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Consolas, 9pt" Ref="142">
-									<ExpressionBindings>
-										<Item1 EventName="BeforePrint" PropertyName="Text" Expression="[employedY/N]" Ref="143"></Item1>
-									</ExpressionBindings>
-								</Item4>
-							</Cells>
-						</Item1>
-					</Rows>
-				</Item2>
-				<Item6 ControlType="XRLabel" Name="label_dgTestDataGrid" Text="Test Data Grid" SizeF="650,25" LocationFloat="0,2455" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="144" />
-				<Item7 ControlType="XRTable" Name="dgTestDataGrid_headers" Borders="All" BackColor="Gainsboro" Padding="2,2,0,0,100" SizeF="650,25" LocationFloat="0,2480" Ref="145">
-					<Rows>
-						<Item1 ControlType="XRTableRow" Name="dgTestDataGrid_headerRow" Weight="1" BackColor="Gainsboro" Ref="146">
-							<Cells>
-								<Item1 ControlType="XRTableCell" Name="header_txtFileGuid" Text="txtFileGuid" Weight="0.3333333333333333" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Arial, 10pt, style=Bold" Ref="147"></Item1>
-								<Item2 ControlType="XRTableCell" Name="header_txtFileName" Text="txtFileName" Weight="0.3333333333333333" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Arial, 10pt, style=Bold" Ref="148"></Item2>
-								<Item3 ControlType="XRTableCell" Name="header_html" Text="html" Weight="0.3333333333333333" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Arial, 10pt, style=Bold" Ref="149"></Item3>
-							</Cells>
-						</Item1>
-					</Rows>
-				</Item7>
-				<Item2 ControlType="XRTable" Name="dgTestDataGrid_keys" Borders="All" Padding="2,2,0,0,100" SizeF="650,25" LocationFloat="0,2505" Ref="150">
-					<Rows>
-						<Item1 ControlType="XRTableRow" Name="dgTestDataGrid_keysRow" Weight="1" Ref="151">
-							<Cells>
-								<Item1 ControlType="XRTableCell" Name="key_txtFileGuid" Weight="0.3333333333333333" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Consolas, 9pt" Ref="152">
-									<ExpressionBindings>
-										<Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtFileGuid]" Ref="153"></Item1>
-									</ExpressionBindings>
-								</Item1>
-								<Item2 ControlType="XRTableCell" Name="key_txtFileName" Weight="0.3333333333333333" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Consolas, 9pt" Ref="154">
-									<ExpressionBindings>
-										<Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtFileName]" Ref="155"></Item1>
-									</ExpressionBindings>
-								</Item2>
-								<Item3 ControlType="XRTableCell" Name="key_html" Weight="0.3333333333333333" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Consolas, 9pt" Ref="156">
-									<ExpressionBindings>
-										<Item1 EventName="BeforePrint" PropertyName="Text" Expression="[html]" Ref="157"></Item1>
-									</ExpressionBindings>
-								</Item3>
-							</Cells>
-						</Item1>
-					</Rows>
-				</Item2>
-				<Item8 ControlType="XRLabel" Name="label_fgTestGrid" Text="Test Form Grid" SizeF="650,25" LocationFloat="0,2545" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="158" />
-				<Item9 ControlType="XRTable" Name="fgTestGrid_headers" Borders="All" BackColor="Gainsboro" Padding="2,2,0,0,100" SizeF="650,25" LocationFloat="0,2570" Ref="159">
-					<Rows>
-						<Item1 ControlType="XRTableRow" Name="fgTestGrid_headerRow" Weight="1" BackColor="Gainsboro" Ref="160">
-							<Cells>
-								<Item1 ControlType="XRTableCell" Name="header_formgridTest1" Text="formgridTest1" Weight="0.3333333333333333" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Arial, 10pt, style=Bold" Ref="161"></Item1>
-								<Item2 ControlType="XRTableCell" Name="header_formgridTest2" Text="formgridTest2" Weight="0.3333333333333333" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Arial, 10pt, style=Bold" Ref="162"></Item2>
-								<Item3 ControlType="XRTableCell" Name="header_btn_view" Text="View" Weight="0.3333333333333333" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Arial, 10pt, style=Bold" Ref="163"></Item3>
-							</Cells>
-						</Item1>
-					</Rows>
-				</Item9>
-				<Item2 ControlType="XRTable" Name="fgTestGrid_keys" Borders="All" Padding="2,2,0,0,100" SizeF="650,25" LocationFloat="0,2595" Ref="164">
-					<Rows>
-						<Item1 ControlType="XRTableRow" Name="fgTestGrid_keysRow" Weight="1" Ref="165">
-							<Cells>
-								<Item1 ControlType="XRTableCell" Name="key_formgridTest1" Weight="0.3333333333333333" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Consolas, 9pt" Ref="166">
-									<ExpressionBindings>
-										<Item1 EventName="BeforePrint" PropertyName="Text" Expression="[formgridTest1]" Ref="167"></Item1>
-									</ExpressionBindings>
-								</Item1>
-								<Item2 ControlType="XRTableCell" Name="key_formgridTest2" Weight="0.3333333333333333" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Consolas, 9pt" Ref="168">
-									<ExpressionBindings>
-										<Item1 EventName="BeforePrint" PropertyName="Text" Expression="[formgridTest2]" Ref="169"></Item1>
-									</ExpressionBindings>
-								</Item2>
-								<Item3 ControlType="XRTableCell" Name="key_btn_view" Weight="0.3333333333333333" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Consolas, 9pt" Ref="170">
-									<ExpressionBindings>
-										<Item1 EventName="BeforePrint" PropertyName="Text" Expression="[btn_view]" Ref="171"></Item1>
-									</ExpressionBindings>
-								</Item3>
-							</Cells>
-						</Item1>
-					</Rows>
-				</Item2>
-			</Controls>
-		</Item3>
-		<Item4 ControlType="BottomMarginBand" Name="BottomMargin" HeightF="40" Ref="172"></Item4>
-	</Bands>
-	<ParameterPanelLayoutItems>
-		<Item1 ControlType="Parameter" Parameter="#Ref-3" Ref="173"></Item1>
-		<Item2 ControlType="Parameter" Parameter="#Ref-4" Ref="174"></Item2>
-	</ParameterPanelLayoutItems>
-</XtraReportsLayoutSerializer>
+  <Extensions Ref="1">
+    <Item1 Key="DataSerializationExtension" Value="DevExpress.XtraReports.Web.ReportDesigner.DefaultDataSerializer" Ref="2">
+    </Item1>
+  </Extensions>
+  <Parameters Ref="3">
+    <Item1 ControlType="Parameter" Description="FormDataGUID" Name="FormDataGUID" Type="#Ref-3" ValueInfo="00000000-0000-0000-0000-000000000000" Ref="4">
+    </Item1>
+    <Item2 ControlType="Parameter" Description="ObjectGUID" Name="ObjectGUID" Type="#Ref-3" ValueInfo="00000000-0000-0000-0000-000000000000" Ref="5">
+    </Item2>
+  </Parameters>
+  <Bands Ref="6">
+    <Item1 ControlType="TopMarginBand" Name="TopMargin" HeightF="40" Ref="7">
+    </Item1>
+    <Item2 ControlType="ReportHeaderBand" Name="ReportHeader" HeightF="50" Ref="8">
+      <Controls>
+        <Item1 ControlType="XRLabel" Name="headerLabel" Text="FormIO2DevExpressTestForm1" TextAlignment="MiddleCenter" SizeF="769.987,30" LocationFloat="0,0" Font="Times New Roman, 14pt, style=Bold" Padding="2,2,0,0,100" Ref="9">
+        </Item1>
+      </Controls>
+    </Item2>
+    <Item3 ControlType="DetailBand" Name="Detail" HeightF="20" Ref="10">
+      <Controls>
+        <Item1 ControlType="XRLabel" Name="label_txtUnnestedField1" Text="txtUnnestedField1" SizeF="487,25" LocationFloat="0,10" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="11">
+        </Item1>
+        <Item2 ControlType="XRLabel" Name="txtUnnestedField1" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="487,25" LocationFloat="0,35" Ref="12">
+          <ExpressionBindings>
+            <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtUnnestedField1]" Ref="13">
+            </Item1>
+          </ExpressionBindings>
+        </Item2>
+        <Item3 ControlType="XRLabel" Name="label_txtUnnestedField2" Text="txtUnnestedField2" SizeF="487,25" LocationFloat="0,68" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="14">
+        </Item3>
+        <Item4 ControlType="XRLabel" Name="txtUnnestedField2" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="487,25" LocationFloat="0,93" Ref="15">
+          <ExpressionBindings>
+            <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtUnnestedField2]" Ref="16">
+            </Item1>
+          </ExpressionBindings>
+        </Item4>
+        <Item5 ControlType="XRLabel" Name="label_txtaUnnestedField3" Text="txtaUnnestedField3" SizeF="487,25" LocationFloat="0,126" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="17" />
+        <Item6 ControlType="XRLabel" Name="txtaUnnestedField3" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="487,25" LocationFloat="0,151" Ref="18">
+          <ExpressionBindings>
+            <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtaUnnestedField3]" Ref="19">
+            </Item1>
+          </ExpressionBindings>
+        </Item6>
+        <Item7 ControlType="XRPanel" Name="miscFieldsPanel" CanShrink="true" Borders="None" Padding="2,2,0,0,100" SizeF="650,494" LocationFloat="0,184" Ref="20">
+          <Controls>
+            <Item8 ControlType="XRLabel" Name="label_miscFieldsPanel" Text="Basic Fields Panel" SizeF="480,25" LocationFloat="5,0" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="21" />
+            <Item1 ControlType="XRLabel" Name="label_txtTextField" Text="Text Field:" SizeF="472,25" LocationFloat="10,25" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="22">
+            </Item1>
+            <Item2 ControlType="XRLabel" Name="txtTextField" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="472,25" LocationFloat="10,50" Ref="23">
+              <ExpressionBindings>
+                <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtTextField]" Ref="24">
+                </Item1>
+              </ExpressionBindings>
+            </Item2>
+            <Item3 ControlType="XRLabel" Name="label_txtaTextArea" Text="Text Area:" SizeF="472,25" LocationFloat="10,83" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="25">
+            </Item3>
+            <Item4 ControlType="XRLabel" Name="txtaTextArea" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="472,50" LocationFloat="10,108" Ref="26">
+              <ExpressionBindings>
+                <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtaTextArea]" Ref="27">
+                </Item1>
+              </ExpressionBindings>
+            </Item4>
+            <Item5 ControlType="XRLabel" Name="label_txtNumber" Text="Number:" SizeF="157,25" LocationFloat="10,166" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="28" />
+            <Item6 ControlType="XRLabel" Name="txtNumber" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="157,25" LocationFloat="10,191" Ref="29">
+              <ExpressionBindings>
+                <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtNumber]" Ref="30">
+                </Item1>
+              </ExpressionBindings>
+            </Item6>
+            <Item7 ControlType="XRCheckBox" Name="chkCheckbox" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="315,25" LocationFloat="10,224" Text="Checkbox" Ref="31">
+              <ExpressionBindings>
+                <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkCheckbox] == &apos;true&apos;, True, False)" Ref="32">
+                </Item1>
+              </ExpressionBindings>
+            </Item7>
+            <Item8 ControlType="XRLabel" Name="label_cmbSelect" Text="Select:" SizeF="472,25" LocationFloat="10,257" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="33" />
+            <Item9 ControlType="XRLabel" Name="cmbSelect" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="472,25" LocationFloat="10,282" Ref="34">
+              <ExpressionBindings>
+                <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[cmbSelect]" Ref="35">
+                </Item1>
+              </ExpressionBindings>
+            </Item9>
+            <Item10 ControlType="XRLabel" Name="label_rdoRadio" Text="Radio:" SizeF="630,25" LocationFloat="10,315" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="36" />
+            <Item11 ControlType="XRPanel" Name="radioPanel_rdoRadio" TextAlignment="MiddleLeft" Padding="2,2,0,0,100" CanShrink="true" SizeF="630,75" LocationFloat="10,340" Ref="37">
+              <Controls>
+                <Item1 ControlType="XRCheckBox" Name="radio_rdoRadio_1" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="1" SizeF="630,25" LocationFloat="0,0" Ref="38">
+                  <ExpressionBindings>
+                    <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([rdoRadio] == &apos;1Val&apos;, True, False)" Ref="39">
+                    </Item1>
+                  </ExpressionBindings>
+                </Item1>
+                <Item2 ControlType="XRCheckBox" Name="radio_rdoRadio_2" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="2" SizeF="630,25" LocationFloat="0,25" Ref="40">
+                  <ExpressionBindings>
+                    <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([rdoRadio] == &apos;2Val&apos;, True, False)" Ref="41">
+                    </Item1>
+                  </ExpressionBindings>
+                </Item2>
+                <Item3 ControlType="XRCheckBox" Name="radio_rdoRadio_3" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="3" SizeF="630,25" LocationFloat="0,50" Ref="42">
+                  <ExpressionBindings>
+                    <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([rdoRadio] == &apos;3Val&apos;, True, False)" Ref="43">
+                    </Item1>
+                  </ExpressionBindings>
+                </Item3>
+              </Controls>
+            </Item11>
+            <Item12 ControlType="XRLabel" Name="button" Visible="false" SizeF="630,25" LocationFloat="10,423" Ref="44">
+              <ExpressionBindings>
+                <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[button]" Ref="45">
+                </Item1>
+              </ExpressionBindings>
+            </Item12>
+          </Controls>
+        </Item7>
+        <Item8 ControlType="XRPanel" Name="advancedFieldsPanel" CanShrink="true" Borders="None" Padding="2,2,0,0,100" SizeF="650,693" LocationFloat="0,693" Ref="46">
+          <Controls>
+            <Item9 ControlType="XRLabel" Name="label_advancedFieldsPanel" Text="Advanced Fields Panel" SizeF="480,25" LocationFloat="5,0" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="47" />
+            <Item1 ControlType="XRLabel" Name="fileUpload" Visible="false" SizeF="630,25" LocationFloat="10,25" Ref="48">
+              <ExpressionBindings>
+                <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[fileUpload]" Ref="49">
+                </Item1>
+              </ExpressionBindings>
+            </Item1>
+            <Item2 ControlType="XRLabel" Name="label_txtEmail" Text="Email:" SizeF="472,25" LocationFloat="10,58" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="50">
+            </Item2>
+            <Item3 ControlType="XRLabel" Name="txtEmail" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="472,25" LocationFloat="10,83" Ref="51">
+              <ExpressionBindings>
+                <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtEmail]" Ref="52">
+                </Item1>
+              </ExpressionBindings>
+            </Item3>
+            <Item4 ControlType="XRLabel" Name="label_txtURL" Text="URL:" SizeF="472,25" LocationFloat="10,116" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="53">
+            </Item4>
+            <Item5 ControlType="XRLabel" Name="txtURL" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="472,25" LocationFloat="10,141" Ref="54">
+              <ExpressionBindings>
+                <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtURL]" Ref="55">
+                </Item1>
+              </ExpressionBindings>
+            </Item5>
+            <Item6 ControlType="XRLabel" Name="label_txtPhoneNumber" Text="Phone Number:" SizeF="472,25" LocationFloat="10,174" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="56" />
+            <Item7 ControlType="XRLabel" Name="txtPhoneNumber" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="472,25" LocationFloat="10,199" Ref="57">
+              <ExpressionBindings>
+                <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtPhoneNumber]" Ref="58">
+                </Item1>
+              </ExpressionBindings>
+            </Item7>
+            <Item8 ControlType="XRLabel" Name="label_txtAddress" Text="Address:" SizeF="472,25" LocationFloat="10,232" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="59" />
+            <Item9 ControlType="XRLabel" Name="txtAddress" TextAlignment="MiddleLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="472,25" LocationFloat="10,257" Ref="60">
+              <ExpressionBindings>
+                <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtAddress]" Ref="61">
+                </Item1>
+              </ExpressionBindings>
+            </Item9>
+            <Item10 ControlType="XRLabel" Name="label_txtDateTime" Text="Date Time:" SizeF="315,25" LocationFloat="10,290" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="62" />
+            <Item11 ControlType="XRLabel" Name="txtDateTime" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="315,25" LocationFloat="10,315" Ref="63">
+              <ExpressionBindings>
+                <Item1 EventName="BeforePrint" PropertyName="Text" Expression="FormatString(&apos;{0:MM/dd/yyyy hh:mm tt}&apos;, [txtDateTime])" Ref="64">
+                </Item1>
+              </ExpressionBindings>
+            </Item11>
+            <Item12 ControlType="XRLabel" Name="label_txtDay" Text="Day:" SizeF="315,25" LocationFloat="10,348" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="65" />
+            <Item13 ControlType="XRLabel" Name="txtDay" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="315,25" LocationFloat="10,373" Ref="66">
+              <ExpressionBindings>
+                <Item1 EventName="BeforePrint" PropertyName="Text" Expression="FormatString(&apos;{0:MM/dd/yyyy}&apos;, [txtDay])" Ref="67">
+                </Item1>
+              </ExpressionBindings>
+            </Item13>
+            <Item14 ControlType="XRLabel" Name="label_txtTime" Text="Time:" SizeF="315,25" LocationFloat="10,406" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="68" />
+            <Item15 ControlType="XRLabel" Name="txtTime" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="315,25" LocationFloat="10,431" Ref="69">
+              <ExpressionBindings>
+                <Item1 EventName="BeforePrint" PropertyName="Text" Expression="FormatString(&apos;{0:hh:mm tt}&apos;, [txtTime])" Ref="70">
+                </Item1>
+              </ExpressionBindings>
+            </Item15>
+            <Item16 ControlType="XRLabel" Name="label_txtCurrency" Text="Currency:" SizeF="157,25" LocationFloat="10,464" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="71" />
+            <Item17 ControlType="XRLabel" Name="txtCurrency" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="157,25" LocationFloat="10,489" Ref="72">
+              <ExpressionBindings>
+                <Item1 EventName="BeforePrint" PropertyName="Text" Expression="FormatString(&apos;{0:C}&apos;, [txtCurrency])" Ref="73">
+                </Item1>
+              </ExpressionBindings>
+            </Item17>
+            <Item18 ControlType="XRLabel" Name="label_sigSignature" Text="Signature:" SizeF="315,25" LocationFloat="10,522" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="74" />
+            <Item19 ControlType="XRPictureBox" Name="sigSignature" Sizing="ZoomImage" Padding="2,2,0,0,100" SizeF="315,100" LocationFloat="10,547" Ref="75">
+              <ExpressionBindings>
+                <Item1 EventName="BeforePrint" PropertyName="ImageSource" Expression="[sigSignature]" Ref="76">
+                </Item1>
+              </ExpressionBindings>
+            </Item19>
+          </Controls>
+        </Item8>
+        <Item9 ControlType="XRPanel" Name="layoutPanel" CanShrink="true" Borders="None" Padding="2,2,0,0,100" SizeF="650,1123" LocationFloat="0,1401" Ref="77">
+          <Controls>
+            <Item10 ControlType="XRLabel" Name="label_layoutPanel" Text="Layout Panel" SizeF="480,25" LocationFloat="5,0" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="78" />
+            <Item1 ControlType="XRLabel" Name="html" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="630,30" LocationFloat="10,25" Text="&lt;b&gt;HTML Component&lt;/b&gt;" Ref="79">
+            </Item1>
+            <Item2 ControlType="XRLabel" Name="content" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="630,25" LocationFloat="10,63" Text="&lt;p&gt;&lt;i&gt;Content Component&lt;/i&gt;&lt;/p&gt;" Ref="80">
+            </Item2>
+            <Item3 ControlType="XRTable" Name="columns" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="630,179" LocationFloat="10,96" KeepTogether="true" Ref="81">
+              <Rows>
+                <Item1 ControlType="XRTableRow" Name="columnsRow_1759780463390" Ref="82">
+                  <Cells>
+                    <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.5" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="83">
+                      <Controls>
+                        <Item1 ControlType="XRLabel" Name="label_txtColumn1Field1" Text="Column 1 Field 1" SizeF="145,25" LocationFloat="8,0" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="84">
+                        </Item1>
+                        <Item2 ControlType="XRLabel" Name="txtColumn1Field1" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="145,25" LocationFloat="8,25" Ref="85">
+                          <ExpressionBindings>
+                            <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtColumn1Field1]" Ref="86">
+                            </Item1>
+                          </ExpressionBindings>
+                        </Item2>
+                        <Item3 ControlType="XRLabel" Name="label_txtColumn1Field2" Text="Column 1 Field 2" SizeF="145,25" LocationFloat="8,58" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="87">
+                        </Item3>
+                        <Item4 ControlType="XRLabel" Name="txtColumn1Field2" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="145,25" LocationFloat="8,83" Ref="88">
+                          <ExpressionBindings>
+                            <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtColumn1Field2]" Ref="89">
+                            </Item1>
+                          </ExpressionBindings>
+                        </Item4>
+                      </Controls>
+                    </Item1>
+                    <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.5" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="90">
+                      <Controls>
+                        <Item1 ControlType="XRLabel" Name="label_txtColumn2Field1" Text="Column 2 Field 1" SizeF="145,25" LocationFloat="8,0" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="91">
+                        </Item1>
+                        <Item2 ControlType="XRLabel" Name="txtColumn2Field1" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="145,25" LocationFloat="8,25" Ref="92">
+                          <ExpressionBindings>
+                            <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtColumn2Field1]" Ref="93">
+                            </Item1>
+                          </ExpressionBindings>
+                        </Item2>
+                        <Item3 ControlType="XRCheckBox" Name="chkColumn2Field2" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="97,25" LocationFloat="8,58" Text="Column 2 Field 2" Ref="94">
+                          <ExpressionBindings>
+                            <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkColumn2Field2] == &apos;true&apos;, True, False)" Ref="95">
+                            </Item1>
+                          </ExpressionBindings>
+                        </Item3>
+                      </Controls>
+                    </Item2>
+                    <Item3 ControlType="XRTableCell" Name="column_3" Weight="0.5" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="96">
+                      <Controls>
+                        <Item1 ControlType="XRLabel" Name="htmlTestElement" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="194,141" LocationFloat="8,0" Text="&lt;b&gt;Bold Text&lt;/b&gt;&lt;br&gt;
+&lt;i&gt;Slanted Text&lt;/i&gt;&lt;bR&gt;
+&lt;h1&gt;BIG Text&lt;/h1&gt;
+&lt;p style=&amp;quot;color: blue;&amp;quot;&gt;Blue Text&lt;/p&gt;" Ref="97">
+                        </Item1>
+                      </Controls>
+                    </Item3>
+                  </Cells>
+                </Item1>
+              </Rows>
+            </Item3>
+            <Item4 ControlType="XRPanel" Name="fieldset" CanShrink="true" Borders="None" Padding="2,2,0,0,100" SizeF="630,204" LocationFloat="10,290" Ref="98">
+              <Controls>
+                <Item1 ControlType="XRLabel" Name="label_txtFieldsetField1" Text="Fieldset Field 1" SizeF="457,25" LocationFloat="10,0" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="99">
+                </Item1>
+                <Item2 ControlType="XRLabel" Name="txtFieldsetField1" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="457,25" LocationFloat="10,25" Ref="100">
+                  <ExpressionBindings>
+                    <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtFieldsetField1]" Ref="101">
+                    </Item1>
+                  </ExpressionBindings>
+                </Item2>
+                <Item3 ControlType="XRLabel" Name="label_txtaFieldsetField2" Text="Fieldset Field 2" SizeF="457,25" LocationFloat="10,58" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="102">
+                </Item3>
+                <Item4 ControlType="XRLabel" Name="txtaFieldsetField2" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="457,50" LocationFloat="10,83" Ref="103">
+                  <ExpressionBindings>
+                    <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtaFieldsetField2]" Ref="104">
+                    </Item1>
+                  </ExpressionBindings>
+                </Item4>
+                <Item5 ControlType="XRCheckBox" Name="chkFieldsetField3" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="305,25" LocationFloat="10,141" Text="Fieldset Field 3" Ref="105">
+                  <ExpressionBindings>
+                    <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkFieldsetField3] == &apos;true&apos;, True, False)" Ref="106">
+                    </Item1>
+                  </ExpressionBindings>
+                </Item5>
+              </Controls>
+            </Item4>
+            <Item5 ControlType="XRPanel" Name="panel" CanShrink="true" Borders="None" Padding="2,2,0,0,100" SizeF="630,179" LocationFloat="10,509" Ref="107">
+              <Controls>
+                <Item6 ControlType="XRLabel" Name="label_panel" Text="Panel" SizeF="465,25" LocationFloat="15,0" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="108" />
+                <Item1 ControlType="XRLabel" Name="label_txtPanelField1" Text="Panel Field 1" SizeF="457,25" LocationFloat="10,25" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="109">
+                </Item1>
+                <Item2 ControlType="XRLabel" Name="txtPanelField1" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="457,25" LocationFloat="10,50" Ref="110">
+                  <ExpressionBindings>
+                    <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtPanelField1]" Ref="111">
+                    </Item1>
+                  </ExpressionBindings>
+                </Item2>
+                <Item3 ControlType="XRLabel" Name="label_cmbPanelField2" Text="Panel Field 2" SizeF="457,25" LocationFloat="10,83" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="112">
+                </Item3>
+                <Item4 ControlType="XRLabel" Name="cmbPanelField2" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="457,25" LocationFloat="10,108" Ref="113">
+                  <ExpressionBindings>
+                    <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[cmbPanelField2]" Ref="114">
+                    </Item1>
+                  </ExpressionBindings>
+                </Item4>
+              </Controls>
+            </Item5>
+            <Item6 ControlType="XRTable" Name="table" Borders="None" Padding="2,2,0,0,100" SizeF="630,105" LocationFloat="10,703" Ref="115">
+              <Rows>
+                <Item1 ControlType="XRTableRow" Name="tableRow_1" Weight="1" Ref="116">
+                  <Cells>
+                    <Item1 ControlType="XRTableCell" Name="cell_1_1" Padding="5,5,0,0,100" Borders="None" TextAlignment="MiddleLeft" Weight="0.3333333333333333" Ref="117">
+                    </Item1>
+                    <Item2 ControlType="XRTableCell" Name="cell_1_2" Padding="5,5,0,0,100" Borders="None" TextAlignment="MiddleLeft" Weight="0.3333333333333333" Ref="118">
+                    </Item2>
+                    <Item3 ControlType="XRTableCell" Name="cell_1_3" Padding="5,5,0,0,100" Borders="None" TextAlignment="MiddleLeft" Weight="0.3333333333333333" Ref="119">
+                    </Item3>
+                  </Cells>
+                </Item1>
+                <Item2 ControlType="XRTableRow" Name="tableRow_2" Weight="1" Ref="120">
+                  <Cells>
+                    <Item1 ControlType="XRTableCell" Name="cell_2_1" Padding="5,5,0,0,100" Borders="None" TextAlignment="MiddleLeft" Weight="0.3333333333333333" Ref="121">
+                    </Item1>
+                    <Item2 ControlType="XRTableCell" Name="cell_2_2" Padding="5,5,0,0,100" Borders="None" TextAlignment="MiddleLeft" Weight="0.3333333333333333" Ref="122">
+                    </Item2>
+                    <Item3 ControlType="XRTableCell" Name="cell_2_3" Padding="5,5,0,0,100" Borders="None" TextAlignment="MiddleLeft" Weight="0.3333333333333333" Ref="123">
+                    </Item3>
+                  </Cells>
+                </Item2>
+                <Item3 ControlType="XRTableRow" Name="tableRow_3" Weight="1" Ref="124">
+                  <Cells>
+                    <Item1 ControlType="XRTableCell" Name="cell_3_1" Padding="5,5,0,0,100" Borders="None" TextAlignment="MiddleLeft" Weight="0.3333333333333333" Ref="125">
+                    </Item1>
+                    <Item2 ControlType="XRTableCell" Name="cell_3_2" Padding="5,5,0,0,100" Borders="None" TextAlignment="MiddleLeft" Weight="0.3333333333333333" Ref="126">
+                    </Item2>
+                    <Item3 ControlType="XRTableCell" Name="cell_3_3" Padding="5,5,0,0,100" Borders="None" TextAlignment="MiddleLeft" Weight="0.3333333333333333" Ref="127">
+                    </Item3>
+                  </Cells>
+                </Item3>
+              </Rows>
+            </Item6>
+            <Item7 ControlType="XRPanel" Name="tab_tab2" CanShrink="true" Borders="None" Padding="2,2,0,0,100" SizeF="630,101" LocationFloat="10,823" Ref="128">
+              <Controls>
+                <Item1 ControlType="XRLabel" Name="label_tab2_label" Text="Tab 1" SizeF="465,25" LocationFloat="5,0" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="129">
+                </Item1>
+                <Item2 ControlType="XRLabel" Name="html1" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="610,30" LocationFloat="10,25" Text="&lt;B&gt;TAB 1 CONTENT&lt;/B&gt;" Ref="130">
+                </Item2>
+              </Controls>
+            </Item7>
+            <Item8 ControlType="XRPanel" Name="tab_tab3" CanShrink="true" Borders="None" Padding="2,2,0,0,100" SizeF="630,101" LocationFloat="10,939" Ref="131">
+              <Controls>
+                <Item1 ControlType="XRLabel" Name="label_tab3_label" Text="Tab 2" SizeF="465,25" LocationFloat="5,0" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="132">
+                </Item1>
+                <Item2 ControlType="XRLabel" Name="html2" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="610,30" LocationFloat="10,25" Text="&lt;i&gt;TAB 2 CONTENT&lt;/i&gt;" Ref="133">
+                </Item2>
+              </Controls>
+            </Item8>
+            <Item9 ControlType="XRPanel" Name="wellComponent" CanShrink="true" Borders="All" BorderWidth="1" Padding="10,10,10,10,100" SizeF="630,63" LocationFloat="10,1055" Ref="134">
+              <Controls>
+                <Item10 ControlType="XRLabel" Name="label_wellComponent" Text="Well Component" SizeF="465,25" LocationFloat="15,0" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="135" />
+              </Controls>
+            </Item9>
+          </Controls>
+        </Item9>
+        <Item10 ControlType="XRLabel" Name="label_dgFamily" Text="Family Data Grid" SizeF="650,25" LocationFloat="0,2539" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="136" />
+        <Item11 ControlType="XRTable" Name="dgFamily_headers" Borders="All" BackColor="Gainsboro" Padding="2,2,0,0,100" SizeF="650,25" LocationFloat="0,2564" Ref="137">
+          <Rows>
+            <Item1 ControlType="XRTableRow" Name="dgFamily_headerRow" Weight="1" BackColor="Gainsboro" Ref="138">
+              <Cells>
+                <Item1 ControlType="XRTableCell" Name="header_name" Text="name" Weight="0.25" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Arial, 10pt, style=Bold" Ref="139">
+                </Item1>
+                <Item2 ControlType="XRTableCell" Name="header_dob" Text="dob" Weight="0.25" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Arial, 10pt, style=Bold" Ref="140">
+                </Item2>
+                <Item3 ControlType="XRTableCell" Name="header_relationshipStatus" Text="relationshipStatus" Weight="0.25" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Arial, 10pt, style=Bold" Ref="141">
+                </Item3>
+                <Item4 ControlType="XRTableCell" Name="header_employedY/N" Text="employedY/N" Weight="0.25" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Arial, 10pt, style=Bold" Ref="142">
+                </Item4>
+              </Cells>
+            </Item1>
+          </Rows>
+        </Item11>
+        <Item12 ControlType="XRTable" Name="dgFamily_keys" Borders="All" Padding="2,2,0,0,100" SizeF="650,25" LocationFloat="0,2589" Ref="143">
+          <Rows>
+            <Item1 ControlType="XRTableRow" Name="dgFamily_keysRow" Weight="1" Ref="144">
+              <Cells>
+                <Item1 ControlType="XRTableCell" Name="key_name" Weight="0.25" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Consolas, 9pt" Ref="145">
+                  <ExpressionBindings>
+                    <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[name]" Ref="146">
+                    </Item1>
+                  </ExpressionBindings>
+                </Item1>
+                <Item2 ControlType="XRTableCell" Name="key_dob" Weight="0.25" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Consolas, 9pt" Ref="147">
+                  <ExpressionBindings>
+                    <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[dob]" Ref="148">
+                    </Item1>
+                  </ExpressionBindings>
+                </Item2>
+                <Item3 ControlType="XRTableCell" Name="key_relationshipStatus" Weight="0.25" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Consolas, 9pt" Ref="149">
+                  <ExpressionBindings>
+                    <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[relationshipStatus]" Ref="150">
+                    </Item1>
+                  </ExpressionBindings>
+                </Item3>
+                <Item4 ControlType="XRTableCell" Name="key_employedY/N" Weight="0.25" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Consolas, 9pt" Ref="151">
+                  <ExpressionBindings>
+                    <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[employedY/N]" Ref="152">
+                    </Item1>
+                  </ExpressionBindings>
+                </Item4>
+              </Cells>
+            </Item1>
+          </Rows>
+        </Item12>
+        <Item13 ControlType="XRLabel" Name="label_dgTestDataGrid" Text="Test Data Grid" SizeF="650,25" LocationFloat="0,2629" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="153" />
+        <Item14 ControlType="XRTable" Name="dgTestDataGrid_headers" Borders="All" BackColor="Gainsboro" Padding="2,2,0,0,100" SizeF="650,25" LocationFloat="0,2654" Ref="154">
+          <Rows>
+            <Item1 ControlType="XRTableRow" Name="dgTestDataGrid_headerRow" Weight="1" BackColor="Gainsboro" Ref="155">
+              <Cells>
+                <Item1 ControlType="XRTableCell" Name="header_txtFileGuid" Text="txtFileGuid" Weight="0.3333333333333333" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Arial, 10pt, style=Bold" Ref="156">
+                </Item1>
+                <Item2 ControlType="XRTableCell" Name="header_txtFileName" Text="txtFileName" Weight="0.3333333333333333" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Arial, 10pt, style=Bold" Ref="157">
+                </Item2>
+                <Item3 ControlType="XRTableCell" Name="header_html" Text="html" Weight="0.3333333333333333" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Arial, 10pt, style=Bold" Ref="158">
+                </Item3>
+              </Cells>
+            </Item1>
+          </Rows>
+        </Item14>
+        <Item15 ControlType="XRTable" Name="dgTestDataGrid_keys" Borders="All" Padding="2,2,0,0,100" SizeF="650,25" LocationFloat="0,2679" Ref="159">
+          <Rows>
+            <Item1 ControlType="XRTableRow" Name="dgTestDataGrid_keysRow" Weight="1" Ref="160">
+              <Cells>
+                <Item1 ControlType="XRTableCell" Name="key_txtFileGuid" Weight="0.3333333333333333" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Consolas, 9pt" Ref="161">
+                  <ExpressionBindings>
+                    <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtFileGuid]" Ref="162">
+                    </Item1>
+                  </ExpressionBindings>
+                </Item1>
+                <Item2 ControlType="XRTableCell" Name="key_txtFileName" Weight="0.3333333333333333" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Consolas, 9pt" Ref="163">
+                  <ExpressionBindings>
+                    <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtFileName]" Ref="164">
+                    </Item1>
+                  </ExpressionBindings>
+                </Item2>
+                <Item3 ControlType="XRTableCell" Name="key_html" Weight="0.3333333333333333" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Consolas, 9pt" Ref="165">
+                  <ExpressionBindings>
+                    <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[html]" Ref="166">
+                    </Item1>
+                  </ExpressionBindings>
+                </Item3>
+              </Cells>
+            </Item1>
+          </Rows>
+        </Item15>
+        <Item16 ControlType="XRLabel" Name="label_fgTestGrid" Text="Test Form Grid" SizeF="650,25" LocationFloat="0,2719" Font="Times New Roman, 9.75pt, style=Bold" TextAlignment="MiddleLeft" Borders="None" Padding="2,2,0,0,100" Ref="167" />
+        <Item17 ControlType="XRTable" Name="fgTestGrid_headers" Borders="All" BackColor="Gainsboro" Padding="2,2,0,0,100" SizeF="650,25" LocationFloat="0,2744" Ref="168">
+          <Rows>
+            <Item1 ControlType="XRTableRow" Name="fgTestGrid_headerRow" Weight="1" BackColor="Gainsboro" Ref="169">
+              <Cells>
+                <Item1 ControlType="XRTableCell" Name="header_formgridTest1" Text="formgridTest1" Weight="0.3333333333333333" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Arial, 10pt, style=Bold" Ref="170">
+                </Item1>
+                <Item2 ControlType="XRTableCell" Name="header_formgridTest2" Text="formgridTest2" Weight="0.3333333333333333" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Arial, 10pt, style=Bold" Ref="171">
+                </Item2>
+                <Item3 ControlType="XRTableCell" Name="header_btn_view" Text="View" Weight="0.3333333333333333" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Arial, 10pt, style=Bold" Ref="172">
+                </Item3>
+              </Cells>
+            </Item1>
+          </Rows>
+        </Item17>
+        <Item18 ControlType="XRTable" Name="fgTestGrid_keys" Borders="All" Padding="2,2,0,0,100" SizeF="650,25" LocationFloat="0,2769" Ref="173">
+          <Rows>
+            <Item1 ControlType="XRTableRow" Name="fgTestGrid_keysRow" Weight="1" Ref="174">
+              <Cells>
+                <Item1 ControlType="XRTableCell" Name="key_formgridTest1" Weight="0.3333333333333333" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Consolas, 9pt" Ref="175">
+                  <ExpressionBindings>
+                    <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[formgridTest1]" Ref="176">
+                    </Item1>
+                  </ExpressionBindings>
+                </Item1>
+                <Item2 ControlType="XRTableCell" Name="key_formgridTest2" Weight="0.3333333333333333" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Consolas, 9pt" Ref="177">
+                  <ExpressionBindings>
+                    <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[formgridTest2]" Ref="178">
+                    </Item1>
+                  </ExpressionBindings>
+                </Item2>
+                <Item3 ControlType="XRTableCell" Name="key_btn_view" Weight="0.3333333333333333" Padding="5,5,5,5,100" Borders="All" TextAlignment="MiddleLeft" Font="Consolas, 9pt" Ref="179">
+                  <ExpressionBindings>
+                    <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[btn_view]" Ref="180">
+                    </Item1>
+                  </ExpressionBindings>
+                </Item3>
+              </Cells>
+            </Item1>
+          </Rows>
+        </Item18>
+      </Controls>
+    </Item3>
+    <Item4 ControlType="BottomMarginBand" Name="BottomMargin" HeightF="40" Ref="181">
+    </Item4>
+  </Bands>
+  <ParameterPanelLayoutItems>
+    <Item1 ControlType="Parameter" Parameter="#Ref-3" Ref="182">
+    </Item1>
+    <Item2 ControlType="Parameter" Parameter="#Ref-4" Ref="183">
+    </Item2>
+  </ParameterPanelLayoutItems>
+</XtraReportsLayoutSerializer>>

@@ -38,12 +38,15 @@ class XMLNode
     }
 }
 
+import { XMLValidator } from './xmlValidator.js';
+
 class XMLProcessor
 {
     constructor()
     {
         this.currentRef = 0;
         this.currentItemNum = 0;
+        this.validateOnGenerate = true; // Enable validation by default
     }
 
     escapeText(text)
@@ -133,6 +136,22 @@ class XMLProcessor
         {
             console.error('Invalid node:', node);
             return '';
+        }
+
+        // Validate before generating if enabled
+        if (this.validateOnGenerate) {
+            const validationResult = XMLValidator.validateAll(node);
+            if (validationResult.hasIssues) {
+                console.warn('XML Validation Issues:');
+                if (validationResult.sequentialIssues.length > 0) {
+                    console.warn('Sequential numbering issues:');
+                    validationResult.sequentialIssues.forEach(issue => console.warn('- ' + issue));
+                }
+                if (validationResult.containerIssues.length > 0) {
+                    console.warn('Container item numbering issues:');
+                    validationResult.containerIssues.forEach(issue => console.warn('- ' + issue));
+                }
+            }
         }
 
         const indentStr = '  '.repeat(indent);

@@ -52,6 +52,7 @@ export class ComponentProcessor
         if (!components || components.length === 0) return [];
 
         const processedNodes = [];
+        const startingItemNum = this.xmlProcessor.currentItemNum;
 
         components.forEach(component =>
         {
@@ -65,6 +66,14 @@ export class ComponentProcessor
 
             const nodes = this.processComponent(component, containerWidth, xOffset);
             processedNodes.push(...nodes);
+            
+            // Ensure the item number advances for the next component
+            if (nodes.length > 0) {
+                this.xmlProcessor.currentItemNum = Math.max(
+                    this.xmlProcessor.currentItemNum,
+                    startingItemNum + processedNodes.length
+                );
+            }
         });
 
         return processedNodes;
@@ -576,7 +585,8 @@ export class ComponentProcessor
         // First create the label if required
         if (def.requiresLabel)
         {
-            nodes.push(this.createLabelNode(component, containerWidth, xOffset));
+            const labelNode = this.createLabelNode(component, containerWidth, xOffset);
+            nodes.push(labelNode);
             this.currentY += 25; // Label height
         }
 
@@ -593,8 +603,11 @@ export class ComponentProcessor
             return nodes;
         }
 
-        // Create header table
-        const headerTableNode = this.xmlProcessor.createItemNode(undefined, 'XRTable',
+        // Track the starting item number and use sequential numbering
+        let currentItemNum = this.xmlProcessor.currentItemNum;
+
+        // Create header table as next item
+        const headerTableNode = this.xmlProcessor.createItemNode(++currentItemNum, 'XRTable',
         {
             Name: `${component.key}_headers` || `datagrid_headers_${Date.now()}`,
             ...def.headerTable.attributes,
@@ -607,11 +620,7 @@ export class ComponentProcessor
         {});
         headerTableNode.addChild(headerRowsNode);
 
-        // Save current item number state
-        const savedItemNum = this.xmlProcessor.currentItemNum;
-        this.xmlProcessor.currentItemNum = 0;
-
-        // Create header row
+        // Create header row (always Item1 within Rows)
         const headerRowNode = this.xmlProcessor.createItemNode(1, 'XRTableRow',
         {
             Name: `${component.key}_headerRow` || `datagrid_headerRow_${Date.now()}`,
@@ -624,10 +633,7 @@ export class ComponentProcessor
         {});
         headerRowNode.addChild(headerCellsNode);
 
-        // Reset item numbering for header cells
-        this.xmlProcessor.currentItemNum = 0;
-
-        // Create header cells with column labels
+        // Create header cells with column labels, using sequential numbers within their container
         visibleColumns.forEach((col, index) =>
         {
             // Handle both direct properties and nested component properties
@@ -644,15 +650,11 @@ export class ComponentProcessor
             headerCellsNode.addChild(cellNode);
         });
 
-        const headerTableItemNum = this.xmlProcessor.currentItemNum;
         nodes.push(headerTableNode);
         this.currentY += 25; // Just move down by the height of the header row
 
-        // Increment the item number for the keys table to ensure uniqueness
-        this.xmlProcessor.currentItemNum = headerTableItemNum + 1;
-
-        // Create keys table
-        const keysTableNode = this.xmlProcessor.createItemNode(undefined, 'XRTable',
+        // Create keys table as next item
+        const keysTableNode = this.xmlProcessor.createItemNode(++currentItemNum, 'XRTable',
         {
             Name: `${component.key}_keys` || `datagrid_keys_${Date.now()}`,
             ...def.keysTable.attributes,
@@ -678,15 +680,13 @@ export class ComponentProcessor
         {});
         keysRowNode.addChild(keysCellsNode);
 
-        // Reset item numbering for key cells
-        this.xmlProcessor.currentItemNum = 0;
-
-        // Create key cells with field keys
+        // Create key cells with field keys, keeping item numbers sequential within their container
         visibleColumns.forEach((col, index) =>
         {
             // Handle both direct properties and nested component properties
             const key = col.key || col.component?.key || `col_${index}`;
 
+            // Create cell with sequential numbering within its container
             const cellNode = this.xmlProcessor.createItemNode(index + 1, 'XRTableCell',
             {
                 Name: `key_${key}`,
@@ -709,8 +709,8 @@ export class ComponentProcessor
         nodes.push(keysTableNode);
         this.currentY += 25 + DevExpressDefinitions.commonAttributes.spacing.sectionSpacing; // Use section spacing after the entire datagrid
 
-        // Restore original item number
-        this.xmlProcessor.currentItemNum = savedItemNum;
+        // Update the processor's item number to the last one we used
+        this.xmlProcessor.currentItemNum = currentItemNum;
 
         return nodes;
     }
@@ -824,15 +824,14 @@ export class ComponentProcessor
         const nodes = [];
         const tabsDef = DevExpressHelpers.getContainerDef('tabs');
 
-        // Save and reset item numbering
-        const savedItemNum = this.xmlProcessor.currentItemNum;
-        this.xmlProcessor.currentItemNum = 0;
-
         // Process each tab as a separate panel
         component.components.forEach((tab, index) =>
         {
+            // Increment item number for each tab
+            this.xmlProcessor.currentItemNum++;
+
             // Create panel for this tab
-            const panelNode = this.xmlProcessor.createItemNode(index + 1, tabsDef.controlType,
+            const panelNode = this.xmlProcessor.createItemNode(this.xmlProcessor.currentItemNum, tabsDef.controlType,
             {
                 Name: `tab_${tab.key || index + 1}`,
                 ...tabsDef.attributes,
@@ -849,7 +848,7 @@ export class ComponentProcessor
             const savedY = this.currentY;
             const savedPanelItemNum = this.xmlProcessor.currentItemNum;
 
-            // Reset Y position for tab contents
+            // Reset Y position and item numbering for tab contents
             this.currentY = 0;
             this.xmlProcessor.currentItemNum = 0;
 
@@ -881,9 +880,6 @@ export class ComponentProcessor
 
             nodes.push(panelNode);
         });
-
-        // Restore original item numbering
-        this.xmlProcessor.currentItemNum = savedItemNum + component.components.length;
 
         return nodes;
     }
