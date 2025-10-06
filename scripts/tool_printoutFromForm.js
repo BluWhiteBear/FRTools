@@ -1,6 +1,6 @@
 // Constants
 const VERSION_INFO = {
-    version: '0.3.5',
+    version: '0.3.6',
     updated: '10/02/2025',
     devexpressVersion: '23.2.5.0'
 };
