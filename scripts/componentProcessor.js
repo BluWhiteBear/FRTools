@@ -192,6 +192,9 @@ export class ComponentProcessor
         const originalY = this.currentY;
         this.currentY = 0;
 
+        // Reset item numbering for container contents (including label)
+        this.xmlProcessor.currentItemNum = 0;
+
         // If container has a label, add it first
         if (component.label)
         {
@@ -206,8 +209,6 @@ export class ComponentProcessor
 
         if (component.components)
         {
-            // Reset item numbering for nested components
-            this.xmlProcessor.currentItemNum = 0;
             const nestedNodes = this.processComponents(component.components, nestedWidth, nestedXOffset);
             nestedNodes.forEach(node => controlsNode.addChild(node));
         }
@@ -451,6 +452,11 @@ export class ComponentProcessor
                 {
                     componentHeight = this.calculateTableHeight(comp);
                 }
+                else if (comp.type === 'columns' && comp.columns)
+                {
+                    // For columns components, use the columns height calculation
+                    componentHeight = this.calculateColumnsHeight(comp);
+                }
                 else if (comp.type === 'radio' && def.calculateHeight)
                 {
                     componentHeight = def.calculateHeight(comp);
@@ -479,6 +485,23 @@ export class ComponentProcessor
 
     createSubReportNode(component, width, xOffset)
     {
+        // Temporarily disable nested subforms due to issues. Create the subreport label like normal,
+        // then skip creating the actual subreport node; instead create a label with placeholder text "REPLACE ME"
+
+        const placeholderNode = this.xmlProcessor.createItemNode(undefined, 'XRLabel',
+        {
+            Name: `placeholder_${component.key || Date.now()}`,
+            Text: 'REPLACE ME WITH SUBREPORT',
+            SizeF: `${width},25`,
+            LocationFloat: `${xOffset},${this.currentY}`
+        });
+
+        // Early return 
+        return placeholderNode;
+
+        // Original code below for reference if re-enabling nested subforms in the future
+        // KEEP THIS CODE INTACT
+
         const def = DevExpressHelpers.getComponentDef('nestedsubform');
 
         // Create the subreport node
@@ -490,27 +513,38 @@ export class ComponentProcessor
             LocationFloat: `${xOffset},${this.currentY}`,
         });
 
-        // Add reference parameter binding for the form GUID
-        const parameterBindings = this.xmlProcessor.buildNode('ParameterBindings',
-        {}, [
+        // Create ReportSource node with required structure
+        const reportSource = this.xmlProcessor.buildNode('ReportSource',
+        {
+            Ref: (this.xmlProcessor.currentRef++).toString(),
+            ControlType: 'DevExpress.XtraReports.UI.XtraReport, DevExpress.XtraReports.v23.2, Version=23.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a',
+            PageWidth: '850',
+            PageHeight: '1100',
+            Version: '23.2',
+            Font: 'Arial, 9pt'
+        });
+
+        // Add bands structure without a Ref attribute
+        const bandsNode = this.xmlProcessor.buildNode('Bands', null, [
             this.xmlProcessor.buildNode('Item1',
             {
-                Name: 'FormDataGUID',
-                Parameter: '#Ref-100' // Reference to the FormDataGUID parameter
-            }),
+                Ref: (this.xmlProcessor.currentRef++).toString(),
+                ControlType: 'TopMarginBand'
+            }, null, true),
             this.xmlProcessor.buildNode('Item2',
             {
-                Name: 'ObjectGUID',
-                Parameter: '#Ref-101' // Reference to the ObjectGUID parameter
-            })
+                Ref: (this.xmlProcessor.currentRef++).toString(),
+                ControlType: 'DetailBand'
+            }, null, true),
+            this.xmlProcessor.buildNode('Item3',
+            {
+                Ref: (this.xmlProcessor.currentRef++).toString(),
+                ControlType: 'BottomMarginBand'
+            }, null, true)
         ]);
-        node.addChild(parameterBindings);
 
-        // Add ReportSourceUrl parameter if provided in form.io definition
-        if (component.formPath)
-        {
-            node.attributes.ReportSourceUrl = component.formPath;
-        }
+        reportSource.addChild(bandsNode);
+        node.addChild(reportSource);
 
         return node;
     }

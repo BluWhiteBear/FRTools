@@ -169,4 +169,93 @@ export class XMLValidator {
             hasIssues: sequentialIssues.length > 0 || containerIssues.length > 0 || refValidation.issues.length > 0
         };
     }
+
+    static repairItemNumbers(node) {
+        const containers = ['Controls', 'Rows', 'Cells', 'ExpressionBindings'];
+        let changes = [];
+
+        // If this is a container that should have sequential items
+        if (containers.includes(node.type)) {
+            let itemNodes = node.children
+                .filter(child => child.type?.startsWith('Item'))
+                .map(child => ({
+                    node: child,
+                    num: parseInt(child.type.replace('Item', '')),
+                    name: child.attributes?.Name || 'unnamed',
+                    type: child.attributes?.ControlType || 'unknown'
+                }))
+                .filter(info => !isNaN(info.num))
+                .sort((a, b) => a.num - b.num);
+
+            // Resequence the items
+            let currentNum = 1;
+            itemNodes.forEach(item => {
+                const oldType = item.node.type;
+                const newType = `Item${currentNum}`;
+                if (oldType !== newType) {
+                    changes.push({
+                        context: node.type,
+                        oldValue: oldType,
+                        newValue: newType,
+                        itemName: item.name,
+                        itemType: item.type
+                    });
+                    item.node.type = newType;
+                }
+                currentNum++;
+            });
+        }
+
+        // Recursively repair children
+        if (node.children && node.children.length > 0) {
+            node.children.forEach(child => {
+                const childChanges = this.repairItemNumbers(child);
+                changes = changes.concat(childChanges);
+            });
+        }
+
+        return changes;
+    }
+
+    static validateAndRepair(rootNode) {
+        // First validate to see if repairs are needed
+        const validation = this.validateAll(rootNode);
+        
+        if (validation.hasIssues) {
+            // Attempt repairs
+            const changes = this.repairItemNumbers(rootNode);
+            
+            // Validate again after repairs
+            const postRepairValidation = this.validateAll(rootNode);
+
+            // Compare original and remaining issues to determine which ones were fixed
+            const fixedIssues = {
+                sequential: validation.sequentialIssues.filter(issue => 
+                    !postRepairValidation.sequentialIssues.includes(issue)
+                ),
+                container: validation.containerIssues.filter(issue => 
+                    !postRepairValidation.containerIssues.includes(issue)
+                ),
+                ref: validation.refIssues.filter(issue => 
+                    !postRepairValidation.refIssues.includes(issue)
+                )
+            };
+            
+            return {
+                originalIssues: validation,
+                changes: changes,
+                remainingIssues: postRepairValidation,
+                fixedIssues: fixedIssues,
+                success: !postRepairValidation.hasIssues
+            };
+        }
+        
+        return {
+            originalIssues: validation,
+            changes: [],
+            remainingIssues: validation,
+            fixedIssues: { sequential: [], container: [], ref: [] },
+            success: true
+        };
+    }
 }

@@ -217,17 +217,31 @@ export const DevExpressDefinitions = {
             }
         },
 
-        nestedsubform: 
+        // nestedsubform: 
+        // {
+        //     controlType: 'XRSubreport',
+        //     defaultHeight: 50,
+        //     requiresLabel: true,
+        //     attributes: 
+        //     {
+        //         ReportSourceUrl: "",
+        //         SizeF: "650,50"
+        //     }
+        // },
+
+        // We'll temporarily treat nested forms as labels until we can resolve XML issues
+        nestedform:
         {
-            controlType: 'XRSubreport',
+            controlType: 'XRLabel',
             defaultHeight: 50,
             requiresLabel: true,
-            attributes: 
+            attributes:
             {
-                ReportSourceId: "0",
-                SizeF: "650,50",
-                GenerateOwnPages: "true"
-            }
+                TextAlignment: 'MiddleLeft',
+                Borders: 'Bottom',
+                Padding: '2,2,0,0,100'
+            },
+            expression: (key) => `[===REPLACE ME WITH A SUBREPORT===]`
         },
 
         email: 

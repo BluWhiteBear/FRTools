@@ -1,14 +1,15 @@
 class XMLNode
 {
-    constructor(type, attributes = {}, children = [])
+    constructor(type, attributes = {}, children = null, selfClosing = false)
     {
         this.type = type;
         this.attributes = {
             ...attributes
         };
-        this.children = [...children];
+        this.children = children ? [...children] : [];
         this.ref = null;
         this.needsRef = false;
+        this.selfClosing = selfClosing;
     }
 
     addChild(child)
@@ -29,7 +30,7 @@ class XMLNode
         const refTypes = [
             'XtraReportsLayoutSerializer',
             'Item1', 'Item2', 'Item3', 'Item4',
-            'Extensions', 'Parameters', 'Bands',
+            'Extensions', 'Parameters',
             'TopMarginBand', 'PageHeaderBand', 'DetailBand', 'BottomMarginBand',
             'StylePriority', 'GlyphOptions'
         ];
@@ -47,6 +48,7 @@ class XMLProcessor
         this.currentRef = 0;
         this.currentItemNum = 0;
         this.validateOnGenerate = true; // Enable validation by default
+        this.hasBeenValidated = false; // Track if we've already validated
     }
 
     escapeText(text)
@@ -108,9 +110,9 @@ class XMLProcessor
     }
 
     // First pass: Build the XML structure
-    buildNode(type, attributes = {}, children = [])
+    buildNode(type, attributes = {}, children = [], selfClosing = false)
     {
-        const node = new XMLNode(type, attributes, children);
+        const node = new XMLNode(type, attributes, children, selfClosing);
         node.setNeedsRef(XMLNode.needsRef(type));
 
         return node;
@@ -130,7 +132,7 @@ class XMLProcessor
     }
 
     // Final pass: Convert to XML string with proper formatting
-    generateXML(node, indent = 0)
+    generateXML(node, indent = 0, isRoot = true)
     {
         if (!node || !node.type)
         {
@@ -138,18 +140,58 @@ class XMLProcessor
             return '';
         }
 
-        // Validate before generating if enabled
-        if (this.validateOnGenerate) {
-            const validationResult = XMLValidator.validateAll(node);
-            if (validationResult.hasIssues) {
-                console.warn('XML Validation Issues:');
-                if (validationResult.sequentialIssues.length > 0) {
-                    console.warn('Sequential numbering issues:');
-                    validationResult.sequentialIssues.forEach(issue => console.warn('- ' + issue));
+        // Validate and repair before generating if enabled and only at the root level
+        if (isRoot && this.validateOnGenerate && !this.hasBeenValidated) {
+            const repairResult = XMLValidator.validateAndRepair(node);
+            this.hasBeenValidated = true; // Mark as validated to prevent recursive validation
+            
+            // Log original issues if any were found
+            if (repairResult.originalIssues.hasIssues) {
+                console.warn('Found XML structure issues:');
+                
+                // Log the original issues
+                if (repairResult.originalIssues.sequentialIssues.length > 0) {
+                    console.warn('Sequential numbering issues found:');
+                    repairResult.originalIssues.sequentialIssues.forEach(issue => console.warn('- ' + issue));
                 }
-                if (validationResult.containerIssues.length > 0) {
-                    console.warn('Container item numbering issues:');
-                    validationResult.containerIssues.forEach(issue => console.warn('- ' + issue));
+                if (repairResult.originalIssues.containerIssues.length > 0) {
+                    console.warn('Container item numbering issues found:');
+                    repairResult.originalIssues.containerIssues.forEach(issue => console.warn('- ' + issue));
+                }
+                
+                // Log what was fixed
+                if (repairResult.changes.length > 0) {
+                    console.info('\nApplied fixes:');
+                    repairResult.changes.forEach(change => 
+                        console.info(`- In ${change.context}: Renamed ${change.oldValue} to ${change.newValue} (${change.itemType} "${change.itemName}")`)
+                    );
+
+                    if (repairResult.fixedIssues.sequential.length > 0) {
+                        console.info('\nFixed sequential numbering issues:');
+                        repairResult.fixedIssues.sequential.forEach(issue => console.info('- ' + issue));
+                    }
+                    if (repairResult.fixedIssues.container.length > 0) {
+                        console.info('\nFixed container numbering issues:');
+                        repairResult.fixedIssues.container.forEach(issue => console.info('- ' + issue));
+                    }
+                }
+                
+                // Log any remaining unfixed issues
+                const hasUnfixedSequential = repairResult.remainingIssues.sequentialIssues.length > 0;
+                const hasUnfixedContainer = repairResult.remainingIssues.containerIssues.length > 0;
+                
+                if (hasUnfixedSequential || hasUnfixedContainer) {
+                    console.error('\nSome issues could not be fixed:');
+                    if (hasUnfixedSequential) {
+                        console.error('Remaining sequential numbering issues:');
+                        repairResult.remainingIssues.sequentialIssues.forEach(issue => console.error('- ' + issue));
+                    }
+                    if (hasUnfixedContainer) {
+                        console.error('Remaining container numbering issues:');
+                        repairResult.remainingIssues.containerIssues.forEach(issue => console.error('- ' + issue));
+                    }
+                } else if (!repairResult.success) {
+                    console.info('\nAll detected issues were fixed successfully.');
                 }
             }
         }
@@ -171,23 +213,24 @@ class XMLProcessor
         });
 
         // Handle self-closing vs normal tags
-        if (!this.requiresClosingTag(node.type) && (!node.children || node.children.length === 0))
+        if (node.selfClosing || (!this.requiresClosingTag(node.type) && (!node.children || node.children.length === 0)))
         {
             xml += ' />\n';
         }
         else
         {
-            xml += '>\n';
-            // Process children
-            if (node.children && node.children.length > 0)
-            {
+            if (node.children && node.children.length > 0) {
+                xml += '>\n';
+                // Process children
                 node.children.forEach(child =>
                 {
-                    const childXml = this.generateXML(child, indent + 1);
+                    const childXml = this.generateXML(child, indent + 1, false); // Pass false for non-root nodes
                     xml += childXml;
                 });
+                xml += `${indentStr}</${node.type}>\n`;
+            } else {
+                xml += `></${node.type}>\n`;
             }
-            xml += `${indentStr}</${node.type}>\n`;
         }
 
         return xml;

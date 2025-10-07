@@ -1,6 +1,23 @@
-// Constants
+//#region Imports
+
+import
+{
+    XMLProcessor
+}
+from './xmlProcessor.js';
+
+import
+{
+    ComponentProcessor
+}
+from './componentProcessor.js';
+
+//#endregion
+
+//#region Constants
+
 const VERSION_INFO = {
-    version: '0.3.6',
+    version: '0.3.7',
     updated: '10/02/2025',
     devexpressVersion: '23.2.5.0'
 };
@@ -26,7 +43,10 @@ const TABLE_LAYOUT = {
     BORDER_WIDTH: 1,
 };
 
-// Core Module: Form to DevExpress Conversion
+//#endregion
+
+//#region Core
+
 class DevExpressConverter
 {
     static state = {
@@ -299,49 +319,6 @@ class DevExpressConverter
         FieldGenerator.initRefs(); // Reset ref and item counters at start
     }
 
-    static COMPONENT_TO_CONTROL_TYPE = {
-        textfield: 'XRLabel',
-        textarea: 'XRRichText',
-        checkbox: 'XRCheckBox',
-        select: 'XRLabel',
-        radio: 'XRLabel',
-        button: 'XRLabel',
-        signature: 'XRPictureBox',
-        fileupload: 'XRLabel',
-        columns: 'XRTable',
-        datetime: 'XRLabel',
-        day: 'XRLabel',
-        time: 'XRLabel',
-        panel: 'XRPanel',
-        table: 'XRTable',
-        tabs: 'XRPanel',
-        well: 'XRPanel',
-        htmlelement: 'XRRichText',
-        content: 'XRRichText',
-    };
-
-    static getControlTypeForComponent(component)
-    {
-        const controlType = this.COMPONENT_TO_CONTROL_TYPE[component.type];
-        if (!controlType)
-        {
-            // Add warning about unhandled component type
-            this.state.warnings.push(
-            {
-                type: 'unhandled_component',
-                message: `Component type '${component.type}' is not explicitly supported. Defaulting to XRLabel.`,
-                component:
-                {
-                    type: component.type,
-                    key: component.key || '[unnamed]',
-                    label: component.label || '[unlabeled]'
-                }
-            });
-            return 'XRLabel'; // Fallback component behavior
-        }
-        return controlType;
-    }
-
     static getTypeCastedFieldExpression(component)
     {
         const key = Utils.escapeXml(component.key);
@@ -365,17 +342,6 @@ class DevExpressConverter
         }
     }
 
-    static isComponentVisible(component, parentVisible = true)
-    {
-        // If parent is hidden, this component is hidden regardless of its own visibility
-        if (!parentVisible) return false;
-
-        // Check this component's visibility
-        if (component.hidden === true) return false;
-        if (component.conditional?.when && component.conditional.show === false) return false;
-
-        return true;
-    }
     static isComponentVisible(component, parentVisible = true)
     {
         // If parent is hidden, this component is hidden regardless of its own visibility
@@ -572,7 +538,9 @@ class DevExpressConverter
                     currentY
                 }
             );
-        }, // Input Components      
+        }, 
+        
+        // Input Components      
         textfield: (component, itemNum, ref, componentWidth, xOffset, currentY, context) =>
         {
             // Use the passed itemNum parameter instead of redeclaring it
@@ -594,6 +562,7 @@ class DevExpressConverter
                 }
             );
         },
+
         number: (component, itemNum, ref, componentWidth, xOffset, currentY, context) =>
         {
             // Set type explicitly and pass to textfield handler
@@ -1319,7 +1288,10 @@ class DevExpressConverter
 
 };
 
-// Utility Module
+//#endregion
+
+//#region Utility
+
 const Utils = {
     escapeXml(unsafe)
     {
@@ -2186,7 +2158,10 @@ const UIHandlers = {
     }
 };
 
-// Component Cleaning Module
+//#endregion
+
+//#region Component Cleaning
+
 const ComponentCleaner = {
   cleanComponent(comp)
   {
@@ -2209,7 +2184,9 @@ const ComponentCleaner = {
   }
 };
 
-// Field Generation Utility Module
+//#endregion
+
+//#region Field Generation
 const FieldGenerator = {
     refCounter: 1, // Start at 1 for main report
     itemCounter: 1, // Start at 1 for numbered items (Item1, Item2, etc.)
@@ -2435,19 +2412,6 @@ const FieldGenerator = {
     }
 };
 
-import
-{
-    XMLProcessor
-}
-from './xmlProcessor.js';
-
-import
-{
-    ComponentProcessor
-}
-from './componentProcessor.js';
-
-// This function generates a minimal valid DevExpress XML report with a header
 function generateMinimalXmlTemplate()
 {
     return (formioData) =>
@@ -2594,7 +2558,10 @@ function generateMinimalXmlTemplate()
     };
 }
 
-// Initialization Module
+//#endregion
+
+//#region Initialization
+
 const Init = {
   initToolPrintoutFromForm(createDevExpressPreview)
   {
@@ -2674,7 +2641,10 @@ const Init = {
   }
 };
 
-// Export Modules
+//#endregion
+
+//#region Exports
+
 export
 {
   DevExpressConverter,
@@ -2684,3 +2654,5 @@ export
   FieldGenerator,
   generateMinimalXmlTemplate
 };
+
+//#endregion
