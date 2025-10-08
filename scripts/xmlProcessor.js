@@ -1,5 +1,14 @@
+//#region Imports
+
+import { XMLValidator } from './xmlValidator.js';
+
+//#endregion
+
+//#region Helpers
+
 class XMLNode
 {
+    // ? Represents a node in the XML structure
     constructor(type, attributes = {}, children = null, selfClosing = false)
     {
         this.type = type;
@@ -12,11 +21,14 @@ class XMLNode
         this.selfClosing = selfClosing;
     }
 
+    // ? Adds a child node to the current node
     addChild(child)
     {
         this.children.push(child);
     }
 
+    // ? Marks whether this node needs a Ref attribute
+    // ? Returns the node object
     setNeedsRef(needs)
     {
         this.needsRef = needs;
@@ -24,9 +36,11 @@ class XMLNode
         return this;
     }
 
+    // ? Determines if a node type needs a Ref attribute
+    // ? Returns boolean - true if it needs a Ref, false otherwise
     static needsRef(type)
     {
-        // List of Node types that require Ref attributes
+        // ? List of Node types that require Ref attributes
         const refTypes = [
             'XtraReportsLayoutSerializer',
             'Item1', 'Item2', 'Item3', 'Item4',
@@ -39,18 +53,23 @@ class XMLNode
     }
 }
 
-import { XMLValidator } from './xmlValidator.js';
+//#endregion
+
+//#region Main Processor
 
 class XMLProcessor
 {
+    // ? Handles the processing of XML data
     constructor()
     {
         this.currentRef = 0;
         this.currentItemNum = 0;
-        this.validateOnGenerate = true; // Enable validation by default
-        this.hasBeenValidated = false; // Track if we've already validated
+        this.validateOnGenerate = true;     // ? Should we validate on generate
+        this.hasBeenValidated = false;      // ? Track if we've already validated
     }
 
+    // ? Escapes special XML characters in text content
+    // ? Returns the escaped text as a string
     escapeText(text)
     {
         if (!text) return '';
@@ -63,6 +82,76 @@ class XMLProcessor
             .replace(/'/g, '&apos;');
     }
 
+    // ? Cleans HTML content for DevExpress markup compatibility
+    // ? Whitelists allowed tags and transforms unsupported tags to supported equivalents
+    cleanHtml(html) {
+        if (!html) return '';
+
+        // First unescape any already escaped HTML
+        html = html.replace(/&quot;/g, '"')
+                  .replace(/&amp;/g, '&')
+                  .replace(/&lt;/g, '<')
+                  .replace(/&gt;/g, '>')
+                  .replace(/&apos;/g, "'");
+
+        // Define tag mappings for replacements
+        const headerSizes = {
+            h1: '14',
+            h2: '12',
+            h3: '11',
+            h4: '10',
+            h5: '9',
+            h6: '8'
+        };
+
+        // Allow list of tags that can pass through as-is
+        const allowedTags = ['b', 'i', 'u', 's', 'r', 'br', 'href', 'strong', 'em'];
+        
+        // First pass: Convert style-based colors to DevExpress color tags
+        html = html.replace(/<([^>]+)style=["'](?:[^"']*?;)*?\s*color:\s*([^;"']+)(?:;[^"']*)?["'][^>]*>/gi, (match, tag, color) => {
+            return `<color=${color}>`;
+        });
+
+        // Remove any remaining style attributes
+        html = html.replace(/\s+style=["'][^"']*["']/gi, '');
+
+        // Convert common HTML equivalents
+        html = html.replace(/<strong>/gi, '<b>')
+                  .replace(/<\/strong>/gi, '</b>')
+                  .replace(/<em>/gi, '<i>')
+                  .replace(/<\/em>/gi, '</i>');
+
+        // Second pass: Convert header tags to size tags
+        html = html.replace(/<(h[1-6])>/gi, (match, tag) => {
+            return `<size=${headerSizes[tag.toLowerCase()]}>`;
+        });
+        html = html.replace(/<\/(h[1-6])>/gi, '</size>');
+
+        // Third pass: Remove all unallowed tags while preserving their content
+        const tagPattern = /<\/?([^>\s]+)[^>]*>/g;
+        html = html.replace(tagPattern, (match, tag) => {
+            tag = tag.toLowerCase();
+            if (allowedTags.includes(tag)) {
+                return match;
+            }
+            // For closing tags of transformed elements (like </p> after a color transform)
+            if (match.startsWith('</')) {
+                if (tag === 'p' && html.includes('<color=')) {
+                    return '</color>';
+                }
+                return '';
+            }
+            return '';
+        });
+
+        // Clean up any doubled spaces and trim
+        html = html.replace(/\s+/g, ' ').trim();
+
+        return html;
+    }
+
+    // ? Escapes special XML characters in attribute values (specifically for HTML display)
+    // ? Returns the escaped text as a string
     escapeHtml(text)
     {
         if (!text) return '';
@@ -73,12 +162,15 @@ class XMLProcessor
             .replace(/'/g, '&apos;');
     }
 
+    // ? Resets the internal state for processing a new XML structure
     reset()
     {
         this.currentRef = 0;
         this.currentItemNum = 0;
     }
 
+    // ? Determines if a node type requires a closing tag
+    // ? Returns boolean - true if it requires a closing tag, false otherwise
     requiresClosingTag(type)
     {
         // List of node types that require closing tags
@@ -104,12 +196,15 @@ class XMLProcessor
         return requireClosing.includes(type);
     }
 
+    // ? Increments and returns the next item number
+    // ? Returns the next item number as an integer
     getNextItemNum()
     {
         return ++this.currentItemNum;
     }
 
-    // First pass: Build the XML structure
+    // ? First pass: Build the XML structure
+    // ? Returns the created XMLNode as an object
     buildNode(type, attributes = {}, children = [], selfClosing = false)
     {
         const node = new XMLNode(type, attributes, children, selfClosing);
@@ -118,20 +213,21 @@ class XMLProcessor
         return node;
     }
 
-    // Second pass: Assign references sequentially
+    // ? Second pass: Assign references sequentially
     assignReferences(node)
     {
-        // Assign ref count if needed
+        // ? Assign ref count if needed
         if (node.needsRef)
         {
             node.attributes.Ref = this.currentRef++;
         }
 
-        // Recursively process all children elements
+        // ? Recursively process all children elements
         node.children.forEach(child => this.assignReferences(child));
     }
 
-    // Final pass: Convert to XML string with proper formatting
+    // ? Final pass: Convert to XML string with proper formatting
+    // ? Returns the generated XML as a string
     generateXML(node, indent = 0, isRoot = true)
     {
         if (!node || !node.type)
@@ -140,43 +236,23 @@ class XMLProcessor
             return '';
         }
 
-        // Validate and repair before generating if enabled and only at the root level
+        // ? Validate and repair before generating if enabled and only at the root level
         if (isRoot && this.validateOnGenerate && !this.hasBeenValidated) {
             const repairResult = XMLValidator.validateAndRepair(node);
-            this.hasBeenValidated = true; // Mark as validated to prevent recursive validation
+            this.hasBeenValidated = true; // ? Mark as validated to prevent recursive validation
             
-            // Log original issues if any were found
+            // ? Log original issues if any were found
             if (repairResult.originalIssues.hasIssues) {
-                console.warn('Found XML structure issues:');
-                
-                // Log the original issues
-                if (repairResult.originalIssues.sequentialIssues.length > 0) {
-                    console.warn('Sequential numbering issues found:');
-                    repairResult.originalIssues.sequentialIssues.forEach(issue => console.warn('- ' + issue));
-                }
-                if (repairResult.originalIssues.containerIssues.length > 0) {
-                    console.warn('Container item numbering issues found:');
-                    repairResult.originalIssues.containerIssues.forEach(issue => console.warn('- ' + issue));
-                }
-                
-                // Log what was fixed
+                // ? Log XML structure issues that were found and repaired
                 if (repairResult.changes.length > 0) {
-                    console.info('\nApplied fixes:');
-                    repairResult.changes.forEach(change => 
-                        console.info(`- In ${change.context}: Renamed ${change.oldValue} to ${change.newValue} (${change.itemType} "${change.itemName}")`)
+                    console.warn('Found XML structure issues!');
+                    console.warn('Applied fixes:');
+                    repairResult.changes.forEach(change =>
+                        console.warn(`- In ${change.context}: Renamed ${change.oldValue} to ${change.newValue} (${change.itemType} "${change.itemName}")`)
                     );
-
-                    if (repairResult.fixedIssues.sequential.length > 0) {
-                        console.info('\nFixed sequential numbering issues:');
-                        repairResult.fixedIssues.sequential.forEach(issue => console.info('- ' + issue));
-                    }
-                    if (repairResult.fixedIssues.container.length > 0) {
-                        console.info('\nFixed container numbering issues:');
-                        repairResult.fixedIssues.container.forEach(issue => console.info('- ' + issue));
-                    }
                 }
                 
-                // Log any remaining unfixed issues
+                // ? Log any remaining unfixed issues
                 const hasUnfixedSequential = repairResult.remainingIssues.sequentialIssues.length > 0;
                 const hasUnfixedContainer = repairResult.remainingIssues.containerIssues.length > 0;
                 
@@ -199,10 +275,10 @@ class XMLProcessor
         const indentStr = '  '.repeat(indent);
         let xml = '';
 
-        // Opening tag
+        // ? Opening tag
         xml += `${indentStr}<${node.type}`;
 
-        // Add attributes
+        // ? Add attributes
         Object.entries(node.attributes ||
         {}).forEach(([key, value]) =>
         {
@@ -212,7 +288,7 @@ class XMLProcessor
             }
         });
 
-        // Handle self-closing vs normal tags
+        // ? Handle self-closing vs normal tags
         if (node.selfClosing || (!this.requiresClosingTag(node.type) && (!node.children || node.children.length === 0)))
         {
             xml += ' />\n';
@@ -221,10 +297,10 @@ class XMLProcessor
         {
             if (node.children && node.children.length > 0) {
                 xml += '>\n';
-                // Process children
+                // ? Process children
                 node.children.forEach(child =>
                 {
-                    const childXml = this.generateXML(child, indent + 1, false); // Pass false for non-root nodes
+                    const childXml = this.generateXML(child, indent + 1, false); // ! Pass false for non-root nodes
                     xml += childXml;
                 });
                 xml += `${indentStr}</${node.type}>\n`;
@@ -236,6 +312,8 @@ class XMLProcessor
         return xml;
     }
 
+    // ? Creates an Item node with a sequential item number
+    // ? Returns the created Item XMLNode as an object
     createItemNode(itemNum, controlType, attributes = {})
     {
         const actualItemNum = (itemNum === undefined || itemNum === null) ? this.getNextItemNum() : itemNum;
@@ -247,17 +325,21 @@ class XMLProcessor
         }).setNeedsRef(true);
     }
 
+    // ? Creates a StylePriority node
+    // ? Returns the created StylePriority XMLNode as an object
     createStylePriorityNode(attributes = {})
     {
         return this.buildNode('StylePriority', attributes).setNeedsRef(true);
     }
 
+    // ? Creates an ExpressionBindings node with given bindings
+    // ? Returns the created ExpressionBindings XMLNode as an object
     createExpressionBindings(...bindings)
     {
         const container = this.buildNode('ExpressionBindings',
         {});
 
-        // Reset item numbering for expression bindings
+        // ? Reset item numbering for expression bindings
         const savedItemNum = this.currentItemNum;
         this.currentItemNum = 0;
 
@@ -272,15 +354,21 @@ class XMLProcessor
             container.addChild(bindingNode);
         });
 
-        // Restore item numbering
+        // ? Restore item numbering
         this.currentItemNum = savedItemNum;
 
         return container;
     }
 }
 
+//#endregion
+
+//#region Exports
+
 export
 {
     XMLNode,
     XMLProcessor
 };
+
+//#endregion

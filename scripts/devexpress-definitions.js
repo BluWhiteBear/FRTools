@@ -133,7 +133,7 @@ export const DevExpressDefinitions = {
         {
             controlType: 'XRCheckBox',
             defaultHeight: 25,
-            widthMultiplier: 0.5,
+            widthMultiplier: 1.0,
             requiresLabel: false,
             attributes: 
             {
@@ -167,7 +167,7 @@ export const DevExpressDefinitions = {
             controlType: 'XRPanel',
             defaultHeight: 25,
             requiresLabel: true,
-            calculateHeight: (options) => options.values.length * 25,
+            calculateHeight: (options) => (options.values.length * 25) + (!options.hideLabel ? 25 : 0),
             attributes: 
             {
                 TextAlignment: 'MiddleLeft',
@@ -179,7 +179,7 @@ export const DevExpressDefinitions = {
             {
                 controlType: 'XRCheckBox',
                 defaultHeight: 25,
-                widthMultiplier: 0.5,
+                widthMultiplier: 1.0,
                 requiresLabel: false,
                 attributes: 
                 {
@@ -194,26 +194,26 @@ export const DevExpressDefinitions = {
             }
         },
 
-        button: // Not supported in reports
+        button: // ! Not supported in reports
         {
             controlType: 'XRLabel',
             defaultHeight: 25,
             requiresLabel: false,
             attributes: 
             {
-                Visible: 'false', // Buttons aren't rendered in reports, so we hide them. We still need a placeholder.
+                Visible: 'false', // ! Buttons aren't rendered in reports, so we hide them. We still need a placeholder.
             }
         },
 
         // === Advanced Fields ===
-        fileupload: // Not supported in reports
+        fileupload: // ! Not supported in reports
         {
             controlType: 'XRLabel',
             defaultHeight: 25,
             requiresLabel: false,
             attributes: 
             {
-                Visible: 'false', // File upload controls aren't rendered in reports, so we hide them. We still need a placeholder.
+                Visible: 'false', // ! File upload controls aren't rendered in reports, so we hide them. We still need a placeholder.
             }
         },
 
@@ -229,7 +229,8 @@ export const DevExpressDefinitions = {
         //     }
         // },
 
-        // We'll temporarily treat nested forms as labels until we can resolve XML issues
+        // ! We'll temporarily treat nested forms as labels until we can resolve XML issues
+        // ! To restore, uncomment the above nestedsubform definition and remove this one, and do the same in componentProcessor.js around line 500
         nestedform:
         {
             controlType: 'XRLabel',
@@ -409,7 +410,7 @@ export const DevExpressDefinitions = {
                 Multiline: 'false',
                 AllowMarkupText: 'true'
             },
-            useHtmlAsText: true
+            useContentAsText: true
         },
 
         // === Data Components ===
@@ -699,7 +700,7 @@ export const DevExpressDefinitions = {
             template: (component, context, { itemNum, componentWidth, xOffset, currentY }) => `
                 <Item${itemNum} ControlType="XRLabel" 
                 Name="${context.escapeXml(component.key || `textfield${itemNum}`)}"
-                Text="${context.escapeXml(component.label || '')}"
+                Text="${context.escapeXml(!component.hideLabel ? (component.label || '') : '')}"
                 SizeF="${componentWidth},${context.LAYOUT.INPUT_HEIGHT}"
                 LocationFloat="${xOffset},${currentY}"
                 Padding="2,2,0,0,100">
@@ -716,7 +717,7 @@ export const DevExpressDefinitions = {
             template: (component, context, { itemNum, componentWidth, xOffset, currentY }) => `
                 <Item${itemNum} ControlType="XRLabel" 
                 Name="${context.escapeXml(component.key || `html${itemNum}`)}"
-                Text="${context.escapeXml(component.content)}"
+                Text="${context.escapeXml(context.cleanHtml(component.content))}"
                 SizeF="${componentWidth},${context.LAYOUT.INPUT_HEIGHT}"
                 LocationFloat="${xOffset},${currentY}"
                 Padding="2,2,0,0,100"
@@ -724,7 +725,13 @@ export const DevExpressDefinitions = {
         },
 
         richtext: {
-            template: (component, context, { itemNum, componentWidth, xOffset, currentY }) => `
+            template: (component, context, { itemNum, componentWidth, xOffset, currentY }) => {
+                // Clean initial content if available
+                if (component.content) {
+                    component.content = context.cleanHtml(component.content);
+                }
+                
+                return `
                 <Item${itemNum} ControlType="XRRichText" 
                 Name="${context.escapeXml(component.key || `richText${itemNum}`)}"
                 SizeF="${componentWidth},${context.LAYOUT.INPUT_HEIGHT * 2}"
@@ -736,13 +743,14 @@ export const DevExpressDefinitions = {
                         PropertyName="Html" Expression="[${component.key}]" />
                 </ExpressionBindings>
                 </Item${itemNum}>`
+            }
         },
 
         checkbox: {
             template: (component, context, { itemNum, componentWidth, xOffset, currentY }) => `
                 <Item${itemNum} ControlType="XRCheckBox" 
                 Name="${context.escapeXml(component.key || `checkbox${itemNum}`)}"
-                Text="${context.escapeXml(component.label || '')}"
+                Text="${context.escapeXml(!component.hideLabel ? (component.label || '') : '')}"
                 SizeF="${componentWidth},${context.LAYOUT.INPUT_HEIGHT}"
                 LocationFloat="${xOffset},${currentY}"
                 Padding="2,2,0,0,100"
@@ -863,14 +871,14 @@ export const DevExpressDefinitions = {
                 Padding="2,2,0,0,100"
                 Borders="Left, Right, Bottom">
                 <Controls>
-                    ${component.label ? context.generateLabel(component, nestedContext) : ''}
+                    ${(component.label && !component.hideLabel) ? context.generateLabel(component, nestedContext) : ''}
                     ${component.components ? 
                     context.processNestedComponents(
                         component.components,
                         context.getNextRef(),
                         componentWidth - (context.LAYOUT.MARGIN * 2),
                         context.LAYOUT.MARGIN,
-                        component.label ? context.LAYOUT.LABEL_HEIGHT + context.LAYOUT.VERTICAL_SPACING : 0,
+                        (component.label && !component.hideLabel) ? context.LAYOUT.LABEL_HEIGHT + context.LAYOUT.VERTICAL_SPACING : 0,
                         nestedContext
                     ) : ''}
                 </Controls>
@@ -1030,7 +1038,7 @@ export const DevExpressHelpers = {
     calculateComponentHeight(component) 
     {
         const def = this.getComponentDef(component.type);
-        const labelHeight = def.requiresLabel ? 25 : 0;
+        const labelHeight = (def.requiresLabel && !component.hideLabel) ? 25 : 0;
         const spacing = DevExpressDefinitions.commonAttributes.spacing.componentSpacing;
 
         return def.defaultHeight + labelHeight + spacing;

@@ -1,46 +1,46 @@
 //#region Imports
 
-import
-{
-    XMLProcessor
-}
-from './xmlProcessor.js';
-
-import
-{
-    ComponentProcessor
-}
-from './componentProcessor.js';
+import { XMLProcessor } from './xmlProcessor.js';
+import { ComponentProcessor } from './componentProcessor.js';
 
 //#endregion
 
 //#region Constants
 
+// ? Version info is used for generating both XML and SQL
 const VERSION_INFO = {
-    version: '0.3.7',
-    updated: '10/02/2025',
+    version: '0.3.8',
+    updated: '10/08/2025',
     devexpressVersion: '23.2.5.0'
 };
 
+// ? Debugging flags
+const debugLevel = 0;       // ? 0: No Logging, 
+                            // ? 1: Basic Event Logging, 
+                            // ? 2: Detailed Component Processing Logging
+
+// ? Details basic layout conventions for XML generation
 const LAYOUT = {
-    MARGIN: 0,
-    VERTICAL_SPACING: 10,
-    LABEL_HEIGHT: 25,
-    INPUT_HEIGHT: 25,
-    DEFAULT_WIDTH: 650,
-    COLUMN_WIDTH: 325,
-    PAGE_WIDTH: 850,
-    PAGE_HEIGHT: 1100,
-    LANDSCAPE: false,
-    HEADER_WIDTH: 769.987,
+    MARGIN: 0,              // ? Page margin in pixels
+    VERTICAL_SPACING: 10,   // ? Vertical space between components
+    LABEL_HEIGHT: 25,       // ? Height of labels
+    INPUT_HEIGHT: 25,       // ? Height of input fields
+    DEFAULT_WIDTH: 650,     // ? Default width for components
+    COLUMN_WIDTH: 325,      // ? Width of columns
+    PAGE_WIDTH: 850,        // ? Width of the page
+    PAGE_HEIGHT: 1100,      // ? Height of the page
+    LANDSCAPE: false,       // ? Adjusted width for landscape orientation
+    HEADER_WIDTH: 769.987,  // ? Width of the report header
 };
 
+// ? Layout conventions for tables. 
+// ? For our purposes this includes Form.io Columns, Tables, FormGrids, and DataGrids
 const TABLE_LAYOUT = {
-    HEADER_HEIGHT: 30,
-    ROW_HEIGHT: 25,
-    CELL_PADDING: 5,
-    DEFAULT_ROWS: 1,
-    BORDER_WIDTH: 1,
+    HEADER_HEIGHT: 30,      // ? Height of table headers
+    ROW_HEIGHT: 25,         // ? Height of table rows
+    CELL_PADDING: 5,        // ? Padding within table cells
+    DEFAULT_ROWS: 1,        // ? Default number of rows in a table
+    BORDER_WIDTH: 1,        // ? Width of table borders
 };
 
 //#endregion
@@ -49,13 +49,25 @@ const TABLE_LAYOUT = {
 
 class DevExpressConverter
 {
+    // ? Holds state information between function calls
     static state = {
-        devExpressJson: null, // For storing the generated JSON
-        warnings: [] // For storing conversion warnings
+        devExpressJson: null,   // ? For storing the generated JSON
+        warnings: []            // ? For storing conversion warnings
     };
 
+    static initialize()
+    {
+        this.state.devExpressJson = null;   // ? Reset generated JSON
+        this.state.warnings = [];           // ? Reset warnings
+        FieldGenerator.initRefs();          // ? Reset ref and item counters at start
+    }
+
+    // ? Counts all components recursively, including nested ones
+    // ? Returns an integer
     static countComponents(components)
     {
+        // ! /// EARLY EXIT ///
+        // ! If components is null or undefined, fall back to a count of 0
         if (!components) return 0;
 
         let count = components.length;
@@ -65,6 +77,7 @@ class DevExpressConverter
             {
                 count += this.countComponents(component.components);
             }
+
             if (component.columns)
             {
                 for (const col of component.columns)
@@ -76,61 +89,80 @@ class DevExpressConverter
                 }
             }
         }
+
         return count;
     }
 
+    // ? Counts all data sources. This includes the main form, DataGrids, FormGrids, and any Nested Forms
+    // ? Returns an integer
     static countDataSources(formioData)
     {
         let dataSources = ['Main Form Table'];
 
+        // ! /// EARLY EXIT ///
+        // ! If there is no form data, fall back to assuming just the main form
         if (!formioData) return dataSources.length;
 
         const checkComponent = (component) =>
         {
+            // ! /// EARLY EXIT ///
+            // ! If the component is null or undefined, just skip it
             if (!component) return;
 
-            const key = component.key || 'unnamed';
+            const key = component.key || 'unnamed'; // ! Fallback for missing keys
 
-            // Count datagrids with DBName
-            if (component.type === 'datagrid' && component.DBName)
+            // ? Count DataGrid components that are NOT marked as FormGrid
+            if (component.type === 'datagrid' && !component.IsFormGrid)
             {
                 dataSources.push(`Datagrid: ${key} (${component.DBName})`);
-                // console.log('Found datagrid:',
-                // {
-                //     key,
-                //     dbName: component.DBName
-                // });
+
+                // ? Debug Logging - DataGrid Found
+                if (debugLevel >= 2) {
+                    console.log('FOUND DataGrid Component:',
+                    {
+                        key,
+                        dbName: component.DBName
+                    });
+                }
             }
 
-            // Count formgrids with DBName
-            if (component.type === 'formgrid' && component.DBName)
+            // ? Count FormGrid components that ARE marked as FormGrid
+            if (component.type === 'datagrid' && component.IsFormGrid) // ! For some reason Form.io types FormGrids as 'datagrid'
             {
                 dataSources.push(`Formgrid: ${key} (${component.DBName})`);
-                // console.log('Found formgrid:',
-                // {
-                //     key,
-                //     dbName: component.DBName
-                // });
+
+                // ? Debug Logging - FormGrid Found
+                if (debugLevel >= 2) {
+                    console.log('FOUND FormGrid Component:',
+                    {
+                        key,
+                        dbName: component.DBName
+                    });
+                }
             }
 
-            // Count nested forms with DBName
-            if (component.type === 'nestedsubform' && component.DBName)
+            // ? Count Nested Form components
+            if (component.type === 'nestedsubform')
             {
                 dataSources.push(`Nested Form: ${key} (${component.DBName})`);
-                // console.log('Found nested form:',
-                // {
-                //     key,
-                //     dbName: component.DBName
-                // });
+
+                // ? Debug Logging - Nested Form Found
+                if (debugLevel >= 2) {
+                    console.log('FOUND Nested Form Component:',
+                    {
+                        key,
+                        dbName: component.DBName
+                    });
+                }
             }
 
-            // Recursively check nested components
+            // ? Recursively check nested components
             if (component.components)
             {
                 component.components.forEach(checkComponent);
             }
 
-            // Check components in columns
+            // ? Check components in columns
             if (component.columns)
             {
                 component.columns.forEach(col =>
@@ -143,74 +175,62 @@ class DevExpressConverter
             }
         };
 
-        // Process all components
+        // ? Process all components
         if (formioData.components)
         {
             formioData.components.forEach(checkComponent);
         }
 
-        console.log('All Data Sources:', dataSources);
+        // ? Debug log all found data sources
+        if (debugLevel >= 1) {
+            console.log('All Data Sources:', dataSources);
+        }
+
         return dataSources.length;
     }
 
+    // ? Recursively finds all DataGrid components in the form definition
+    // ? Returns an array of component objects
     static findDataGridComponents(formioData, results = [])
     {
+        // ! /// EARLY EXIT ///
+        // ! If there is no form data, just return the empty results array
         if (!formioData) return results;
 
-        // Debug logging
-        if (formioData.Grid) {
-            // console.log('Grid property found:', {
-            //     hasDataGrid: !!formioData.Grid.dataGrid,
-            //     hasFormGrid: !!formioData.Grid.formGrid,
-            //     dataGridDBName: formioData.Grid.dataGrid?.DBTableName,
-            //     formGridDBName: formioData.Grid.formGrid?.DBTableName
-            // });
-        }
-
-        // First check the Grid property for datagrid info
+        // ? Adds root-level DataGrids to results
         if (formioData.Grid?.dataGrid?.DBTableName && !formioData.Grid?.formGrid)
         {
-            //console.log('Found root-level datagrid:', formioData.Grid.dataGrid);
-            // Add root-level datagrid to results
             results.push({
                 DBName: formioData.Grid.dataGrid.DBTableName,
                 type: 'datagrid',
-                key: formioData.Grid.dataGrid.key || 'mainGrid'  // Use 'mainGrid' as fallback for root grid
+                key: formioData.Grid.dataGrid.key || 'mainGrid'
             });
         }
 
-        // Check components for additional datagrids
+        // ? Adds nested DataGrids to results
         const components = formioData.components;
+
+        // ! /// EARLY EXIT ///
+        // ! If there are no components, just return the current results array
         if (!components) return results;
 
         for (const component of components)
         {
-            // Debug log any grid-like components
-            if (component.type?.includes('grid') || component.DBName) {
-                // console.log('Examining potential grid component:', {
-                //     key: component.key,
-                //     type: component.type,
-                //     DBName: component.DBName,
-                //     isFormGrid: !!component.formGrid,
-                //     component: component
-                // });
-            }
+            // ? Make sure it's a datagrid and not a formgrid
+            const isDataGrid = component.type === 'datagrid' && component.DBName && !component.IsFormGrid; // ! They're both typed as 'datagrid' in Form.io for some reason...
 
-            // Make sure this is a pure datagrid and not a formgrid
-            const isDataGrid = component.type === 'datagrid' && 
-                             component.DBName && 
-                             !component.IsFormGrid; // Use IsFormGrid property to distinguish between grid types
-                             
             if (isDataGrid)
             {
-                // Make sure we always have a valid key
+                // ? Make sure we always have a valid key
+                // ! If the key is missing, generate a fallback key based on the component's index
                 const safeKey = component.key || `grid_${results.length + 1}`;
                 results.push({
                     ...component,
                     key: safeKey
                 });
             }
-            // Recursively check nested components
+
+            // ? Recursively check nested components
             if (component.components)
             {
                 this.findDataGridComponents(
@@ -219,28 +239,21 @@ class DevExpressConverter
                 }, results);
             }
         }
+
         return results;
     }
 
+    // ? Recursively finds all FormGrid components in the form definition
+    // ? Returns an array of component objects
     static findFormGridComponents(formioData, results = [])
     {
+        // ! /// EARLY EXIT ///
+        // ! If there is no form data, just return the empty results array
         if (!formioData) return results;
 
-        // Debug logging
-        if (formioData.Grid) {
-            // console.log('FormGrid - Grid property found:', {
-            //     hasDataGrid: !!formioData.Grid.dataGrid,
-            //     hasFormGrid: !!formioData.Grid.formGrid,
-            //     dataGridDBName: formioData.Grid.dataGrid?.DBTableName,
-            //     formGridDBName: formioData.Grid.formGrid?.DBTableName
-            // });
-        }
-
-        // First check the Grid property for formgrid info
+        // ? Adds root-level FormGrids to results
         if (formioData.Grid?.formGrid?.DBTableName)
         {
-            //console.log('Found root-level formgrid:', formioData.Grid.formGrid);
-            // Add root-level formgrid to results
             results.push({
                 DBName: formioData.Grid.formGrid.DBTableName,
                 type: 'formgrid',
@@ -248,29 +261,20 @@ class DevExpressConverter
             });
         }
 
-        // Check components for additional formgrids
+        // ? Adds nested FormGrids to results
         const components = formioData.components;
+
+        // ! /// EARLY EXIT ///
+        // ! If there are no components, just return the current results array
         if (!components) return results;
 
         for (const component of components)
         {
-            // Debug log any form or grid-like components
-            if (component.type?.includes('grid') || component.type?.includes('form') || component.DBName) {
-                // console.log('FormGrid - Examining potential component:', {
-                //     key: component.key,
-                //     type: component.type,
-                //     DBName: component.DBName,
-                //     isFormGrid: !!component.formGrid,
-                //     hasForm: component.type?.includes('form'),
-                //     component: component
-                // });
-            }
-
-            // Check if this is a formgrid using the IsFormGrid property
-            const isFormGrid = component.DBName && component.IsFormGrid;
+            // ? Make sure it's a formgrid and not a datagrid
+            const isFormGrid = component.DBName && component.IsFormGrid; // ! They're both typed as 'datagrid' in Form.io for some reason...
             
             if (isFormGrid) {
-                // Look for the View button in the components to get the dialog form table
+                // ? Look for the View button in the components to get the dialog form table
                 let dialogFormTable = null;
                 if (component.components) {
                     const viewButton = component.components.find(c => 
@@ -278,29 +282,34 @@ class DevExpressConverter
                         c.key === 'btn_view' && 
                         c.Form_DBTable
                     );
+
                     if (viewButton) {
                         dialogFormTable = viewButton.Form_DBTable;
                     }
                 }
-                // Include the dialogFormTable in the component data
+
+                // ? Include the dialogFormTable in the component data
                 const gridData = {
                     ...component,
                     dialogFormTable: dialogFormTable
                 };
+
                 results.push(gridData);
                 continue;
             }
 
             if (isFormGrid)
             {
-                // Make sure we always have a valid key
+                // ? Make sure we always have a valid key
+                // ! If the key is missing, generate a fallback key based on the component's index
                 const safeKey = component.key || `fg_${results.length + 1}`;
                 results.push({
                     ...component,
                     key: safeKey
                 });
             }
-            // Recursively check nested components
+
+            // ? Recursively check nested components
             if (component.components)
             {
                 this.findFormGridComponents(
@@ -309,16 +318,14 @@ class DevExpressConverter
                 }, results);
             }
         }
+
         return results;
     }
 
-    static initialize()
-    {
-        this.state.devExpressJson = null;
-        this.state.warnings = []; // Reset warnings
-        FieldGenerator.initRefs(); // Reset ref and item counters at start
-    }
-
+    // ? Generates XML Expression Bindings for a given component field based on its type
+    // ? Returns a string
+    // ! I believe this is deprecated now, since we pass in the full expression in the component definitions.
+    // TODO: Investigate this! If it's not needed, remove it. Maybe it's used as a fallback?
     static getTypeCastedFieldExpression(component)
     {
         const key = Utils.escapeXml(component.key);
@@ -342,14 +349,18 @@ class DevExpressConverter
         }
     }
 
+    // ? Determines if a component is visible based on its own properties and its parent's visibility
     static isComponentVisible(component, parentVisible = true)
     {
-        // If parent is hidden, this component is hidden regardless of its own visibility
+        // ? If parent is hidden, this component is hidden regardless of its own visibility
         if (!parentVisible) return false;
 
-        // Check this component's visibility
+        // ? Check this component's "hidden" property
         if (component.hidden === true) return false;
-        if (component.conditional?.when && component.conditional.show === false) return false;
+
+        // ? Check if this component conditionally hidden based on simple visibility
+        // ! This ASSUMES that if there is simple conditional logic, it should be hidden on the report
+        //if (component.conditional?.when && component.conditional.show === false) return false;
 
         return true;
     }
@@ -1103,17 +1114,20 @@ class DevExpressConverter
         },
     };
 
+    // ? Generate SubBands for each top-level component
+    // ? Returns XML string
     static generateSubBands(components)
     {
         if (!components || components.length === 0)
         {
-            // Return an empty SubBand with Controls element for validation
+            // ? Return an empty SubBand with Controls element for validation
             return `
         <Item1 ControlType="SubBand" Name="SubBand1" HeightF="0">
           <Controls></Controls>
         </Item1>`;
         }
 
+        // ? Generate SubBand for each component
         return components.map((component, index) => `
         <Item${index + 1} ControlType="SubBand" Name="SubBand${index + 1}" 
           HeightF="${DevExpressConverter.core.calculateComponentHeight(component)}">
@@ -1123,34 +1137,46 @@ class DevExpressConverter
         </Item${index + 1}>`).join('\n');
     }
 
+    // ? Main transformation function
+    // ? Takes Form.io JSON and returns compressed base64 DevExpress report template
+    // ! Throws errors on critical failures, logs warnings for non-critical issues
     static transformToDevExpress(formioData)
     {
         try
         {
-            // Initialize counters
+            // ? Initialize counters
             DevExpressConverter.initialize();
 
+            // ? Validate input
             if (!formioData)
             {
                 throw new Error('No form data provided');
             }
 
-            console.log("transformToDevExpress called with formData:",
+            // ? Log input summary
+            if (debugLevel >= 1)
             {
-                formName: formioData.FormName,
-                hasTemplate: Boolean(formioData.FormioTemplate),
-                hasComponents: Boolean(formioData.FormioTemplate?.components?.length)
-            });
+                console.log("transformToDevExpress() called with formData:",
+                {
+                    formName: formioData.FormName,
+                    hasTemplate: Boolean(formioData.FormioTemplate),
+                    hasComponents: Boolean(formioData.FormioTemplate?.components?.length)
+                });
+            }
 
-            // Get a minimal valid XML template with the report name
+            // ? Get a minimal valid XML template with the report name
             const xmlTemplateFunc = generateMinimalXmlTemplate();
             let xmlTemplate = xmlTemplateFunc(formioData);
 
-            //console.log("XML template generated, length:", xmlTemplate.length);
-            //console.log("XML preview:", xmlTemplate.substring(0, 200) + "...");
+            // ? Log initial XML template size and preview
+            if (debugLevel >= 2)
+            {
+                console.log("XML template generated, length:", xmlTemplate.length);
+                console.log("XML preview:", xmlTemplate.substring(0, 200) + "...");
+            }
 
-            // Clean XML - remove unnecessary whitespace but preserve structure
-            // Clean and validate XML before compressing
+            // ? Clean XML - remove unnecessary whitespace but preserve structure
+            // ? Clean and validate XML before compressing
             xmlTemplate = xmlTemplate.replace(/>\s+</g, '><')
                 .replace(/\s+>/g, '>')
                 .replace(/<\s+/g, '<')
@@ -1158,8 +1184,14 @@ class DevExpressConverter
                 .trim();
 
             const initialValidation = Utils.validateXmlOutput(xmlTemplate);
-            //console.log("Initial XML validation results:", initialValidation);
 
+            // ? Log initial validation results
+            if (debugLevel >= 1)
+            {
+                console.log("Initial XML validation results:", initialValidation);
+            }
+
+            // ? Check for critical errors in initial validation
             if (initialValidation.some(result => result.startsWith("ERROR")))
             {
                 const criticalErrors = initialValidation.filter(result => result.startsWith("ERROR"));
@@ -1168,76 +1200,97 @@ class DevExpressConverter
                 throw error;
             }
 
-            // Compress and encode the XML
+            // ? Compress and encode the XML
             let base64Template;
             try
             {
-                // Convert XML to bytes
+                // ? Convert XML to bytes
                 const encoder = new TextEncoder();
                 const xmlBytes = encoder.encode(xmlTemplate);
 
-                // Compress the XML bytes
+                // ? Compress the XML bytes
                 const compressed = pako.gzip(xmlBytes,
                 {
                     level: 9
                 });
 
-                // Convert to base64 string
+                // ?Convert to base64 string
                 const compressedArray = new Uint8Array(compressed);
                 let binaryString = '';
                 compressedArray.forEach(byte =>
                 {
                     binaryString += String.fromCharCode(byte);
                 });
-                base64Template = btoa(binaryString);
-                //console.log('XML compressed successfully, base64 length:', base64Template.length);
 
-                // Attempt to decode the template as a final validation
+                base64Template = btoa(binaryString);
+
+                // ? Log compression results
+                if (debugLevel >= 2)
+                {
+                    console.log('XML compressed successfully, base64 length:', base64Template.length);
+                }
+
+                // ? Attempt to decode the template as a final validation
                 try
                 {
                     const decodedTemplate = Utils.decodeReportTemplate(base64Template);
+
                     if (!decodedTemplate || !decodedTemplate.content)
                     {
                         console.warn('Warning: Template decoded to empty content - this may cause issues');
                     }
                     else
                     {
-                        // console.log('Template validation successful - decoded content length:',
-                        //     decodedTemplate.content.length);
+                        // ? Log decoded content length
+                        if (debugLevel >= 2)
+                        {
+                            console.log('Template validation successful - decoded content length:', decodedTemplate.content.length);
+                        }
 
-                        // Look for specific field bindings in the decoded XML to verify fields are present
+                        // ? Look for specific field bindings in the decoded XML to verify fields are present
                         const fieldBindings = decodedTemplate.content.match(/Expression="\[(.*?)\]"/g) || [];
+
                         if (fieldBindings.length === 0)
                         {
                             console.warn('Warning: No field bindings found in the decoded template');
                         }
                         else
                         {
-                            console.log(`Found ${fieldBindings.length} field bindings in the decoded template`);
+                            // ? Log number of field bindings found
+                            if (debugLevel >= 2)
+                            {
+                                console.log(`Found ${fieldBindings.length} field bindings in the decoded template`);
+                            }
                         }
                     }
                 }
                 catch (decodeError)
                 {
-                    console.warn('Warning: Could not validate template by decoding:', decodeError);
-                    // Don't throw here - we'll proceed with the potentially problematic template
+                    console.error('Warning: Could not validate template by decoding:', decodeError);
+                    throw new Error('Template decoding validation failed');
                 }
             }
             catch (compressionError)
             {
                 console.error('Template compression error:', compressionError);
                 throw new Error('Failed to compress template');
-            } // Validate the XML before finalizing
+            } 
+            
+            // ? Validate the XML before finalizing
             const validationResults = Utils.validateXmlOutput(xmlTemplate);
 
-            // Log validation results
-            console.log("XML validation results:", validationResults);
+            // ? Log validation results
+            if (debugLevel >= 1)
+            {
+                console.log("XML validation results:", validationResults);
+            }
 
-            // Check for critical errors (not just warnings)
+            // ? Check for critical errors (not just warnings)
             const hasCriticalErrors = validationResults.some(result =>
                 result.startsWith("ERROR") && !result.includes("WARNING")
             );
 
+            // ? If critical errors are present, throw with details
             if (hasCriticalErrors)
             {
                 const criticalErrors = validationResults.filter(msg => msg.startsWith("ERROR"));
@@ -1247,14 +1300,7 @@ class DevExpressConverter
                 throw error;
             }
 
-            // Add ComponentStorageand ObjectStorage sections with proper data structure
-            const formFields = Object.keys(formioData)
-                .map(key => `<Column Name="${Utils.escapeXml(key)}" Type="System.String"/>`)
-                .join('');
-
-            xmlTemplate = xmlTemplate.replace('</Bands>', `</Bands><ComponentStorage><Item1 Ref="0" ObjectType="DevExpress.DataAccess.Json.JsonDataSource,DevExpress.DataAccess.v23.2" Name="jsonDataSource1"><Source Type="DevExpress.DataAccess.Json.CustomJsonSource"/><Parameters><Item1 Ref="100" ValueInfo="00000000-0000-0000-0000-000000000000" Name="FormDataGUID" Type="#Ref-3"/><Item2 Ref="101" ValueInfo="00000000-0000-0000-0000-000000000000" Name="ObjectGUID" Type="#Ref-3"/></Parameters><Schema><Item Type="DefaultSchema"><Columns>${formFields}</Columns></Item></Schema></Item1></ComponentStorage><ObjectStorage><Item1 Ref="3" ObjectType="System.Type" Content="System.Guid"/><Item2 Ref="4" ObjectType="DevExpress.XtraReports.Parameters.StaticListLookUpSettings, DevExpress.Printing.v23.2.Core"><LookUpValues><Item1 Content="System.String"/></LookUpValues></Item2></ObjectStorage>`);
-
-            // Create minimal DevExpress JSON structure
+            // ? Create minimal DevExpress JSON structure
             const departmentName = formioData.DepartmentName || 'FormIO';
             const reportName = formioData.FormName || 'Simple Report';
 
@@ -1268,10 +1314,10 @@ class DevExpressConverter
                 ReportGuid: formioData.FormDefinitionGuid || "00000000-0000-0000-0000-000000000000",
                 UserGuid: formioData.UserGuid || "00000000-0000-0000-0000-000000000000",
                 DepartmentGuid: formioData.DeparmentGuid || "00000000-0000-0000-0000-000000000000",
-                IsPrivate: false,
+                IsPrivate: true,
                 Parameters: "",
                 ReportTemplate: base64Template,
-                isHidden: false,
+                isHidden: true,
                 Description: reportName,
                 IsReportExist: false,
                 LastMod: `/Date(${Date.now()})/`,
@@ -1285,7 +1331,6 @@ class DevExpressConverter
             throw error;
         }
     }
-
 };
 
 //#endregion
@@ -1293,6 +1338,8 @@ class DevExpressConverter
 //#region Utility
 
 const Utils = {
+    // ? Basic XML escaping
+    // ? Returns a string
     escapeXml(unsafe)
     {
         if (!unsafe) return '';
@@ -1303,51 +1350,53 @@ const Utils = {
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&apos;');
     },
+
+    // ? Basic XML validation function
+    // ? Returns an array of validation messages
+    // ! This is the first layer of validation, and simply checks for valid XML structure. More detailed validation is done in xmlValidator.js
     validateXmlOutput(xml)
     {
         try
         {
-            // Fallback basic validation
+            // ? Holds validation messages
             const validationResults = [];
 
-            // Basic string checks
+            // ? Check for empty input
             if (!xml || xml.trim() === '')
             {
                 return ["ERROR: XML is empty"];
             }
 
-            // Clean up any potential formatting issues
-            xml = xml.replace(/>\s+</g, '><') // Remove whitespace between tags
-                .replace(/\s+>/g, '>') // Remove whitespace before closing bracket
-                .replace(/<\s+/g, '<') // Remove whitespace after opening bracket
-                .replace(/\s{2,}/g, ' '); // Collapse multiple spaces
+            // ? Clean up any potential formatting issues
+            xml = xml.replace(/>\s+</g, '><')   // ? Remove whitespace between tags
+                .replace(/\s+>/g, '>')          // ? Remove whitespace before closing bracket
+                .replace(/<\s+/g, '<')          // ? Remove whitespace after opening bracket
+                .replace(/\s{2,}/g, ' ');       // ? Collapse multiple spaces
 
-            // Check basic XML structure
+            // ? Check basic XML structure
             if (!xml.startsWith('<?xml'))
             {
                 validationResults.push("WARNING: Missing XML declaration");
             }
 
-            // Check for well-formedness by parsing with DOMParser
+            // ? Check if XML is malformed by parsing with DOMParser
             const parser = new DOMParser();
             const xmlDoc = parser.parseFromString(xml, "text/xml");
-
-            // Check if parsing failed
             const parseError = xmlDoc.getElementsByTagName("parsererror");
             if (parseError.length > 0)
             {
-                validationResults.push(`ERROR: XML is not well-formed. ${parseError[0].textContent}`);
+                validationResults.push(`ERROR: XML is malformed. ${parseError[0].textContent}`);
                 return validationResults;
             }
 
-            // Check for required elements
+            // ? Check for required elements
             const bands = xmlDoc.getElementsByTagName("Bands");
             if (bands.length === 0)
             {
                 validationResults.push("ERROR: Missing required <Bands> element");
             }
 
-            // Check for DetailBand
+            // ? Check for DetailBand
             const detailBands = xmlDoc.querySelectorAll("[ControlType='DetailBand']");
             if (detailBands.length === 0)
             {
@@ -1357,7 +1406,7 @@ const Utils = {
             {
                 validationResults.push(`INFO: Found DetailBand element`);
 
-                // Check for Controls within DetailBand
+                // ? Check for Controls within DetailBand
                 const controls = detailBands[0].getElementsByTagName("Controls");
                 if (controls.length === 0)
                 {
@@ -1365,7 +1414,7 @@ const Utils = {
                 }
                 else
                 {
-                    // Check for field elements in Controls
+                    // ? Check for field elements in Controls
                     const items = controls[0].children;
                     if (items.length === 0)
                     {
@@ -1378,7 +1427,7 @@ const Utils = {
                 }
             }
 
-            // Success if no errors
+            // ? Success if no errors
             if (!validationResults.some(msg => msg.startsWith("ERROR")))
             {
                 validationResults.push("SUCCESS: Basic XML validation passed");
@@ -1392,53 +1441,13 @@ const Utils = {
         }
     },
 
-    cleanAndPrepareXmlForOutput(xml)
-    {
-        if (!xml) return '';
-
-        try
-        {
-            // First, normalize the XML by parsing and serializing with DOMParser
-            const parser = new DOMParser();
-            const xmlDoc = parser.parseFromString(xml, "text/xml");
-
-            // Check if parsing failed
-            const parseError = xmlDoc.getElementsByTagName("parsererror");
-            if (parseError.length > 0)
-            {
-                console.error("Error parsing XML during cleaning:", parseError[0].textContent);
-                // Fall back to basic string cleaning if parsing fails
-                return xml.trim()
-                    .replace(/\r?\n\s*/g, '') // Remove line breaks and leading whitespace
-                    .replace(/>\s+</g, '><'); // Remove spaces between tags
-            }
-
-            // Special handling for self-closing tags to ensure proper XML
-            const serializer = new XMLSerializer();
-            let serialized = serializer.serializeToString(xmlDoc);
-
-            // Clean up the serialized output - DOMParser may add some namespace declarations
-            serialized = serialized
-                .replace(/xmlns="http:\/\/www\.w3\.org\/1999\/xhtml"/g, '')
-                .replace(/\s{2,}/g, ' ') // Replace multiple spaces with single space
-                .replace(/>\s+</g, '><'); // Remove spaces between tags
-
-            return serialized;
-        }
-        catch (error)
-        {
-            console.error("Error cleaning XML:", error);
-
-            // Fall back to basic string cleaning
-            return xml.trim()
-                .replace(/\r?\n\s*/g, '') // Remove line breaks and leading whitespace
-                .replace(/>\s+</g, '><'); // Remove spaces between tags
-        }
-    },
+    // ? Decode and decompress a base64 DevExpress report template
+    // ? Returns an object with type, content, and format
     decodeReportTemplate(base64Template)
     {
         try
         {
+            // ? Validates that input is a non-empty string
             if (!base64Template)
             {
                 console.error('Empty template provided');
@@ -1449,11 +1458,14 @@ const Utils = {
                 };
             }
 
-            // Debug base64 input
-            //console.log('Base64 template length:', base64Template.length);
-            //console.log('Base64 template start:', base64Template.substring(0, 50));
+            // ? Debug base64 input
+            if (debugLevel >= 2)
+            {
+                console.log('Base64 template length:', base64Template.length);
+                console.log('Base64 template start:', base64Template.substring(0, 50));
+            }
 
-            // Convert base64 to binary array
+            // ? Convert base64 to binary array
             const binaryStr = atob(base64Template);
             const bytes = new Uint8Array(binaryStr.length);
             for (let i = 0; i < binaryStr.length; i++)
@@ -1461,11 +1473,14 @@ const Utils = {
                 bytes[i] = binaryStr.charCodeAt(i);
             }
 
-            // Debug compressed bytes
-            //console.log('Compressed bytes length:', bytes.length);
-            //console.log('First few bytes:', Array.from(bytes.slice(0, 10)));
+            // ? Debug compressed bytes
+            if (debugLevel >= 2)
+            {
+                console.log('Compressed bytes length:', bytes.length);
+                console.log('First few bytes:', Array.from(bytes.slice(0, 10)));
+            }
 
-            // Decompress with error handling
+            // ? Decompress with error handling
             let decompressed;
             try
             {
@@ -1480,11 +1495,14 @@ const Utils = {
                 throw error;
             }
 
-            // Debug decompressed content
-            //console.log('Decompressed length:', decompressed?.length);
-            //console.log('Decompressed start:', decompressed?.substring(0, 100));
+            // ? Debug decompressed content
+            if (debugLevel >= 2)
+            {
+                console.log('Decompressed length:', decompressed?.length);
+                console.log('Decompressed start:', decompressed?.substring(0, 100));
+            }
 
-            // Validate XML structure 
+            // ? Validate XML structure 
             if (!decompressed?.startsWith('<?xml'))
             {
                 throw new Error('Invalid XML content');
@@ -1504,22 +1522,29 @@ const Utils = {
         }
     },
 
+    // ? Generate SQL query string for printout procedures
+    // ? Returns a string
+    // ! This generates basic SQL Stored Procedure create or alter statements for the main form, DataGrids, and FormGrids
     generateSqlQuery(formioData)
     {
-        // Query Header
+        // ? Query Header
         const generateDate = new Date().toLocaleDateString();
         const generateTime = new Date().toLocaleTimeString();
         const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
         const timeZoneAbbr = moment.tz(timeZone).zoneAbbr();
 
-        // Parse FormioTemplate if needed
+        // ? Parse FormioTemplate if needed
         let formioTemplate;
         if (typeof formioData.FormioTemplate === 'string')
         {
             try
             {
                 formioTemplate = JSON.parse(formioData.FormioTemplate);
-                console.log('Parsed FormioTemplate:', formioTemplate);
+
+                if (debugLevel >= 2)
+                {
+                    console.log('Parsed FormioTemplate:', formioTemplate);
+                }
             }
             catch (error)
             {
@@ -1529,22 +1554,19 @@ const Utils = {
         }
         else
         {
-            formioTemplate = formioData.FormioTemplate ||
-            {};
+            formioTemplate = formioData.FormioTemplate || {};
         }
 
-        // Get the table name without [dbo]. or ct_ prefixes
+        // ? Get the table name without [dbo]. or ct_ prefixes
         const fullTableName = formioData.TableName || '[dbo].[DefaultTable]';
         const tableName = fullTableName.replace(/^\[dbo\]\./i, '').replace(/^\[?ct_/i, '');
         const procedureName = `cstm_${tableName.replace(/[\[\]]/g, '')}`;
 
-        // Debug logging for datagrids
-        //console.log('Found data grids:', DevExpressConverter.findDataGridComponents(formioData));
-
-        // Build the SQL string in parts
+        // ? Build the SQL string in parts
         let sqlParts = [];
 
-        // Main procedure
+        // ? Main procedure
+        // TODO: Add additional handling for joining Nested Form relation tables and adding their FIGUID and OwnerObjectGUID to the select
         sqlParts.push(`
 /* MAIN FORM PROCEDURE */
 create or alter procedure [${procedureName}_Printout]
@@ -1552,7 +1574,7 @@ create or alter procedure [${procedureName}_Printout]
   @OwnerObjectGUID uniqueidentifier = null
 as
   /*
-    This procedure was generated by version ${VERSION_INFO.version} of the Formio to DevExpress converter tool on ${generateDate} at ${generateTime} ${timeZoneAbbr}
+    This procedure was generated by version ${VERSION_INFO.version} of the Printout From Form tool on ${generateDate} at ${generateTime} ${timeZoneAbbr}
     It is not intended for direct use and should be modified as needed.
   */
 
@@ -1567,7 +1589,7 @@ as
   and main.__ownerobjectguid = @OwnerObjectGUID
 GO`);
 
-        // Data grid procedures
+        // ? Data grid procedures
         const dataGrids = DevExpressConverter.findDataGridComponents(formioTemplate);
         if (dataGrids.length > 0) {
             dataGrids.forEach(grid => {
@@ -1579,7 +1601,7 @@ create or alter procedure [${procedureName}_${safeKey}]
   @OwnerObjectGUID uniqueidentifier = null
 as
   /*
-    This procedure was generated by version ${VERSION_INFO.version} of the Formio to DevExpress converter tool on ${generateDate} at ${generateTime} ${timeZoneAbbr}
+    This procedure was generated by version ${VERSION_INFO.version} of the Printout From Form tool on ${generateDate} at ${generateTime} ${timeZoneAbbr}
     It is not intended for direct use and should be modified as needed.
   */
 
@@ -1599,7 +1621,7 @@ GO`);
             });
         }
 
-        // Form grid procedures
+        // ? Form grid procedures
         const formGrids = DevExpressConverter.findFormGridComponents(formioTemplate);
         if (formGrids.length > 0) {
             formGrids.forEach(grid => {
@@ -1611,7 +1633,7 @@ create or alter procedure [${procedureName}_${safeKey}]
   @OwnerObjectGUID uniqueidentifier = null
 as
   /*
-    This procedure was generated by version ${VERSION_INFO.version} of the Formio to DevExpress converter tool on ${generateDate} at ${generateTime} ${timeZoneAbbr}
+    This procedure was generated by version ${VERSION_INFO.version} of the Printout From Form tool on ${generateDate} at ${generateTime} ${timeZoneAbbr}
     It is not intended for direct use and should be modified as needed.
   */
 
@@ -1628,92 +1650,28 @@ GO`);
             });
         }
 
+        // ? Combine all parts into final SQL
         const sql = sqlParts.join('\n\n');
 
-        // Update SQL preview
+        // ? Update SQL preview
         const previewContainer = document.getElementById('sql-rendered');
         previewContainer.innerHTML = `<code class="language-sql">${sql}</code>`;
 
-        // Show output container
+        // ? Show output container
         document.getElementById('outputSql').style.display = 'block';
 
         Prism.highlightAll();
 
         return sql;
-    },
-    generateDataSchema(formioData)
-    {
-        const fields = [];
-        const processComponents = (components) =>
-        {
-            if (!components) return;
-
-            components.forEach(comp =>
-            {
-                if (comp.key)
-                {
-                    let fieldType = "String";
-                    // Improved type mapping
-                    switch (comp.type)
-                    {
-                        case 'number':
-                            fieldType = comp.decimalLimit ? "Decimal" : "Int32";
-                            break;
-                        case 'checkbox':
-                            fieldType = "Boolean";
-                            break;
-                        case 'datetime':
-                            fieldType = "DateTime";
-                            break;
-                        case 'datagrid':
-                            fieldType = "String"; // Store as JSON string
-                            break;
-                        case 'select':
-                        case 'radio':
-                            fieldType = "String";
-                            break;
-                        case 'file':
-                            fieldType = "String"; // Store as file path/URL
-                            break;
-                        case 'signature':
-                            fieldType = "String"; // Store as base64
-                            break;
-                        default:
-                            fieldType = "String";
-                    }
-                    fields.push(
-                    {
-                        Name: comp.key,
-                        Type: `System.${fieldType}`,
-                        AllowNull: !comp.validate?.required
-                    });
-                }
-                if (comp.components)
-                {
-                    processComponents(comp.components);
-                }
-                if (comp.columns)
-                {
-                    comp.columns.forEach(col =>
-                    {
-                        if (col.components)
-                        {
-                            processComponents(col.components);
-                        }
-                    });
-                }
-            });
-        };
-
-        processComponents(formioData.FormioTemplate.components || []);
-        return fields;
-    },
+    }
 };
 
 const UIHandlers = {
+    // ? Initialize "Upload Another" button functionality
+    // ! This button simply reloads the page to reset the tool's state
     setupUploadHandlers()
     {
-        // Setup the "Upload Another" button handler
+        // ? Setup the "Upload Another" button handler
         const uploadAnotherBtn = document.getElementById('uploadAnotherBtn');
         if (uploadAnotherBtn)
         {
@@ -1724,37 +1682,41 @@ const UIHandlers = {
         }
     },
 
+    // ? Handle file upload, parse JSON, and generate previews
+    // ! This is the main entry point after a user uploads a JSON file
     handleFileUpload(event, createDevExpressPreview)
     {
+        // ! /// EARLY EXIT ///
+        // ? Validate file input
         const file = event.target.files[0];
         if (!file) return;
 
-        // Show "Upload Another" button and hide initial upload
+        // ? On upload we swap the file upload and the upload another button's visibility
         document.getElementById('initial-upload').style.display = 'none';
         document.getElementById('upload-another').style.display = 'block';
-        // Re-setup the upload another handler as the button is now visible
         Init.setupUploadAnotherHandler();
 
-        // Reset conversion info display
+        // ? Reset conversion info display
         const conversionInfo = document.getElementById('conversion-info');
         if (conversionInfo)
         {
-            // Hide the element
+            // ? Hide the element
             conversionInfo.style.display = 'none';
-            // Reset class to default
+            // ? Reset class to default
             conversionInfo.className = 'alert mb-4';
-            // Clear all content
+            // ? Clear all content
             const timestamp = conversionInfo.querySelector('.conversion-timestamp');
             const duration = conversionInfo.querySelector('.conversion-duration');
             const warnings = conversionInfo.querySelector('#conversion-warnings ul');
             if (timestamp) timestamp.textContent = '';
             if (duration) duration.textContent = '';
             if (warnings) warnings.innerHTML = '';
-            // Hide warnings section
+            // ? Hide warnings section
             const warningsContainer = conversionInfo.querySelector('#conversion-warnings');
             if (warningsContainer) warningsContainer.style.display = 'none';
         }
 
+        // ? This is for conversion performance metrics
         const startTime = performance.now();
         const startDate = new Date();
         const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -1766,33 +1728,43 @@ const UIHandlers = {
             try
             {
                 let jsonData = JSON.parse(e.target.result);
-                console.log("File loaded, raw data:",
+
+                if (debugLevel >= 1)
                 {
-                    hasFormioTemplate: Boolean(jsonData.FormioTemplate),
-                    templateType: typeof jsonData.FormioTemplate
-                });
+                    console.log("File loaded, raw data:",
+                    {
+                        hasFormioTemplate: Boolean(jsonData.FormioTemplate),
+                        templateType: typeof jsonData.FormioTemplate
+                    });
+                }
 
                 if (jsonData.FormioTemplate)
                 {
-                    // Enable preview tabs
+                    // ? Enable preview tabs
+                    // ! These are disabled by default until a valid form is loaded
                     document.querySelector('#preview-tab')?.classList.remove('disabled');
                     document.querySelector('#devexpress-preview-tab')?.classList.remove('disabled');
                     document.getElementById('output-wrapper').style.display = 'block';
 
-                    // Parse FormioTemplate if needed
+                    // ? Parse FormioTemplate if needed
                     let formioTemplate;
                     if (typeof jsonData.FormioTemplate === 'string')
                     {
-                        //console.log("FormioTemplate is a string, attempting to parse...");
                         try
                         {
                             formioTemplate = JSON.parse(jsonData.FormioTemplate);
-                            console.log("Successfully parsed FormioTemplate:",
+
+                            // ? Debug logging
+                            if (debugLevel >= 1)
                             {
-                                hasComponents: Boolean(formioTemplate.components),
-                                componentCount: formioTemplate.components?.length || 0
-                            });
-                            // Update the original object with the parsed version
+                                console.log("Successfully parsed FormioTemplate:",
+                                {
+                                    hasComponents: Boolean(formioTemplate.components),
+                                    componentCount: formioTemplate.components?.length || 0
+                                });
+                            }
+
+                            // ? Update the original object with the parsed version
                             jsonData.FormioTemplate = formioTemplate;
                         }
                         catch (error)
@@ -1805,25 +1777,25 @@ const UIHandlers = {
                     }
                     else
                     {
-                        //console.log("FormioTemplate is already an object");
                         formioTemplate = jsonData.FormioTemplate;
                     }
 
-                    // Clean form definition
+                    // ? Clean form definition
                     if (formioTemplate.components)
                     {
                         formioTemplate.components = formioTemplate.components.map(c => ComponentCleaner.cleanComponent(c));
                     }
 
-                    // Update Form Information section
+                    // ? Update Form Information section
                     document.getElementById('formTitle').textContent = jsonData.FormName || 'N/A';
                     document.getElementById('departmentName').textContent = jsonData.DepartmentName || 'N/A';
                     document.getElementById('formGuid').textContent = jsonData.FormDefinitionGuid || 'N/A';
                     document.getElementById('componentCount').textContent = DevExpressConverter.countComponents(formioTemplate.components) || '0';
                     document.getElementById('dataSourceCount').textContent = DevExpressConverter.countDataSources(formioTemplate) || '1';
 
-                    // Create Form.io preview
+                    // ? Create Form.io preview
                     const formContainer = document.getElementById('formio-rendered');
+
                     if (formContainer)
                     {
                         Formio.createForm(formContainer, formioTemplate,
@@ -1833,7 +1805,11 @@ const UIHandlers = {
                             sanitize: true
                         }).then(form =>
                         {
-                            console.log('Form.io preview created successfully');
+                            // ? Debug logging
+                            if (debugLevel >= 1)
+                            {
+                                console.log('Form.io form instance created:', form);
+                            }
                         }).catch(err =>
                         {
                             console.error('Error creating Form.io preview:', err);
@@ -1844,7 +1820,7 @@ const UIHandlers = {
                         });
                     }
 
-                    // Generate DevExpress report
+                    // ? Generate DevExpress report
                     DevExpressConverter.state.devExpressJson = DevExpressConverter.transformToDevExpress(jsonData);
 
                     if (DevExpressConverter.state.devExpressJson)
@@ -1856,27 +1832,32 @@ const UIHandlers = {
                             Prism.highlightAll();
                         }
 
-                        // When accessing the template for decoding, parse if needed
+                        // ? When accessing the template for decoding, parse if needed
                         const devExpressData = typeof DevExpressConverter.state.devExpressJson === 'string' ?
                             JSON.parse(DevExpressConverter.state.devExpressJson) :
                             DevExpressConverter.state.devExpressJson;
 
                         const decodedTemplate = Utils.decodeReportTemplate(devExpressData[0].ReportTemplate);
-                        // Add debug logging
-                        console.log('Decoded template result:',
+
+                        // ? Debug logging
+                        if (debugLevel >= 1)
                         {
-                            success: Boolean(decodedTemplate),
-                            type: decodedTemplate?.type,
-                            contentLength: decodedTemplate?.content?.length,
-                            contentStart: decodedTemplate?.content?.substring(0, 100)
-                        });
+                            console.log('Decoded template result:',
+                            {
+                                success: Boolean(decodedTemplate),
+                                type: decodedTemplate?.type,
+                                contentLength: decodedTemplate?.content?.length,
+                                contentStart: decodedTemplate?.content?.substring(0, 100)
+                            });
+                        }
 
                         if (decodedTemplate && createDevExpressPreview)
                         {
                             createDevExpressPreview(devExpressData, decodedTemplate);
 
-                            // Add DevExpress XML preview with validation
+                            // ? Add DevExpress XML preview with validation
                             const xmlContainer = document.getElementById('devexpress-rendered');
+
                             if (xmlContainer)
                             {
                                 if (!decodedTemplate.content)
@@ -1886,39 +1867,34 @@ const UIHandlers = {
                                 }
                                 else
                                 {
-                                    // Format the XML with proper indentation
+                                    // ? Format the XML with proper indentation
                                     const formatXml = (xml) =>
                                     {
                                         let formatted = '';
                                         let indent = '';
-                                        const tab = '  '; // 2 spaces indentation
+                                        const tab = '  '; // ! We define indentation tabs here as 2 spaces
+
                                         xml.split(/>\s*</).forEach(node =>
                                         {
                                             if (node.match(/^\/\w/))
-                                            { // Closing tag
+                                            { // ? Closing tag
                                                 indent = indent.substring(tab.length);
                                             }
                                             formatted += indent + '<' + node + '>\r\n';
                                             if (node.match(/^<?\w[^>]*[^\/]$/))
-                                            { // Opening tag
+                                            { // ? Opening tag
                                                 indent += tab;
                                             }
                                         });
+
                                         return formatted.substring(1, formatted.length - 2);
                                     };
 
-                                    // Set the formatted XML content
+                                    // ? Set the formatted XML content
                                     xmlContainer.textContent = formatXml(decodedTemplate.content);
-                                    // Trigger Prism.js highlighting
-                                    Prism.highlightElement(xmlContainer);
 
-                                    // Debug output
-                                    console.log('XML container updated:',
-                                    {
-                                        containerExists: Boolean(xmlContainer),
-                                        contentLength: decodedTemplate.content.length,
-                                        firstChars: decodedTemplate.content.substring(0, 100)
-                                    });
+                                    // ? Trigger Prism.js highlighting
+                                    Prism.highlightElement(xmlContainer);
 
                                     Prism.highlightAll();
                                 }
@@ -1928,16 +1904,16 @@ const UIHandlers = {
                                 console.error('XML container element not found');
                             }
 
-                            // Generate and show SQL preview 
+                            // ? Generate and show SQL preview
                             Utils.generateSqlQuery(jsonData);
                         }
                     }
 
-                    // Calculate duration at the end of processing
+                    // ? Calculate duration at the end of processing
                     const endTime = performance.now();
                     const duration = endTime - startTime;
 
-                    // Show success info
+                    // ? Show success info
                     UIHandlers.updateConversionInfo(startDate, timeZoneAbbr, duration);
                 }
             }
@@ -1947,8 +1923,12 @@ const UIHandlers = {
                 UIHandlers.handleError(error);
             }
         };
+
         reader.readAsText(file);
     },
+
+    // ? Copy DevExpress Report JSON to clipboard
+    // ! This copies an unformatted version of the JSON to ensure compatibility (All on one line)
     copyJson()
     {
         if (!DevExpressConverter.state.devExpressJson)
@@ -1957,8 +1937,8 @@ const UIHandlers = {
             return;
         }
 
-        // Ensure proper JSON formatting for DevExpress compatibility
-        // Use a clean stringify with no BOM or special characters
+        // ? Format as a standard clean JSON without BOM for XML compatibility
+        // ! This copies the raw JSON
         const jsonData = DevExpressConverter.state.devExpressJson;
         const formattedJson = JSON.stringify(jsonData);
 
@@ -1971,6 +1951,9 @@ const UIHandlers = {
             })
             .catch(err => console.error('Copy failed:', err));
     },
+
+    // ? Download DevExpress Report JSON as a file
+    // ! This saves an unformatted version of the JSON to ensure compatibility (All on one line)
     downloadJson()
     {
         if (!DevExpressConverter.state.devExpressJson)
@@ -1981,12 +1964,12 @@ const UIHandlers = {
 
         const fileName = `${DevExpressConverter.state.devExpressJson[0].DepartmentName}_${DevExpressConverter.state.devExpressJson[0].ReportName}-REPORT.json`;
 
-        // Ensure proper JSON formatting for DevExpress compatibility
-        // Format as a standard clean JSON without BOM for XML compatibility
+        // ? Ensure proper JSON formatting for DevExpress compatibility
+        // ? Format as a standard clean JSON without BOM for XML compatibility
         const jsonData = DevExpressConverter.state.devExpressJson;
         const formattedJson = JSON.stringify(jsonData);
 
-        // Create blob with explicit UTF-8 encoding and no BOM markers
+        // ? Create blob with explicit UTF-8 encoding and no BOM markers
         const blob = new Blob([formattedJson],
         {
             type: 'application/json;charset=utf-8'
@@ -2000,6 +1983,8 @@ const UIHandlers = {
         URL.revokeObjectURL(url);
     },
 
+    // ? Copy DevExpress Report XML to clipboard
+    // ! This copies the formatted XML as displayed in the preview
     copyXML()
     {
         const xml = document.getElementById('devexpress-rendered').textContent;
@@ -2013,6 +1998,8 @@ const UIHandlers = {
             .catch(err => console.error('Copy failed:', err));
     },
 
+    // ? Copy SQL query to clipboard
+    // ! This copies the formatted SQL as displayed in the preview
     copySQL()
     {
         const sql = document.getElementById('sql-rendered').textContent;
@@ -2026,14 +2013,16 @@ const UIHandlers = {
             .catch(err => console.error('Copy failed:', err));
     },
 
+    // ? Update conversion info section with timestamp, duration, and warnings
+    // ! This is called after a successful conversion
     updateConversionInfo(startDate, timeZoneAbbr, duration)
     {
         const conversionInfo = document.getElementById('conversion-info');
 
-        // Clear all existing content
+        // ? Clear all existing content
         conversionInfo.innerHTML = '';
 
-        // Create fresh elements
+        // ? Create fresh elements
         const timestamp = document.createElement('div');
         timestamp.className = 'conversion-timestamp';
         const durationEl = document.createElement('div');
@@ -2048,17 +2037,17 @@ const UIHandlers = {
       <ul class="list-unstyled mb-0"></ul>
     `;
 
-        // Add elements to conversion info
+        // ? Add elements to conversion info
         conversionInfo.appendChild(timestamp);
         conversionInfo.appendChild(durationEl);
         conversionInfo.appendChild(warningsSection);
 
-        // Set success state
+        // ? Set success state
         conversionInfo.className = 'alert alert-success mb-4';
         timestamp.textContent = `File converted on ${startDate.toLocaleDateString()} at ${startDate.toLocaleTimeString()} (${timeZoneAbbr})`;
         durationEl.textContent = `Conversion took ${duration.toFixed(2)}ms (${(duration/1000).toFixed(3)} seconds)`;
 
-        // Handle warnings if any exist
+        // ? Handle warnings if any exist
         if (DevExpressConverter.state.warnings.length > 0)
         {
             warningsList.innerHTML = DevExpressConverter.state.warnings.map(warning =>
@@ -2083,10 +2072,13 @@ const UIHandlers = {
         conversionInfo.style.display = 'block';
     },
 
+    // ? Handle and display errors in the conversion info section
+    // ! This is called when an error occurs during processing
     handleError(error)
     {
         const conversionInfo = document.getElementById('conversion-info');
-        // Clear any existing content first
+
+        // ? Clear any existing content first
         conversionInfo.innerHTML = '';
         const timestamp = document.createElement('div');
         timestamp.className = 'conversion-timestamp';
@@ -2102,12 +2094,12 @@ const UIHandlers = {
     `;
         warnings.style.display = 'none';
 
-        // Append the basic structure
+        // ? Append the basic structure
         conversionInfo.appendChild(timestamp);
         conversionInfo.appendChild(duration);
         conversionInfo.appendChild(warnings);
 
-        // Create the error content
+        // ? Create the error content
         const errorDetails = [];
         if (error.validationErrors)
         {
@@ -2118,7 +2110,7 @@ const UIHandlers = {
             errorDetails.push(`Additional data: ${JSON.stringify(error.data)}`);
         }
 
-        // Create error header
+        // ? Create error header
         const errorHeader = document.createElement('div');
         errorHeader.className = 'conversion-header d-flex align-items-center mb-2';
         errorHeader.innerHTML = `
@@ -2127,7 +2119,7 @@ const UIHandlers = {
     `;
         conversionInfo.insertBefore(errorHeader, timestamp);
 
-        // Update timestamp and error message
+        // ? Update timestamp and error message
         timestamp.textContent = `Error occurred on ${new Date().toLocaleString()} (${moment.tz(Intl.DateTimeFormat().resolvedOptions().timeZone).zoneAbbr()})`;
         duration.innerHTML = `
       <div class="conversion-error-message">
@@ -2143,11 +2135,11 @@ const UIHandlers = {
       </div>
     `;
 
-        // Set error styles and show
+        // ? Set error styles and show
         conversionInfo.className = 'alert alert-danger mb-4';
         conversionInfo.style.display = 'block';
 
-        // Still log details for debugging
+        // ? Still log details for debugging
         console.error('Error details:',
         {
             message: error.message,
@@ -2162,178 +2154,92 @@ const UIHandlers = {
 
 //#region Component Cleaning
 
+// ? Strips components and their children of unnecessary properties
+// ? Returns cleaned component object
+// ! This simplifies the form definition for easier processing and debugging
 const ComponentCleaner = {
-  cleanComponent(comp)
-  {
-    if (comp.conditional)
+    cleanComponent(comp)
     {
-      delete comp.conditional;
-    }
-    
-    if (comp.customConditional)
-    {
-      delete comp.customConditional;
-    }
+        // ? Conditional property cleanup
+        if (comp.conditional)
+        {
+            delete comp.conditional;
+        }
 
-    if (comp.components)
-    {
-      comp.components = comp.components.map(c => ComponentCleaner.cleanComponent(c));
-    }
+        // ? Custom conditional cleanup
+        if (comp.customConditional)
+        {
+            delete comp.customConditional;
+        }
 
-    return comp;
-  }
+        // ? If our component has children, clean them too
+        // ! This is done recursively to handle nested structures
+        if (comp.components)
+        {
+            comp.components = comp.components.map(c => ComponentCleaner.cleanComponent(c));
+        }
+
+        return comp;
+    }
 };
 
 //#endregion
 
 //#region Field Generation
 const FieldGenerator = {
-    refCounter: 1, // Start at 1 for main report
-    itemCounter: 1, // Start at 1 for numbered items (Item1, Item2, etc.)
-    usedRefs: new Set(), // Track used reference numbers
+    refCounter: 1,          // ? Start at 1 for main report
+    itemCounter: 1,         // ? Start at 1 for numbered items (Item1, Item2, etc.)
+    usedRefs: new Set(),    // ? Track used reference numbers
 
-    // Initialize or reset both counters
+    // ? Initialize or reset both counters
     initRefs()
     {
-        this.refCounter = 1; // Always start at 1 for refs
-        this.itemCounter = 1; // Always start at 1 for items
-        this.usedRefs.clear();
+        this.refCounter = 1;    // ? Always start at 1 for refs
+        this.itemCounter = 1;   // ? Always start at 1 for items
+        this.usedRefs.clear();  // ? Clear used refs
     },
 
-    // Get next sequential reference number
+    // ? Get next sequential reference number
+    // ? Returns an integer
     getNextRef()
     {
         const ref = this.refCounter++;
         this.usedRefs.add(ref);
-        console.log(`Assigned Ref="${ref}"`); // Debug logging
+
+        // ? Debug logging
+        if (debugLevel >= 2)
+        {
+            console.log(`Assigned Ref="${ref}"`);
+        }
+
         return ref;
     },
 
-    // Get next sequential item number
+    // ? Get next sequential item number
+    // ? Returns an integer
     getNextItemNum()
     {
         return this.itemCounter++;
     },
 
-    // Reserve a specific reference number
+    // ? Reserve a specific reference number
+    // ! This is used when a specific ref is needed to avoid conflicts
+    // ! It does not change the current refCounter, just marks the ref as used
     reserveRef(ref)
     {
         this.usedRefs.add(ref);
     },
 
-    // Generate field label component (bold)
-    generateFieldLabel(key, label, width, xOffset, yOffset)
-    {
-        const labelRef = this.getNextRef();
-        const styleRef = this.getNextRef();
-        const itemNum = this.getNextItemNum();
-
-        return `<Item${itemNum} ControlType="XRLabel" Name="label_${Utils.escapeXml(key || `field${itemNum}`)}"
-      Text="${Utils.escapeXml(label || '')}"
-      SizeF="${width},${LAYOUT.LABEL_HEIGHT}"
-      LocationFloat="${xOffset},${yOffset}"
-      TextAlignment="MiddleLeft"
-      Font="Times New Roman, 9.75pt, style=Bold"
-      Padding="2,2,0,0,100"
-      Borders="None">
-      <StylePriority Ref="${styleRef}" UseFont="true" UseTextAlignment="false" UseBorders="false" />
-    </Item${itemNum}>`;
-    },
-
-    // Generate field label component (bold)
-    generateFieldLabel(key, label, width, xOffset, yOffset)
-    {
-        const labelRef = this.getNextRef();
-        const styleRef = this.getNextRef();
-        const itemNum = this.getNextItemNum();
-
-        return `<Item${itemNum} ControlType="XRLabel" Name="label_${Utils.escapeXml(key || `field${itemNum}`)}"
-      Text="${Utils.escapeXml(label || '')}"
-      SizeF="${width},${LAYOUT.LABEL_HEIGHT}"
-      LocationFloat="${xOffset},${yOffset}"
-      TextAlignment="MiddleLeft"
-      Font="Times New Roman, 9.75pt, style=Bold"
-      Padding="2,2,0,0,100"
-      Borders="None">
-      <StylePriority Ref="${styleRef}" UseFont="true" UseTextAlignment="false" UseBorders="false" />
-    </Item${itemNum}>`;
-    },
-
-    // Generate field value component
-    generateFieldValue(key, width, xOffset, yOffset, borderStyle = "Bottom", fieldType = "text")
-    {
-        const fieldRef = this.getNextRef();
-        const styleRef = this.getNextRef();
-        const exprRef = this.getNextRef();
-
-        // Helper to get proper type cast
-        const getTypeCast = (type, fieldKey) =>
-        {
-            switch (type)
-            {
-                case 'datetime':
-                    return `ToString(Format(ToDateTime([${Utils.escapeXml(fieldKey)}]), 'g'))`;
-                case 'number':
-                    return `ToString(Format(ToDecimal([${Utils.escapeXml(fieldKey)}], CultureInfo.InvariantCulture), 'n2'))`;
-                case 'boolean':
-                    return `IIF(ToBoolean([${Utils.escapeXml(fieldKey)}]), 'Yes', 'No')`;
-                default:
-                    return `[${Utils.escapeXml(fieldKey)}]`;
-            }
-        };
-
-        // Get expression with proper type casting
-        const expression = getTypeCast(fieldType, key);
-
-        // Text alignment based on field type  
-        const textAlignment = fieldType === 'number' ? "MiddleRight" :
-            fieldType === 'textarea' ? "TopLeft" : "MiddleLeft";
-
-        // Handle multiline for textareas
-        const multilineAttribute = fieldType === 'textarea' ? '\n      Multiline="true"' : '';
-
-        return `<Item${fieldRef} ControlType="XRLabel" Name="${Utils.escapeXml(key || `field${fieldRef}`)}"
-      SizeF="${width},${fieldType === 'textarea' ? LAYOUT.INPUT_HEIGHT * 2 : LAYOUT.INPUT_HEIGHT}"
-      LocationFloat="${xOffset},${yOffset}"
-      TextAlignment="${textAlignment}"${multilineAttribute}
-      Padding="2,2,0,0,100"
-      Borders="${borderStyle}">
-      <ExpressionBindings>
-        <Item1 Ref="${exprRef}" EventName="BeforePrint" PropertyName="Text" Expression="${expression}" />
-      </ExpressionBindings>
-      <StylePriority Ref="${styleRef}" UseTextAlignment="true" UseBorders="false" />
-    </Item${fieldRef}>`;
-    },
-
-    // Generate a checkbox field
-    generateCheckbox(key, label, width, xOffset, yOffset)
-    {
-        const checkboxRef = this.getNextRef();
-        const styleRef = this.getNextRef();
-        const exprRef = this.getNextRef();
-        const glyphRef = this.getNextRef();
-
-        return `<Item${checkboxRef} ControlType="XRCheckBox" Name="${Utils.escapeXml(key || `checkbox${checkboxRef}`)}"
-      Text="${Utils.escapeXml(label || '')}"
-      SizeF="${width},${LAYOUT.INPUT_HEIGHT}"
-      LocationFloat="${xOffset},${yOffset}"
-      Padding="2,2,0,0,100"
-      Borders="None">
-      <GlyphOptions Ref="${glyphRef}" Size="13,13" />
-      <ExpressionBindings>
-        <Item1 Ref="${exprRef}" EventName="BeforePrint" PropertyName="CheckState" Expression="IIF(ISNULL([${Utils.escapeXml(key)}], False), False, ToBoolean([${Utils.escapeXml(key)}]))" />
-      </ExpressionBindings>
-      <StylePriority Ref="${styleRef}" UseBorders="false" UseTextAlignment="true" />
-    </Item${checkboxRef}>`;
-    },
-    // Generate a field based on component type
+    // ? Generate a field based on component type
+    // ? Returns a string
+    // ! This function routes to specific field generators based on component type
     generateComponentField(component, width, xOffset, yOffset)
     {
         console.log("Generating field for component:", component.key, component.type);
         const key = component.key;
         const label = component.label || component.key;
 
-        // Handle specific component types
+        // ? Handle specific component types
         switch (component.type)
         {
             case 'checkbox':
@@ -2344,10 +2250,10 @@ const FieldGenerator = {
 
             case 'textarea':
             {
-                // For textareas, use taller input height
+                // ? For textareas, use taller input height
                 const labelXml = this.generateFieldLabel(key, label, width, xOffset, yOffset);
 
-                // Create a taller text field for textarea
+                // ? Create a taller text field for textarea
                 const fieldRef = this.getNextRef();
                 const styleRef = this.getNextRef();
                 const exprRef = this.getNextRef();
@@ -2369,7 +2275,9 @@ const FieldGenerator = {
             }
 
             case 'textfield':
+
             case 'email':
+
             case 'number':
             {
                 const fieldType = component.type === 'number' ? 'number' : 'text';
@@ -2395,7 +2303,101 @@ const FieldGenerator = {
         }
     },
 
-    // Generate a complete field with label and value
+    // ? Generate field label element
+    // ? Returns a string
+    // TODO: Move the XML definition to the template class in dexepxress-definitions.js
+    generateFieldLabel(key, label, width, xOffset, yOffset)
+    {
+        const labelRef = this.getNextRef();
+        const styleRef = this.getNextRef();
+        const itemNum = this.getNextItemNum();
+
+        return `<Item${itemNum} ControlType="XRLabel" Name="label_${Utils.escapeXml(key || `field${itemNum}`)}"
+      Text="${Utils.escapeXml(label || '')}"
+      SizeF="${width},${LAYOUT.LABEL_HEIGHT}"
+      LocationFloat="${xOffset},${yOffset}"
+      TextAlignment="MiddleLeft"
+      Font="Times New Roman, 9.75pt, style=Bold"
+      Padding="2,2,0,0,100"
+      Borders="None">
+      <StylePriority Ref="${styleRef}" UseFont="true" UseTextAlignment="false" UseBorders="false" />
+    </Item${itemNum}>`;
+    },
+
+    // ? Generate field value element
+    // ? Returns a string
+    // TODO: Move the XML definition to the template class in devexpress-definitions.js
+    generateFieldValue(key, width, xOffset, yOffset, borderStyle = "Bottom", fieldType = "text")
+    {
+        const fieldRef = this.getNextRef();
+        const styleRef = this.getNextRef();
+        const exprRef = this.getNextRef();
+
+        // ? Helper to get proper type cast
+        // TODO: Investigate this function further. I'm almost certain this functionality has been deprecated by pulling the expression bindings from the element definitions
+        const getTypeCast = (type, fieldKey) =>
+        {
+            switch (type)
+            {
+                case 'datetime':
+                    return `ToString(Format(ToDateTime([${Utils.escapeXml(fieldKey)}]), 'g'))`;
+                case 'number':
+                    return `ToString(Format(ToDecimal([${Utils.escapeXml(fieldKey)}], CultureInfo.InvariantCulture), 'n2'))`;
+                case 'boolean':
+                    return `IIF(ToBoolean([${Utils.escapeXml(fieldKey)}]), 'Yes', 'No')`;
+                default:
+                    return `[${Utils.escapeXml(fieldKey)}]`;
+            }
+        };
+
+        // ? Get expression with proper type casting
+        const expression = getTypeCast(fieldType, key);
+
+        // ? Text alignment based on field type  
+        const textAlignment = fieldType === 'number' ? "MiddleRight" :
+            fieldType === 'textarea' ? "TopLeft" : "MiddleLeft";
+
+        // ? Handle multiline for textareas
+        const multilineAttribute = fieldType === 'textarea' ? '\n      Multiline="true"' : '';
+
+        return `<Item${fieldRef} ControlType="XRLabel" Name="${Utils.escapeXml(key || `field${fieldRef}`)}"
+      SizeF="${width},${fieldType === 'textarea' ? LAYOUT.INPUT_HEIGHT * 2 : LAYOUT.INPUT_HEIGHT}"
+      LocationFloat="${xOffset},${yOffset}"
+      TextAlignment="${textAlignment}"${multilineAttribute}
+      Padding="2,2,0,0,100"
+      Borders="${borderStyle}">
+      <ExpressionBindings>
+        <Item1 Ref="${exprRef}" EventName="BeforePrint" PropertyName="Text" Expression="${expression}" />
+      </ExpressionBindings>
+      <StylePriority Ref="${styleRef}" UseTextAlignment="true" UseBorders="false" />
+    </Item${fieldRef}>`;
+    },
+
+    // ? Generate a checkbox element
+    // ? Returns a string
+    generateCheckbox(key, label, width, xOffset, yOffset)
+    {
+        const checkboxRef = this.getNextRef();
+        const styleRef = this.getNextRef();
+        const exprRef = this.getNextRef();
+        const glyphRef = this.getNextRef();
+
+        return `<Item${checkboxRef} ControlType="XRCheckBox" Name="${Utils.escapeXml(key || `checkbox${checkboxRef}`)}"
+      Text="${Utils.escapeXml(label || '')}"
+      SizeF="${width},${LAYOUT.INPUT_HEIGHT}"
+      LocationFloat="${xOffset},${yOffset}"
+      Padding="2,2,0,0,100"
+      Borders="None">
+      <GlyphOptions Ref="${glyphRef}" Size="13,13" />
+      <ExpressionBindings>
+        <Item1 Ref="${exprRef}" EventName="BeforePrint" PropertyName="CheckState" Expression="IIF(ISNULL([${Utils.escapeXml(key)}], False), False, ToBoolean([${Utils.escapeXml(key)}]))" />
+      </ExpressionBindings>
+      <StylePriority Ref="${styleRef}" UseBorders="false" UseTextAlignment="true" />
+    </Item${checkboxRef}>`;
+    },
+
+    // ? Generates a generic Label and Output label pair
+    // ? Returns a string
     generateField(key, label, width, xOffset, yOffset, fieldType = "text")
     {
         const labelXml = this.generateFieldLabel(key, label, width, xOffset, yOffset);
@@ -2412,19 +2414,20 @@ const FieldGenerator = {
     }
 };
 
+// ? Generates a minimal XML template for DevExpress reports that we can then populate with element nodes
 function generateMinimalXmlTemplate()
 {
     return (formioData) =>
     {
         const processor = new XMLProcessor();
 
-        // Report metadata
+        // ? Report metadata
         const name = formioData?.FormName || 'Simple Report';
         const reportGuid = formioData?.ReportGuid || '00000000-0000-0000-0000-000000000000';
         const departmentGuid = formioData?.DepartmentGuid || '00000000-0000-0000-0000-000000000000';
         const displayName = Utils.escapeXml(`${name};${name};false;false;${departmentGuid};${reportGuid}`);
 
-        // Create root node
+        // ? Create root node
         const root = processor.buildNode('XtraReportsLayoutSerializer',
         {
             SerializerVersion: "23.2.5.0",
@@ -2438,7 +2441,7 @@ function generateMinimalXmlTemplate()
             DataMember: "Root"
         });
 
-        // Build basic structure
+        // ? Build basic structure
         const extensions = processor.buildNode('Extensions',
         {}, [
             processor.createItemNode(1, undefined,
@@ -2466,17 +2469,17 @@ function generateMinimalXmlTemplate()
             })
         ]);
 
-        // Process form components using the ComponentProcessor
+        // ? Process form components using the ComponentProcessor
         const componentProcessor = new ComponentProcessor(processor);
-        componentProcessor.currentY = 10; // Start Y position for components
+        componentProcessor.currentY = 10; // ! Start Y position for components. This is essentially the space between the top of the Detail Band and the first element
 
         const controls = [];
         if (formioData?.FormioTemplate?.components)
         {
             const processedNodes = componentProcessor.processComponents(
                 formioData.FormioTemplate.components,
-                650, // Default width
-                0 // Starting X offset
+                650,    // ? Default width
+                0       // ? Starting X offset
             );
             controls.push(...processedNodes);
         }
@@ -2484,7 +2487,7 @@ function generateMinimalXmlTemplate()
         const detailControls = processor.buildNode('Controls',
         {}, controls);
 
-        // Build header controls
+        // ? Build header controls
         const headerControls = processor.buildNode('Controls',
         {}, [
             processor.createItemNode(1, "XRLabel",
@@ -2499,7 +2502,7 @@ function generateMinimalXmlTemplate()
             })
         ]);
 
-        // Build bands structure
+        // ? Build bands structure
         const bands = processor.buildNode('Bands',
         {}, [
             processor.createItemNode(1, "TopMarginBand",
@@ -2515,7 +2518,7 @@ function generateMinimalXmlTemplate()
             processor.createItemNode(3, "DetailBand",
             {
                 Name: "Detail",
-                HeightF: `${Math.ceil(DevExpressConverter.core.calculateNestedHeight(componentProcessor.components || [])) + (LAYOUT.VERTICAL_SPACING * 2)}` // Calculate height including nested components
+                HeightF: `${Math.ceil(DevExpressConverter.core.calculateNestedHeight(componentProcessor.components || [])) + (LAYOUT.VERTICAL_SPACING * 2)}` // ? Calculate height including nested components
             }),
             processor.createItemNode(4, "BottomMarginBand",
             {
@@ -2524,16 +2527,16 @@ function generateMinimalXmlTemplate()
             })
         ]);
 
-        // Add controls to their respective bands
-        bands.children[1].addChild(headerControls); // Add header controls to PageHeaderBand
-        bands.children[2].addChild(detailControls); // Add detail controls to DetailBand
+        // ? Add controls to their respective bands
+        bands.children[1].addChild(headerControls); // ? Add header controls to PageHeaderBand
+        bands.children[2].addChild(detailControls); // ? Add detail controls to DetailBand
 
-        // Add all main sections to root
+        // ? Add all main sections to root
         root.addChild(extensions);
         root.addChild(parameters);
         root.addChild(bands);
 
-        // Add ParameterPanelLayoutItems
+        // ? Add ParameterPanelLayoutItems
         const parameterPanel = processor.buildNode('ParameterPanelLayoutItems',
         {}, [
             processor.createItemNode(1, "Parameter",
@@ -2547,10 +2550,10 @@ function generateMinimalXmlTemplate()
         ]);
         root.addChild(parameterPanel);
 
-        // Second pass: Assign all references
+        // ? Second pass: Assign all references
         processor.assignReferences(root);
 
-        // Final pass: Generate XML string with proper formatting and cleanup
+        // ? Final pass: Generate XML string with proper formatting and cleanup
         const xmlContent = processor.generateXML(root);
         const finalXml = '<?xml version="1.0" encoding="utf-8"?>\n' + xmlContent;
         return finalXml.replace(/>>+/g, '>').replace(/\s+$/gm, '');
@@ -2563,82 +2566,86 @@ function generateMinimalXmlTemplate()
 //#region Initialization
 
 const Init = {
-  initToolPrintoutFromForm(createDevExpressPreview)
-  {
-    if (document.readyState === 'loading')
+    // ? Initialize event listeners when DOM is ready
+    // ! This ensures all elements are available before attaching handlers
+    initToolPrintoutFromForm(createDevExpressPreview)
     {
-      document.addEventListener('DOMContentLoaded', () => this.initializeEventListeners(createDevExpressPreview));
+        if (document.readyState === 'loading')
+        {
+            document.addEventListener('DOMContentLoaded', () => this.initializeEventListeners(createDevExpressPreview));
+        }
+        else
+        {
+            this.initializeEventListeners(createDevExpressPreview);
+        }
+    },
+
+    // ? Setup handler for "Upload Another" button to reset the form
+    // ! This reloads the page to clear all state and allow a new upload
+    setupUploadAnotherHandler()
+    {
+        const uploadAnotherBtn = document.getElementById('uploadAnotherBtn');
+
+        if (uploadAnotherBtn)
+        {
+            uploadAnotherBtn.addEventListener('click', () =>
+            {
+            console.log('Upload another clicked, reloading page');
+
+            window.location.reload();
+            });
+        } else { console.warn('Upload another button not found'); }
+    },
+
+    // ? Attach event listeners to UI elements
+    // ! This is separated for clarity and modularity
+    initializeEventListeners(createDevExpressPreview)
+    {
+        const fileUpload = document.getElementById('fileUpload');
+        const copyJsonBtn = document.getElementById('copyJsonBtn');
+        const downloadJsonBtn = document.getElementById('downloadJsonBtn');
+        const copyXmlBtn = document.getElementById('copyXmlBtn');
+        const copySqlBtn = document.getElementById('copySqlBtn');
+        const previewTab = document.querySelector('#preview-tab');
+        const devexpressPreviewTab = document.querySelector('#devexpress-preview-tab');
+
+        this.setupUploadAnotherHandler();
+
+        if (fileUpload)
+        {
+            fileUpload.addEventListener('change', event => UIHandlers.handleFileUpload(event, createDevExpressPreview));
+        } else { console.warn('File upload element not found'); }
+
+        if (copyJsonBtn)
+        {
+            copyJsonBtn.addEventListener('click', UIHandlers.copyJson);
+        } else { console.warn('Copy JSON button not found'); }
+
+        if (downloadJsonBtn)
+        {
+            downloadJsonBtn.addEventListener('click', UIHandlers.downloadJson);
+        } else { console.warn('Download JSON button not found'); }
+
+        if (copyXmlBtn)
+        {
+            copyXmlBtn.addEventListener('click', UIHandlers.copyXML);
+        } else { console.warn('Copy XML button not found'); }
+
+        if (copySqlBtn)
+        {
+            copySqlBtn.addEventListener('click', UIHandlers.copySQL);
+        } else { console.warn('Copy SQL button not found'); }
+
+        if (previewTab)
+        {
+            previewTab.classList.add('disabled');
+        } else { console.warn('Preview tab element not found'); }
+
+        if (devexpressPreviewTab)
+        {
+            devexpressPreviewTab.classList.add('disabled');
+        } else { console.warn('DevExpress preview tab element not found'); }
     }
-    else
-    {
-      this.initializeEventListeners(createDevExpressPreview);
-    }
-  },
-
-  setupUploadAnotherHandler()
-  {
-    const uploadAnotherBtn = document.getElementById('uploadAnotherBtn');
-
-    if (uploadAnotherBtn)
-    {
-      console.log('Setting up upload another button handler');
-
-      uploadAnotherBtn.addEventListener('click', () =>
-      {
-        console.log('Upload another clicked, reloading page');
-
-        window.location.reload();
-      });
-    } else { console.log('Upload another button not found'); }
-  },
-
-  initializeEventListeners(createDevExpressPreview)
-  {
-    const fileUpload = document.getElementById('fileUpload');
-    const copyJsonBtn = document.getElementById('copyJsonBtn');
-    const downloadJsonBtn = document.getElementById('downloadJsonBtn');
-    const copyXmlBtn = document.getElementById('copyXmlBtn');
-    const copySqlBtn = document.getElementById('copySqlBtn');
-    const previewTab = document.querySelector('#preview-tab');
-    const devexpressPreviewTab = document.querySelector('#devexpress-preview-tab');
-
-    this.setupUploadAnotherHandler();
-    
-    if (fileUpload)
-    {
-      fileUpload.addEventListener('change', event => UIHandlers.handleFileUpload(event, createDevExpressPreview));
-    } else { console.warn('File upload element not found'); }
-
-    if (copyJsonBtn)
-    {
-      copyJsonBtn.addEventListener('click', UIHandlers.copyJson);
-    } else { console.warn('Copy JSON button not found'); }
-
-    if (downloadJsonBtn)
-    {
-      downloadJsonBtn.addEventListener('click', UIHandlers.downloadJson);
-    } else { console.warn('Download JSON button not found'); }
-
-    if (copyXmlBtn)
-    {
-      copyXmlBtn.addEventListener('click', UIHandlers.copyXML);
-    } else { console.warn('Copy XML button not found'); }
-
-    if (copySqlBtn)
-    {
-      copySqlBtn.addEventListener('click', UIHandlers.copySQL);
-    } else { console.warn('Copy SQL button not found'); }
-
-    if (previewTab)
-    {
-      previewTab.classList.add('disabled');
-    } else { console.warn('Preview tab element not found'); }
-
-    if (devexpressPreviewTab)
-    {
-      devexpressPreviewTab.classList.add('disabled');
-    } else { console.warn('DevExpress preview tab element not found'); }
-  }
 };
 
 //#endregion
