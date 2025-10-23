@@ -1,4 +1,127 @@
+// Settings persistence utility
+const SettingsManager = {
+    SETTINGS_KEY: 'printoutFormSettings',
+
+    saveSettings() {
+    const settings = {
+            //orientation: document.getElementById('settings_orientation')?.value,
+            pageWidth: document.getElementById('settings_pageWidth')?.value,
+            marginsLeft: document.getElementById('settings_marginsLeft')?.value,
+            marginsRight: document.getElementById('settings_marginsRight')?.value,
+            marginsTop: document.getElementById('settings_marginsTop')?.value,
+            marginsBottom: document.getElementById('settings_marginsBottom')?.value,
+            labelHeight: document.getElementById('settings_labelHeight')?.value,
+            verticalSpacing: document.getElementById('settings_verticalSpacing')?.value,
+
+            fontHeaderFamily: document.getElementById('font_header_family')?.value,
+            fontHeaderSize: document.getElementById('font_header_size')?.value,
+            fontHeaderBold: document.getElementById('font_header_bold')?.checked,
+            fontHeaderItalics: document.getElementById('font_header_italics')?.checked,
+            fontHeaderUnderline: document.getElementById('font_header_underline')?.checked,
+            fontHeaderStrikethrough: document.getElementById('font_header_strikethrough')?.checked,
+
+            fontSectionFamily: document.getElementById('font_section_family')?.value,
+            fontSectionSize: document.getElementById('font_section_size')?.value,
+            fontSectionBold: document.getElementById('font_section_bold')?.checked,
+            fontSectionItalics: document.getElementById('font_section_italics')?.checked,
+            fontSectionUnderline: document.getElementById('font_section_underline')?.checked,
+            fontSectionStrikethrough: document.getElementById('font_section_strikethrough')?.checked,
+
+            fontFieldLabelFamily: document.getElementById('font_fieldLabel_family')?.value,
+            fontFieldLabelSize: document.getElementById('font_fieldLabel_size')?.value,
+            fontFieldLabelBold: document.getElementById('font_fieldLabel_bold')?.checked,
+            fontFieldLabelItalics: document.getElementById('font_fieldLabel_italics')?.checked,
+            fontFieldLabelUnderline: document.getElementById('font_fieldLabel_underline')?.checked,
+            fontFieldLabelStrikethrough: document.getElementById('font_fieldLabel_strikethrough')?.checked,
+
+            fontFieldOutputFamily: document.getElementById('font_fieldOutput_family')?.value,
+            fontFieldOutputSize: document.getElementById('font_fieldOutput_size')?.value,
+            fontFieldOutputBold: document.getElementById('font_fieldOutput_bold')?.checked,
+            fontFieldOutputItalics: document.getElementById('font_fieldOutput_italics')?.checked,
+            fontFieldOutputUnderline: document.getElementById('font_fieldOutput_underline')?.checked,
+            fontFieldOutputStrikethrough: document.getElementById('font_fieldOutput_strikethrough')?.checked
+        };
+    localStorage.setItem(this.SETTINGS_KEY, JSON.stringify(settings));
+    console.log('[SettingsManager] Settings saved:', settings);
+    },
+
+    loadSettings() {
+        const settingsStr = localStorage.getItem(this.SETTINGS_KEY);
+        if (!settingsStr) {
+            console.log('[SettingsManager] No saved settings found.');
+            return;
+        }
+        const settings = JSON.parse(settingsStr);
+        console.log('[SettingsManager] Settings loaded:', settings);
+        //document.getElementById('settings_orientation').value = settings.orientation || 'orientation_portrait';
+        document.getElementById('settings_pageWidth').value = settings.pageWidth || 850;
+        document.getElementById('settings_marginsLeft').value = settings.marginsLeft || 50;
+        document.getElementById('settings_marginsRight').value = settings.marginsRight || 50;
+        document.getElementById('settings_marginsTop').value = settings.marginsTop || 50;
+        document.getElementById('settings_marginsBottom').value = settings.marginsBottom || 50;
+        document.getElementById('settings_labelHeight').value = settings.labelHeight || 30;
+        document.getElementById('settings_verticalSpacing').value = settings.verticalSpacing || 10;
+
+        document.getElementById('font_header_family').value = settings.fontHeaderFamily || 'Times New Roman';
+        document.getElementById('font_header_size').value = settings.fontHeaderSize || 14;
+        document.getElementById('font_header_bold').checked = !!settings.fontHeaderBold;
+        document.getElementById('font_header_italics').checked = !!settings.fontHeaderItalics;
+        document.getElementById('font_header_underline').checked = !!settings.fontHeaderUnderline;
+        document.getElementById('font_header_strikethrough').checked = !!settings.fontHeaderStrikethrough;
+
+        document.getElementById('font_section_family').value = settings.fontSectionFamily || 'Times New Roman';
+        document.getElementById('font_section_size').value = settings.fontSectionSize || 11;
+        document.getElementById('font_section_bold').checked = !!settings.fontSectionBold;
+        document.getElementById('font_section_italics').checked = !!settings.fontSectionItalics;
+        document.getElementById('font_section_underline').checked = !!settings.fontSectionUnderline;
+        document.getElementById('font_section_strikethrough').checked = !!settings.fontSectionStrikethrough;
+
+        document.getElementById('font_fieldLabel_family').value = settings.fontFieldLabelFamily || 'Times New Roman';
+        document.getElementById('font_fieldLabel_size').value = settings.fontFieldLabelSize || 9;
+        document.getElementById('font_fieldLabel_bold').checked = !!settings.fontFieldLabelBold;
+        document.getElementById('font_fieldLabel_italics').checked = !!settings.fontFieldLabelItalics;
+        document.getElementById('font_fieldLabel_underline').checked = !!settings.fontFieldLabelUnderline;
+        document.getElementById('font_fieldLabel_strikethrough').checked = !!settings.fontFieldLabelStrikethrough;
+
+        document.getElementById('font_fieldOutput_family').value = settings.fontFieldOutputFamily || 'Times New Roman';
+        document.getElementById('font_fieldOutput_size').value = settings.fontFieldOutputSize || 9;
+        document.getElementById('font_fieldOutput_bold').checked = !!settings.fontFieldOutputBold;
+        document.getElementById('font_fieldOutput_italics').checked = !!settings.fontFieldOutputItalics;
+        document.getElementById('font_fieldOutput_underline').checked = !!settings.fontFieldOutputUnderline;
+        document.getElementById('font_fieldOutput_strikethrough').checked = !!settings.fontFieldOutputStrikethrough;
+    },
+
+    setupAutoSave() {
+        // Save settings on change for all relevant fields
+        const fields = [
+            'settings_orientation', 'settings_pageWidth', 'settings_marginsLeft', 'settings_marginsRight',
+            'settings_marginsTop', 'settings_marginsBottom', 'settings_labelHeight', 'settings_verticalSpacing',
+
+            'font_header_family', 'font_header_size', 'font_header_bold', 'font_header_italics',
+            'font_header_underline', 'font_header_strikethrough',
+
+            'font_section_family', 'font_section_size', 'font_section_bold', 'font_section_italics',
+            'font_section_underline', 'font_section_strikethrough',
+
+            'font_fieldLabel_family', 'font_fieldLabel_size', 'font_fieldLabel_bold', 'font_fieldLabel_italics',
+            'font_fieldLabel_underline', 'font_fieldLabel_strikethrough',
+
+            'font_fieldOutput_family', 'font_fieldOutput_size', 'font_fieldOutput_bold', 'font_fieldOutput_italics',
+            'font_fieldOutput_underline', 'font_fieldOutput_strikethrough'
+        ];
+
+        console.log('[DEBUG] Setting up auto-save for fields:', fields);
+
+        fields.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('change', () => this.saveSettings());
+            }
+        });
+    }
+};
 //#region Imports
+import { LAYOUT } from './layoutConfig.js';
 
 import { XMLProcessor } from './xmlProcessor.js';
 import { ComponentProcessor } from './componentProcessor.js';
@@ -9,8 +132,8 @@ import { ComponentProcessor } from './componentProcessor.js';
 
 // ? Version info is used for generating both XML and SQL
 const VERSION_INFO = {
-    version: '0.3.8',
-    updated: '10/08/2025',
+    version: '0.4.1',
+    updated: '10/23/2025',
     devexpressVersion: '23.2.5.0'
 };
 
@@ -20,24 +143,154 @@ const debugLevel = 0;       // ? 0: No Logging,
                             // ? 2: Detailed Component Processing Logging
 
 // ? Details basic layout conventions for XML generation
-const LAYOUT = {
-    MARGIN: 0,              // ? Page margin in pixels
-    VERTICAL_SPACING: 10,   // ? Vertical space between components
-    LABEL_HEIGHT: 25,       // ? Height of labels
-    INPUT_HEIGHT: 25,       // ? Height of input fields
-    DEFAULT_WIDTH: 650,     // ? Default width for components
-    COLUMN_WIDTH: 325,      // ? Width of columns
-    PAGE_WIDTH: 850,        // ? Width of the page
-    PAGE_HEIGHT: 1100,      // ? Height of the page
-    LANDSCAPE: false,       // ? Adjusted width for landscape orientation
-    HEADER_WIDTH: 769.987,  // ? Width of the report header
-};
+
+// Utility to pull settings from the Settings tab
+// Auto-load and auto-save settings on DOM ready
+window.addEventListener('DOMContentLoaded', () => {
+    SettingsManager.loadSettings();
+    SettingsManager.setupAutoSave();
+
+    // Apply settings to LAYOUT
+    applyLayoutSettingsFromUI();
+
+    // Add reset button handler
+    const resetBtn = document.getElementById('resetSettingsBtn');
+    if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+            // Set all fields to their default values
+            document.getElementById('settings_orientation').value = 'orientation_portrait';
+            document.getElementById('settings_pageWidth').value = 850;
+            document.getElementById('settings_marginsLeft').value = 50;
+            document.getElementById('settings_marginsRight').value = 50;
+            document.getElementById('settings_marginsTop').value = 50;
+            document.getElementById('settings_marginsBottom').value = 50;
+            document.getElementById('settings_labelHeight').value = 30;
+            document.getElementById('settings_verticalSpacing').value = 10;
+
+            document.getElementById('font_header_family').value = 'Times New Roman';
+            document.getElementById('font_header_size').value = 14;
+            document.getElementById('font_header_bold').checked = true;
+            document.getElementById('font_header_italics').checked = false;
+            document.getElementById('font_header_underline').checked = false;
+            document.getElementById('font_header_strikethrough').checked = false;
+
+            document.getElementById('font_section_family').value = 'Times New Roman';
+            document.getElementById('font_section_size').value = 11;
+            document.getElementById('font_section_bold').checked = true;
+            document.getElementById('font_section_italics').checked = false;
+            document.getElementById('font_section_underline').checked = false;
+            document.getElementById('font_section_strikethrough').checked = false;
+
+            document.getElementById('font_fieldLabel_family').value = 'Times New Roman';
+            document.getElementById('font_fieldLabel_size').value = 9;
+            document.getElementById('font_fieldLabel_bold').checked = true;
+            document.getElementById('font_fieldLabel_italics').checked = false;
+            document.getElementById('font_fieldLabel_underline').checked = false;
+            document.getElementById('font_fieldLabel_strikethrough').checked = false;
+
+            document.getElementById('font_fieldOutput_family').value = 'Times New Roman';
+            document.getElementById('font_fieldOutput_size').value = 9;
+            document.getElementById('font_fieldOutput_bold').checked = true;
+            document.getElementById('font_fieldOutput_italics').checked = false;
+            document.getElementById('font_fieldOutput_underline').checked = false;
+            document.getElementById('font_fieldOutput_strikethrough').checked = false;
+
+            SettingsManager.saveSettings();
+            console.log('[SettingsManager] Settings reset to defaults.');
+        });
+    }
+});
+function applyLayoutSettingsFromUI() {
+    // Get the Page Width field value
+    const pageWidthInput = document.getElementById('settings_pageWidth');
+    const marginLeftInput = document.getElementById('settings_marginsLeft');
+    const marginRightInput = document.getElementById('settings_marginsRight');
+    const marginTopInput = document.getElementById('settings_marginsTop');
+    const marginBottomInput = document.getElementById('settings_marginsBottom');
+    const labelHeightInput = document.getElementById('settings_labelHeight');
+    const verticalSpacingInput = document.getElementById('settings_verticalSpacing');
+
+    const fontHeaderFamilyInput = document.getElementById('font_header_family');
+    const fontHeaderSizeInput = document.getElementById('font_header_size');
+    const fontHeaderBoldInput = document.getElementById('font_header_bold');
+    const fontHeaderItalicsInput = document.getElementById('font_header_italics');
+    const fontHeaderUnderlineInput = document.getElementById('font_header_underline');
+    const fontHeaderStrikethroughInput = document.getElementById('font_header_strikethrough');
+
+    const fontSectionFamilyInput = document.getElementById('font_section_family');
+    const fontSectionSizeInput = document.getElementById('font_section_size');
+    const fontSectionBoldInput = document.getElementById('font_section_bold');
+    const fontSectionItalicsInput = document.getElementById('font_section_italics');
+    const fontSectionUnderlineInput = document.getElementById('font_section_underline');
+    const fontSectionStrikethroughInput = document.getElementById('font_section_strikethrough');
+
+    const fontFieldLabelFamilyInput = document.getElementById('font_fieldLabel_family');
+    const fontFieldLabelSizeInput = document.getElementById('font_fieldLabel_size');
+    const fontFieldLabelBoldInput = document.getElementById('font_fieldLabel_bold');
+    const fontFieldLabelItalicsInput = document.getElementById('font_fieldLabel_italics');
+    const fontFieldLabelUnderlineInput = document.getElementById('font_fieldLabel_underline');
+    const fontFieldLabelStrikethroughInput = document.getElementById('font_fieldLabel_strikethrough');
+
+    const fontFieldOutputFamilyInput = document.getElementById('font_fieldOutput_family');
+    const fontFieldOutputSizeInput = document.getElementById('font_fieldOutput_size');
+    const fontFieldOutputBoldInput = document.getElementById('font_fieldOutput_bold');
+    const fontFieldOutputItalicsInput = document.getElementById('font_fieldOutput_italics');
+    const fontFieldOutputUnderlineInput = document.getElementById('font_fieldOutput_underline');
+    const fontFieldOutputStrikethroughInput = document.getElementById('font_fieldOutput_strikethrough');
+
+    // Update LAYOUT constants
+    LAYOUT.PAGE_WIDTH = parseFloat(pageWidthInput.value);
+    LAYOUT.MARGIN_LEFT = parseFloat(marginLeftInput.value);
+    LAYOUT.MARGIN_RIGHT = parseFloat(marginRightInput.value);
+    LAYOUT.MARGIN_TOP = parseFloat(marginTopInput.value);
+    LAYOUT.MARGIN_BOTTOM = parseFloat(marginBottomInput.value);
+    LAYOUT.LABEL_HEIGHT = parseFloat(labelHeightInput.value);
+    LAYOUT.VERTICAL_SPACING = parseFloat(verticalSpacingInput.value);
+
+    // Build style string for header font
+    let headerStyles = [];
+    if (fontHeaderBoldInput.checked) headerStyles.push('Bold');
+    if (fontHeaderItalicsInput.checked) headerStyles.push('Italic');
+    if (fontHeaderUnderlineInput.checked) headerStyles.push('Underline');
+    if (fontHeaderStrikethroughInput.checked) headerStyles.push('Strikeout');
+    LAYOUT.FONT_REPORTHEADER = `${fontHeaderFamilyInput.value}, ${fontHeaderSizeInput.value}pt`
+        + (headerStyles.length ? `, style=${headerStyles.join(',')}` : '');
+
+    // Build style string for section header font
+    let sectionStyles = [];
+    if (fontSectionBoldInput.checked) sectionStyles.push('Bold');
+    if (fontSectionItalicsInput.checked) sectionStyles.push('Italic');
+    if (fontSectionUnderlineInput.checked) sectionStyles.push('Underline');
+    if (fontSectionStrikethroughInput.checked) sectionStyles.push('Strikeout');
+    LAYOUT.FONT_SECTIONHEADER = `${fontSectionFamilyInput.value}, ${fontSectionSizeInput.value}pt`
+        + (sectionStyles.length ? `, style=${sectionStyles.join(',')}` : '');
+
+    // Build style string for field label font
+    let fieldLabelStyles = [];
+    if (fontFieldLabelBoldInput.checked) fieldLabelStyles.push('Bold');
+    if (fontFieldLabelItalicsInput.checked) fieldLabelStyles.push('Italic');
+    if (fontFieldLabelUnderlineInput.checked) fieldLabelStyles.push('Underline');
+    if (fontFieldLabelStrikethroughInput.checked) fieldLabelStyles.push('Strikeout');
+    LAYOUT.FONT_FIELDLABEL = `${fontFieldLabelFamilyInput.value}, ${fontFieldLabelSizeInput.value}pt`
+        + (fieldLabelStyles.length ? `, style=${fieldLabelStyles.join(',')}` : '');
+
+    // Build style string for field output font
+    let fieldOutputStyles = [];
+    if (fontFieldOutputBoldInput.checked) fieldOutputStyles.push('Bold');
+    if (fontFieldOutputItalicsInput.checked) fieldOutputStyles.push('Italic');
+    if (fontFieldOutputUnderlineInput.checked) fieldOutputStyles.push('Underline');
+    if (fontFieldOutputStrikethroughInput.checked) fieldOutputStyles.push('Strikeout');
+    LAYOUT.FONT_FIELDOUTPUT = `${fontFieldOutputFamilyInput.value}, ${fontFieldOutputSizeInput.value}pt`
+        + (fieldOutputStyles.length ? `, style=${fieldOutputStyles.join(',')}` : '');
+
+    console.log('[Settings] Applied:', LAYOUT);
+}
 
 // ? Layout conventions for tables. 
 // ? For our purposes this includes Form.io Columns, Tables, FormGrids, and DataGrids
 const TABLE_LAYOUT = {
     HEADER_HEIGHT: 30,      // ? Height of table headers
-    ROW_HEIGHT: 25,         // ? Height of table rows
+    ROW_HEIGHT: 30,         // ? Height of table rows
     CELL_PADDING: 5,        // ? Padding within table cells
     DEFAULT_ROWS: 1,        // ? Default number of rows in a table
     BORDER_WIDTH: 1,        // ? Width of table borders
@@ -49,6 +302,11 @@ const TABLE_LAYOUT = {
 
 class DevExpressConverter
 {
+    // Call this at the start of the conversion process
+    static applySettings() {
+        applyLayoutSettingsFromUI();
+    }
+
     // ? Holds state information between function calls
     static state = {
         devExpressJson: null,   // ? For storing the generated JSON
@@ -257,7 +515,7 @@ class DevExpressConverter
             results.push({
                 DBName: formioData.Grid.formGrid.DBTableName,
                 type: 'formgrid',
-                key: formioData.Grid.formGrid.key || 'mainFormGrid'  // Use 'mainFormGrid' as fallback for root grid
+                key: formioData.Grid.formGrid.key || 'mainFormGrid'
             });
         }
 
@@ -463,6 +721,7 @@ class DevExpressConverter
                 }
             );
         },
+
         columns: (component, itemNum, ref, componentWidth, xOffset, currentY, context) =>
         {
             // Check visibility of the columns container
@@ -924,15 +1183,18 @@ class DevExpressConverter
                 return '';
             }
 
-            // Filter and process visible components
-            const results = components.map((component) =>
-            {
-                // Check visibility in context of parent
-                if (!DevExpressConverter.isComponentVisible(component, parentVisible))
-                {
-                    console.log(`Skipping hidden component: ${component.key || 'unnamed'}`);
-                    return '';
-                }
+            // Sort components by Y position before processing
+            const visibleComponents = components.filter(component => DevExpressConverter.isComponentVisible(component, parentVisible));
+            
+            // Sort by top position (y coordinate)
+            visibleComponents.sort((a, b) => {
+                const aY = (a.formio?.top || a.top || 0);
+                const bY = (b.formio?.top || b.top || 0);
+                return aY - bY;
+            });
+
+            // Process sorted components
+            const results = visibleComponents.map((component) => {
 
                 console.log(`Processing nested component: ${component.key || 'unnamed'}`,
                 {
@@ -987,10 +1249,10 @@ class DevExpressConverter
         TextAlignment="MiddleLeft"
         SizeF="${context.LAYOUT.PAGE_WIDTH - (context.LAYOUT.MARGIN * 2)},${context.LAYOUT.LABEL_HEIGHT}"
         LocationFloat="0,0"
-        Font="Times New Roman, 9.75pt, style=Bold"
+        Font="${LAYOUT.FONT_SECTIONHEADER}"
         Padding="2,2,0,0,100">
         Borders="None"
-        <StylePriority UseFont="false"/>
+        <StylePriority UseFont="true"/>
       </Item${labelItemNum}>`;
         },
 
@@ -1023,8 +1285,8 @@ class DevExpressConverter
         SizeF="${width},${height}"
         LocationFloat="0,0"
         Padding="2,2,0,0,100"
-        Font="Times New Roman, 9.75pt, style=Bold">
-        <StylePriority UseFont="false" UseBorders="false" UseTextAlignment="false"/>
+        Font="${LAYOUT.FONT_FIELDLABEL}">
+        <StylePriority UseFont="true" UseBorders="false" UseTextAlignment="false"/>
       </Item1>`;
         },
 
@@ -1144,6 +1406,8 @@ class DevExpressConverter
     {
         try
         {
+            // ? Apply settings from UI before initializing
+            DevExpressConverter.applySettings();
             // ? Initialize counters
             DevExpressConverter.initialize();
 
@@ -2186,6 +2450,7 @@ const ComponentCleaner = {
 //#endregion
 
 //#region Field Generation
+
 const FieldGenerator = {
     refCounter: 1,          // ? Start at 1 for main report
     itemCounter: 1,         // ? Start at 1 for numbered items (Item1, Item2, etc.)
@@ -2317,7 +2582,7 @@ const FieldGenerator = {
       SizeF="${width},${LAYOUT.LABEL_HEIGHT}"
       LocationFloat="${xOffset},${yOffset}"
       TextAlignment="MiddleLeft"
-      Font="Times New Roman, 9.75pt, style=Bold"
+      Font="${LAYOUT.FONT_FIELDLABEL}"
       Padding="2,2,0,0,100"
       Borders="None">
       <StylePriority Ref="${styleRef}" UseFont="true" UseTextAlignment="false" UseBorders="false" />
@@ -2434,9 +2699,10 @@ function generateMinimalXmlTemplate()
             ControlType: "DevExpress.XtraReports.UI.XtraReport, DevExpress.XtraReports.v23.2, Version=23.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a",
             Name: "Report",
             DisplayName: displayName,
-            Margins: "40, 40, 40, 40",
-            PageWidth: "850",
-            PageHeight: "1100",
+            Margins: `${LAYOUT.MARGIN_LEFT}, ${LAYOUT.MARGIN_RIGHT}, ${LAYOUT.MARGIN_TOP}, ${LAYOUT.MARGIN_BOTTOM}`,
+            PaperKind: "Custom",
+            PageWidth: `${LAYOUT.PAGE_WIDTH}`,
+            PageHeight: `${LAYOUT.PAGE_HEIGHT}`,
             Version: "23.2",
             DataMember: "Root"
         });
@@ -2474,14 +2740,83 @@ function generateMinimalXmlTemplate()
         componentProcessor.currentY = 10; // ! Start Y position for components. This is essentially the space between the top of the Detail Band and the first element
 
         const controls = [];
+        // Initialize component groups array at a higher scope
+        const componentGroups = [];
+        let currentGroup = [];
+
         if (formioData?.FormioTemplate?.components)
         {
+            // Process components and collect grid markers
             const processedNodes = componentProcessor.processComponents(
                 formioData.FormioTemplate.components,
-                650,    // ? Default width
-                0       // ? Starting X offset
+                LAYOUT.DEFAULT_WIDTH,   // ? Default width for components
+                0                       // ? Starting X offset
             );
-            controls.push(...processedNodes);
+            console.log('Processed components:', processedNodes); // Debug logging
+            console.log('Grid markers:', componentProcessor.gridComponents); // Debug logging
+
+            console.log('Starting to process nodes into groups...');
+            
+            // Improved grouping: split processedNodes into groups at grid markers
+            const groups = [];
+            let currentComponents = [];
+            let gridIdx = 0;
+            processedNodes.forEach((node) => {
+                if (node.type === 'grid') {
+                    // If there are components collected, push them as a group
+                    if (currentComponents.length > 0) {
+                        groups.push({ type: 'components', components: currentComponents.slice(), afterGridIndex: gridIdx - 1 });
+                        currentComponents = [];
+                    }
+                    // Push the grid marker
+                    groups.push({ type: 'grid', gridIndex: gridIdx });
+                    gridIdx++;
+                } else {
+                    currentComponents.push(node);
+                }
+            });
+            // Push any remaining components after last grid
+            if (currentComponents.length > 0) {
+                groups.push({ type: 'components', components: currentComponents.slice(), afterGridIndex: gridIdx - 1 });
+            }
+
+            // Assign to componentGroups
+            componentGroups.length = 0;
+            componentGroups.push(...groups);
+
+            // Debug output
+            console.log('Final component groups (split at grids):', {
+                totalGroups: componentGroups.length,
+                groups: componentGroups.map(g => ({
+                    type: g.type,
+                    count: g.type === 'components' ? g.components.length : 'N/A',
+                    gridIndex: g.type === 'grid' ? g.gridIndex : 'N/A'
+                }))
+            });
+
+            // Add initial components to the main detail band
+            if (componentGroups.length > 0 && componentGroups[0].type === 'components') {
+                console.log('Adding initial components to main detail band:', {
+                    count: componentGroups[0].components.length
+                });
+                // Reset Y positions for main detail band components
+                let detailBandY = LAYOUT.VERTICAL_SPACING;
+                componentGroups[0].components.forEach(component => {
+                    const locationStr = component.attributes?.LocationFloat;
+                    if (locationStr) {
+                        const [x, _] = locationStr.split(',').map(Number);
+                        const sizeStr = component.attributes?.SizeF;
+                        const componentHeight = sizeStr ? 
+                            parseInt(sizeStr.split(',')[1]) || LAYOUT.INPUT_HEIGHT :
+                            LAYOUT.INPUT_HEIGHT;
+                        component.attributes.LocationFloat = `${x},${detailBandY}`;
+                        detailBandY += componentHeight + LAYOUT.VERTICAL_SPACING;
+                    }
+                });
+                controls.push(...componentGroups[0].components);
+            } else {
+                console.log('No initial components for main detail band');
+            }
         }
 
         const detailControls = processor.buildNode('Controls',
@@ -2495,37 +2830,173 @@ function generateMinimalXmlTemplate()
                 Name: "headerLabel",
                 Text: name,
                 TextAlignment: "MiddleCenter",
-                SizeF: "769.987,30",
+                SizeF: (LAYOUT.PAGE_WIDTH - LAYOUT.MARGIN_LEFT - LAYOUT.MARGIN_RIGHT) + ",50",
                 LocationFloat: "0,0",
-                Font: "Times New Roman, 14pt, style=Bold",
+                Font: LAYOUT.FONT_REPORTHEADER,
                 Padding: "2,2,0,0,100"
             })
         ]);
 
         // ? Build bands structure
-        const bands = processor.buildNode('Bands',
-        {}, [
-            processor.createItemNode(1, "TopMarginBand",
+        // Reset item numbering for bands
+        processor.currentItemNum = 0;
+        
+        // Get the grid components that were processed by ComponentProcessor
+        const gridComponents = componentProcessor.gridComponents || [];
+        
+        const bandsArray = [
+            processor.createItemNode(undefined, "TopMarginBand",
             {
                 Name: "TopMargin",
-                HeightF: "40"
+                HeightF: LAYOUT.MARGIN_TOP
             }),
-            processor.createItemNode(2, "ReportHeaderBand",
+            processor.createItemNode(undefined, "ReportHeaderBand",
             {
                 Name: "ReportHeader",
                 HeightF: "50"
             }),
-            processor.createItemNode(3, "DetailBand",
+            processor.createItemNode(undefined, "DetailBand",
             {
                 Name: "Detail",
-                HeightF: `${Math.ceil(DevExpressConverter.core.calculateNestedHeight(componentProcessor.components || [])) + (LAYOUT.VERTICAL_SPACING * 2)}` // ? Calculate height including nested components
-            }),
-            processor.createItemNode(4, "BottomMarginBand",
+                HeightF: controls.length > 0 ? 
+                    (() => {
+                        // Calculate max Y extent of all components
+                        let maxY = LAYOUT.VERTICAL_SPACING;
+                        controls.forEach(component => {
+                            const sizeStr = component.attributes?.SizeF;
+                            const locationStr = component.attributes?.LocationFloat;
+                            if (sizeStr && locationStr) {
+                                const height = parseInt(sizeStr.split(',')[1]) || LAYOUT.INPUT_HEIGHT;
+                                const y = parseInt(locationStr.split(',')[1]) || 0;
+                                maxY = Math.max(maxY, y + height);
+                            }
+                        });
+                        return (maxY + LAYOUT.VERTICAL_SPACING).toString();
+                    })() :
+                    LAYOUT.VERTICAL_SPACING.toString()
+            })
+        ];
+
+        // Iterate through componentGroups in order, creating bands for each grid and using the next components group for spacer
+        for (let i = 0; i < componentGroups.length; i++) {
+            const group = componentGroups[i];
+            if (group.type === 'grid') {
+                const grid = gridComponents[group.gridIndex];
+                const gridBaseName = grid.key || `Grid${group.gridIndex + 1}`;
+
+                // Create header band with nested DetailBand
+                const headerReport = processor.createItemNode(undefined, "DetailReportBand", {
+                    Name: `DetailReport_${gridBaseName}_header`,
+                    HeightF: "30"
+                });
+                const headerBands = processor.buildNode('Bands', {}, [
+                    processor.createItemNode(1, "DetailBand", {
+                        Name: `Detail_${gridBaseName}_header`,
+                        HeightF: "30"
+                    })
+                ]);
+                if (grid.headerContent && grid.headerContent.length > 0) {
+                    const headerControls = processor.buildNode('Controls', {});
+                    grid.headerContent.forEach(component => {
+                        if (typeof component === 'string') {
+                            headerControls.addChild(processor.parseXml(component));
+                        } else {
+                            headerControls.addChild(component);
+                        }
+                    });
+                    headerBands.children[0].addChild(headerControls);
+                }
+                headerReport.addChild(headerBands);
+                bandsArray.push(headerReport);
+
+                // Create keys band with nested DetailBand
+                const keysReport = processor.createItemNode(undefined, "DetailReportBand", {
+                    Name: `DetailReport_${gridBaseName}_keys`,
+                    HeightF: "30"
+                });
+                const keysBands = processor.buildNode('Bands', {}, [
+                    processor.createItemNode(1, "DetailBand", {
+                        Name: `Detail_${gridBaseName}_keys`,
+                        HeightF: "30"
+                    })
+                ]);
+                if (grid.dataContent && grid.dataContent.length > 0) {
+                    const keysControls = processor.buildNode('Controls', {});
+                    grid.dataContent.forEach(component => {
+                        if (typeof component === 'string') {
+                            keysControls.addChild(processor.parseXml(component));
+                        } else {
+                            keysControls.addChild(component);
+                        }
+                    });
+                    keysBands.children[0].addChild(keysControls);
+                }
+                keysReport.addChild(keysBands);
+                bandsArray.push(keysReport);
+
+                // Create spacer band with nested DetailBand
+                const spacerReport = processor.createItemNode(undefined, "DetailReportBand", {
+                    Name: `DetailReport_${gridBaseName}_spacer`,
+                    HeightF: "30"
+                });
+                // Use the next components group for spacer
+                let nextComponents = [];
+                if (i + 1 < componentGroups.length && componentGroups[i + 1].type === 'components') {
+                    nextComponents = componentGroups[i + 1].components;
+                }
+                let maxBandHeight = LAYOUT.VERTICAL_SPACING;
+                nextComponents.forEach(component => {
+                    const sizeStr = component.attributes?.SizeF;
+                    const locationStr = component.attributes?.LocationFloat;
+                    if (sizeStr && locationStr) {
+                        const height = parseInt(sizeStr.split(',')[1]) || 0;
+                        const y = parseInt(locationStr.split(',')[1]) || 0;
+                        maxBandHeight = Math.max(maxBandHeight, y + height + LAYOUT.VERTICAL_SPACING);
+                    }
+                });
+                const spacerHeight = nextComponents.length > 0 ? maxBandHeight : 15;
+                const spacerBands = processor.buildNode('Bands', {}, [
+                    processor.createItemNode(1, "DetailBand", {
+                        Name: `Detail_${gridBaseName}_spacer`,
+                        HeightF: spacerHeight.toString()
+                    })
+                ]);
+                if (nextComponents.length > 0) {
+                    const spacerControls = processor.buildNode('Controls', {});
+                    let bandY = LAYOUT.VERTICAL_SPACING;
+                    let maxY = LAYOUT.VERTICAL_SPACING;
+                    nextComponents.forEach(component => {
+                        const locationStr = component.attributes?.LocationFloat;
+                        if (locationStr) {
+                            const [x, _] = locationStr.split(',').map(Number);
+                            const sizeStr = component.attributes?.SizeF;
+                            const componentHeight = sizeStr ?
+                                parseInt(sizeStr.split(',')[1]) || LAYOUT.INPUT_HEIGHT :
+                                LAYOUT.INPUT_HEIGHT;
+                            component.attributes.LocationFloat = `${x},${bandY}`;
+                            maxY = Math.max(maxY, bandY + componentHeight);
+                            bandY += componentHeight + LAYOUT.VERTICAL_SPACING;
+                        }
+                        spacerControls.addChild(component);
+                    });
+                    spacerBands.children[0].addChild(spacerControls);
+                    spacerBands.children[0].attributes.HeightF = (maxY + LAYOUT.VERTICAL_SPACING).toString();
+                }
+                spacerReport.addChild(spacerBands);
+                bandsArray.push(spacerReport);
+            }
+        }
+
+        // ? Add BottomMarginBand
+        bandsArray.push(
+            processor.createItemNode(undefined, "BottomMarginBand",
             {
                 Name: "BottomMargin",
-                HeightF: "40"
+                HeightF: LAYOUT.MARGIN_BOTTOM
             })
-        ]);
+        );
+
+        const bands = processor.buildNode('Bands', {}, bandsArray);
 
         // ? Add controls to their respective bands
         bands.children[1].addChild(headerControls); // ? Add header controls to PageHeaderBand
@@ -2654,12 +3125,12 @@ const Init = {
 
 export
 {
-  DevExpressConverter,
-  Utils,
-  UIHandlers,
-  Init,
-  FieldGenerator,
-  generateMinimalXmlTemplate
+    DevExpressConverter,
+    Utils,
+    UIHandlers,
+    Init,
+    FieldGenerator,
+    generateMinimalXmlTemplate
 };
 
 //#endregion

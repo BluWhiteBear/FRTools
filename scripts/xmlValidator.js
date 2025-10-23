@@ -1,5 +1,31 @@
 // Validation class for XML nodes
 export class XMLValidator {
+    // Repairs Ref numbers to be sequential starting from 1
+    static repairRefNumbers(node, currentRef = 1) {
+        let changes = [];
+        // If this node has a Ref attribute, resequence it
+        if (node.attributes?.Ref) {
+            const oldRef = node.attributes.Ref;
+            if (parseInt(oldRef) !== currentRef) {
+                changes.push({
+                    context: node.type,
+                    oldValue: oldRef,
+                    newValue: currentRef,
+                    name: node.attributes?.Name || 'unnamed'
+                });
+                node.attributes.Ref = currentRef.toString();
+            }
+            currentRef++;
+        }
+        // Recursively repair children
+        if (node.children && node.children.length > 0) {
+            node.children.forEach(child => {
+                currentRef = this.repairRefNumbers(child, currentRef).nextRef;
+                changes = changes.concat(this.repairRefNumbers(child, currentRef).changes);
+            });
+        }
+        return { changes, nextRef: currentRef };
+    }
     static validateRefNumbers(node, currentRef = 1, parentContext = '') {
         let issues = [];
         
@@ -220,6 +246,8 @@ export class XMLValidator {
     static validateAndRepair(rootNode) {
         // First validate to see if repairs are needed
         const validation = this.validateAll(rootNode);
+
+        console.log('Initial Validation:', validation);
         
         if (validation.hasIssues) {
             // Attempt repairs

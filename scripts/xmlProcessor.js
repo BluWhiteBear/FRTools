@@ -9,13 +9,11 @@ import { XMLValidator } from './xmlValidator.js';
 class XMLNode
 {
     // ? Represents a node in the XML structure
-    constructor(type, attributes = {}, children = null, selfClosing = false)
+    constructor(type, attributes = {}, children = [], selfClosing = false)
     {
         this.type = type;
-        this.attributes = {
-            ...attributes
-        };
-        this.children = children ? [...children] : [];
+        this.attributes = { ...attributes };
+        this.children = Array.isArray(children) ? [...children] : [];
         this.ref = null;
         this.needsRef = false;
         this.selfClosing = selfClosing;
@@ -104,45 +102,82 @@ class XMLProcessor
             h6: '8'
         };
 
-        // Allow list of tags that can pass through as-is
-        const allowedTags = ['b', 'i', 'u', 's', 'r', 'br', 'href', 'strong', 'em'];
+        // Stack to track open tags for proper nesting
+        const tagStack = [];
+        const processedHtml = [];
         
-        // First pass: Convert style-based colors to DevExpress color tags
-        html = html.replace(/<([^>]+)style=["'](?:[^"']*?;)*?\s*color:\s*([^;"']+)(?:;[^"']*)?["'][^>]*>/gi, (match, tag, color) => {
-            return `<color=${color}>`;
-        });
-
-        // Remove any remaining style attributes
-        html = html.replace(/\s+style=["'][^"']*["']/gi, '');
-
-        // Convert common HTML equivalents
-        html = html.replace(/<strong>/gi, '<b>')
-                  .replace(/<\/strong>/gi, '</b>')
-                  .replace(/<em>/gi, '<i>')
-                  .replace(/<\/em>/gi, '</i>');
-
-        // Second pass: Convert header tags to size tags
-        html = html.replace(/<(h[1-6])>/gi, (match, tag) => {
-            return `<size=${headerSizes[tag.toLowerCase()]}>`;
-        });
-        html = html.replace(/<\/(h[1-6])>/gi, '</size>');
-
-        // Third pass: Remove all unallowed tags while preserving their content
-        const tagPattern = /<\/?([^>\s]+)[^>]*>/g;
-        html = html.replace(tagPattern, (match, tag) => {
-            tag = tag.toLowerCase();
-            if (allowedTags.includes(tag)) {
-                return match;
+        // Convert HTML to tokens we can process
+        const tokens = html.match(/<[^>]+>|[^<]+/g) || [];
+        
+        for (const token of tokens) {
+            if (!token.startsWith('<')) {
+                // Text content
+                processedHtml.push(token);
+                continue;
             }
-            // For closing tags of transformed elements (like </p> after a color transform)
-            if (match.startsWith('</')) {
-                if (tag === 'p' && html.includes('<color=')) {
-                    return '</color>';
+
+            // Handle HTML tags
+            if (token.startsWith('</')) {
+                // Closing tag
+                const tag = token.match(/<\/([^>]+)>/)[1].toLowerCase();
+                
+                // Find matching opening tag in stack
+                const stackIndex = tagStack.findIndex(t => t.tag === tag);
+                if (stackIndex !== -1) {
+                    // Close all tags up to and including this one
+                    for (let i = tagStack.length - 1; i >= stackIndex; i--) {
+                        const closingTag = tagStack[i];
+                        processedHtml.push(`</${closingTag.devExpressTag}>`);
+                        tagStack.pop();
+                    }
                 }
-                return '';
+            } else {
+                // Opening tag or self-closing tag
+                const match = token.match(/<([^>\s]+)([^>]*)>/);
+                if (!match) continue;
+                
+                const tag = match[1].toLowerCase();
+                const attrs = match[2];
+
+                // Handle style attribute for colors
+                const colorMatch = attrs.match(/style=["'](?:[^"']*?;)*?\s*color:\s*([^;"']+)(?:;[^"']*)?["']/i);
+                if (colorMatch) {
+                    const color = colorMatch[1];
+                    tagStack.push({ tag: tag, devExpressTag: 'color' });
+                    processedHtml.push(`<color=${color}>`);
+                    continue;
+                }
+
+                // Handle header tags
+                if (tag.match(/^h[1-6]$/)) {
+                    const size = headerSizes[tag];
+                    tagStack.push({ tag: tag, devExpressTag: 'size' });
+                    processedHtml.push(`<size=${size}>`);
+                    continue;
+                }
+
+                // Handle common tag conversions
+                if (tag === 'strong') {
+                    tagStack.push({ tag: tag, devExpressTag: 'b' });
+                    processedHtml.push('<b>');
+                } else if (tag === 'em') {
+                    tagStack.push({ tag: tag, devExpressTag: 'i' });
+                    processedHtml.push('<i>');
+                } else if (tag === 'br') {
+                    processedHtml.push('<br>');
+                } else if (['b', 'i', 'u', 's'].includes(tag)) {
+                    tagStack.push({ tag: tag, devExpressTag: tag });
+                    processedHtml.push(`<${tag}>`);
+                }
             }
-            return '';
-        });
+        }
+
+        // Close any remaining open tags
+        for (let i = tagStack.length - 1; i >= 0; i--) {
+            processedHtml.push(`</${tagStack[i].devExpressTag}>`);
+        }
+
+        return processedHtml.join('');
 
         // Clean up any doubled spaces and trim
         html = html.replace(/\s+/g, ' ').trim();
@@ -200,6 +235,7 @@ class XMLProcessor
     // ? Returns the next item number as an integer
     getNextItemNum()
     {
+        //console.log ('Getting next item number:', this.currentItemNum + 1);
         return ++this.currentItemNum;
     }
 
@@ -216,14 +252,25 @@ class XMLProcessor
     // ? Second pass: Assign references sequentially
     assignReferences(node)
     {
+        if (!node) {
+            console.warn('Skipping undefined node in assignReferences');
+            return;
+        }
+
         // ? Assign ref count if needed
         if (node.needsRef)
         {
             node.attributes.Ref = this.currentRef++;
         }
 
-        // ? Recursively process all children elements
-        node.children.forEach(child => this.assignReferences(child));
+        // ? Recursively process all children elements if they exist
+        if (node.children) {
+            node.children.forEach(child => {
+                if (child) {
+                    this.assignReferences(child);
+                }
+            });
+        }
     }
 
     // ? Final pass: Convert to XML string with proper formatting
@@ -318,11 +365,10 @@ class XMLProcessor
     {
         const actualItemNum = (itemNum === undefined || itemNum === null) ? this.getNextItemNum() : itemNum;
 
-        return this.buildNode(`Item${actualItemNum}`,
-        {
-            ControlType: controlType,
-            ...attributes
-        }).setNeedsRef(true);
+        // Only add ControlType if it's provided
+        const nodeAttributes = controlType ? { ControlType: controlType, ...attributes } : attributes;
+
+        return this.buildNode(`Item${actualItemNum}`, nodeAttributes).setNeedsRef(true);
     }
 
     // ? Creates a StylePriority node

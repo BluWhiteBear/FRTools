@@ -38,7 +38,7 @@
         <div class="card shadow-sm mx-auto">
             <!-- Navigation Tabs -->
             <div class="card-header pt-4" style="background: none; border: none;">
-                <ul class="nav nav-tabs card-header-tabs">
+                <ul class="nav nav-tabs card-header-tabs d-flex">
                     <li class="nav-item">
                         <a class="nav-link active" id="converter-tab" data-bs-toggle="tab" href="#converter">
                             <i class="bi bi-recycle"></i> Converter
@@ -52,6 +52,16 @@
                     <li class="nav-item">
                         <a class="nav-link" id="devexpress-preview-tab" data-bs-toggle="tab" href="#preview">
                             <i class="bi bi-eye"></i> DevX Preview
+                        </a>
+                    </li>
+                    <li class="nav-item ms-auto">
+                        <a class="nav-link" id="settings-tab" data-bs-toggle="tab" href="#settings">
+                            <i class="bi bi-gear"></i> Settings
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="help-tab" data-bs-toggle="tab" href="#help">
+                            <i class="bi bi-question-circle"></i> Help
                         </a>
                     </li>
                 </ul>
@@ -189,6 +199,567 @@
                     <div class="tab-pane fade" id="preview" role="tabpanel">
                         <div id="viewer-container">
                             <!-- The DevExpress viewer component will be loaded here dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Settings Tab -->
+                    <div class="tab-pane fade" id="settings" role="tabpanel">
+                        <div id="settings-container">
+                            <div class="d-flex justify-content-end mb-3">
+                                <button id="resetSettingsBtn" class="btn btn-primary">
+                                    <i class="bi bi-arrow-counterclockwise me-1"></i> Reset to Defaults
+                                </button>
+                            </div>
+                            <div class="output-section mb-4 p-4 rounded-3" style="background: linear-gradient(180deg, #2a2a2a9c 0%, #1a1a1ae7 100%); border: 1px solid rgba(255,255,255,0.1);">
+                                <h3 class="fw-bold text-light mb-3"><i class="bi bi-file-earmark-text me-2"></i>Layout Settings</h3>
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-6">
+                                        <h5 class="fw-semibold text-light mb-2"><i class="bi bi-aspect-ratio me-2"></i>Page Size</h5>
+                                        <label for="settings_pageWidth" class="form-label text-light">Page Width</label>
+                                        <input type="number" id="settings_pageWidth" class="form-control text-light bg-dark" placeholder="Enter page width" step="0.01" value="850">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5 class="fw-semibold text-light mb-2"><i class="bi bi-arrows-fullscreen me-2"></i>Margins</h5>
+                                        <div class="row g-2">
+                                            <div class="col-md-3">
+                                                <label for="settings_marginsLeft" class="form-label text-light">Left</label>
+                                                <input type="number" id="settings_marginsLeft" class="form-control text-light bg-dark" placeholder="Left" step="0.01" value="50">
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label for="settings_marginsRight" class="form-label text-light">Right</label>
+                                                <input type="number" id="settings_marginsRight" class="form-control text-light bg-dark" placeholder="Right" step="0.01" value="50">
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label for="settings_marginsTop" class="form-label text-light">Top</label>
+                                                <input type="number" id="settings_marginsTop" class="form-control text-light bg-dark" placeholder="Top" step="0.01" value="50">
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label for="settings_marginsBottom" class="form-label text-light">Bottom</label>
+                                                <input type="number" id="settings_marginsBottom" class="form-control text-light bg-dark" placeholder="Bottom" step="0.01" value="50">
+                                            </div>
+                                        </div>
+                                    </div> 
+                                </div>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="settings_labelHeight" class="form-label text-light">Label Height</label>
+                                        <input type="number" id="settings_labelHeight" class="form-control text-light bg-dark" placeholder="Enter label height" step="0.01" value="30">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="settings_verticalSpacing" class="form-label text-light">Vertical Spacing</label>
+                                        <input type="number" id="settings_verticalSpacing" class="form-control text-light bg-dark" placeholder="Enter vertical spacing between elements" step="0.01" value="10">
+                                    </div>
+                                </div>
+                                <h3 class="fw-bold text-light mt-4 mb-3"><i class="bi bi-type me-2"></i>Fonts</h3>
+                                <!-- Header Font Settings -->
+                                <div class="mb-4 p-3 rounded-3" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);">
+                                    <h6 class="fw-semibold text-light mb-3">Report Header</h6>
+                                    <div class="row g-3 align-items-end">
+                                        <div class="col-md-3">
+                                            <label for="font_header_family" class="form-label text-light">Font</label>
+                                            <select id="font_header_family" class="form-select bg-dark text-light">
+                                                <option value="Arial">Arial</option>
+                                                <option value="Arial Black">Arial Black</option>
+                                                <option value="Calibri">Calibri</option>
+                                                <option value="Calibri Light">Calibri Light</option>
+                                                <option value="Cambria">Cambria</option>
+                                                <option value="Cambria Math">Cambria Math</option>
+                                                <option value="Candara">Candara</option>
+                                                <option value="Comic Sans MS">Comic Sans MS</option>
+                                                <option value="Consolas">Consolas</option>
+                                                <option value="Constantia">Constantia</option>
+                                                <option value="Corbel">Corbel</option>
+                                                <option value="Courier New">Courier New</option>
+                                                <option value="Times New Roman" selected>Times New Roman</option>
+                                                <option value="Dotum">Dotum</option>
+                                                <option value="DotumChe">DotumChe</option>
+                                                <option value="Ebrima">Ebrima</option>
+                                                <option value="Franklin Gothic Medium">Franklin Gothic Medium</option>
+                                                <option value="Gabriola">Gabriola</option>
+                                                <option value="Gadugi">Gadugi</option>
+                                                <option value="Georgia">Georgia</option>
+                                                <option value="Gulim">Gulim</option>
+                                                <option value="GulimChe">GulimChe</option>
+                                                <option value="Impact">Impact</option>
+                                                <option value="Javanese Text">Javanese Text</option>
+                                                <option value="Leelawadee UI">Leelawadee UI</option>
+                                                <option value="Leelawadee UI Semilight">Leelawadee UI Semilight</option>
+                                                <option value="Lucida Console">Lucida Console</option>
+                                                <option value="Lucida Sans Unicode">Lucida Sans Unicode</option>
+                                                <option value="Malgun Gothic">Malgun Gothic</option>
+                                                <option value="Malgun Gothic Semilight">Malgun Gothic Semilight</option>
+                                                <option value="Marlett">Marlett</option>
+                                                <option value="Microsoft Himalaya">Microsoft Himalaya</option>
+                                                <option value="Microsoft JhengHei">Microsoft JhengHei</option>
+                                                <option value="Microsoft JhengHei Light">Microsoft JhengHei Light</option>
+                                                <option value="Microsoft JhengHei UI">Microsoft JhengHei UI</option>
+                                                <option value="Microsoft JhengHei UI Light">Microsoft JhengHei UI Light</option>
+                                                <option value="Microsoft New Tai Lue">Microsoft New Tai Lue</option>
+                                                <option value="Microsoft PhagsPa">Microsoft PhagsPa</option>
+                                                <option value="Microsoft Sans Serif">Microsoft Sans Serif</option>
+                                                <option value="Microsoft Tai Le">Microsoft Tai Le</option>
+                                                <option value="Microsoft YaHei">Microsoft YaHei</option>
+                                                <option value="Microsoft YaHei Light">Microsoft YaHei Light</option>
+                                                <option value="Microsoft YaHei UI">Microsoft YaHei UI</option>
+                                                <option value="Microsoft YaHei UI Light">Microsoft YaHei UI Light</option>
+                                                <option value="Microsoft Yi Baiti">Microsoft Yi Baiti</option>
+                                                <option value="MingLiU">MingLiU</option>
+                                                <option value="MingLiU_HKSCS">MingLiU_HKSCS</option>
+                                                <option value="MingLiU_HKSCS-ExtB">MingLiU_HKSCS-ExtB</option>
+                                                <option value="MingLiU_ExtB">MingLiU_ExtB</option>
+                                                <option value="Mongolian Baiti">Mongolian Baiti</option>
+                                                <option value="MS Gothic">MS Gothic</option>
+                                                <option value="MS PGothic">MS PGothic</option>
+                                                <option value="MS UI Gothic">MS UI Gothic</option>
+                                                <option value="MV Boli">MV Boli</option>
+                                                <option value="Myanmar Text">Myanmar Text</option>
+                                                <option value="Mirmala UI">Mirmala UI</option>
+                                                <option value="Mirmala UI Semilight">Mirmala UI Semilight</option>
+                                                <option value="NSimSun">NSimSun</option>
+                                                <option value="Palatino Linotype">Palatino Linotype</option>
+                                                <option value="PMingLiU">PMingLiU</option>
+                                                <option value="PMingLiU-ExtB">PMingLiU-ExtB</option>
+                                                <option value="Segoe MDL2 Assets">Segoe MDL2 Assets</option>
+                                                <option value="Segoe Print">Segoe Print</option>
+                                                <option value="Segoe Script">Segoe Script</option>
+                                                <option value="Segoe UI">Segoe UI</option>
+                                                <option value="Segoe UI Black">Segoe UI Black</option>
+                                                <option value="Segoe UI Emoji">Segoe UI Emoji</option>
+                                                <option value="Segoe UI Historic">Segoe UI Historic</option>
+                                                <option value="Segoe UI Light">Segoe UI Light</option>
+                                                <option value="Segoe UI Semibold">Segoe UI Semibold</option>
+                                                <option value="Segoe UI Semilight">Segoe UI Semilight</option>
+                                                <option value="Segoe UI Symbol">Segoe UI Symbol</option>
+                                                <option value="SimSun">SimSun</option>
+                                                <option value="SimSun-ExtB">SimSun-ExtB</option>
+                                                <option value="Sitka Banner">Sitka Banner</option>
+                                                <option value="Sitka Display">Sitka Display</option>
+                                                <option value="Sitka Heading">Sitka Heading</option>
+                                                <option value="Sitka Small">Sitka Small</option>
+                                                <option value="Sitka Subheading">Sitka Subheading</option>
+                                                <option value="Sitka Text">Sitka Text</option>
+                                                <option value="Sylfaen">Sylfaen</option>
+                                                <option value="Symbol">Symbol</option>
+                                                <option value="Tahoma">Tahoma</option>
+                                                <option value="Times New Roman">Times New Roman</option>
+                                                <option value="Trebuchet MS">Trebuchet MS</option>
+                                                <option value="Verdana">Verdana</option>
+                                                <option value="Webdings">Webdings</option>
+                                                <option value="Yu Gothic">Yu Gothic</option>
+                                                <option value="Yu Gothic Light">Yu Gothic Light</option>
+                                                <option value="Yu Gothic Medium">Yu Gothic Medium</option>
+                                                <option value="Yu Gothic UI">Yu Gothic UI</option>
+                                                <option value="Yu Gothic UI Light">Yu Gothic UI Light</option>
+                                                <option value="Yu Gothic UI Semibold">Yu Gothic UI Semibold</option>
+                                                <option value="Yu Gothic UI Semilight">Yu Gothic UI Semilight</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label for="font_header_size" class="form-label text-light">Font Size</label>
+                                            <input type="number" id="font_header_size" class="form-control text-light bg-dark" step="0.25" placeholder="Size" value="14">
+                                        </div>
+                                        <div class="col-md-1 d-flex align-items-center justify-content-center">
+                                            <input type="checkbox" id="font_header_bold" class="form-check-input bg-dark me-2" style="width: 1.25em; height: 1.25em;" aria-label="Bold" checked>
+                                            <i class="bi bi-type-bold text-light fs-5" title="Bold"></i>
+                                        </div>
+                                        <div class="col-md-1 d-flex align-items-center justify-content-center">
+                                            <input type="checkbox" id="font_header_italics" class="form-check-input bg-dark me-2" style="width: 1.25em; height: 1.25em;" aria-label="Italics">
+                                            <i class="bi bi-type-italic text-light fs-5" title="Italics"></i>
+                                        </div>
+                                        <div class="col-md-1 d-flex align-items-center justify-content-center">
+                                            <input type="checkbox" id="font_header_underline" class="form-check-input bg-dark me-2" style="width: 1.25em; height: 1.25em;" aria-label="Underline">
+                                            <i class="bi bi-type-underline text-light fs-5" title="Underline"></i>
+                                        </div>
+                                        <div class="col-md-1 d-flex align-items-center justify-content-center">
+                                            <input type="checkbox" id="font_header_strikethrough" class="form-check-input bg-dark me-2" style="width: 1.25em; height: 1.25em;" aria-label="Strikethrough">
+                                            <i class="bi bi-type-strikethrough text-light fs-5" title="Strikethrough"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Section Header Font Settings -->
+                                <div class="mb-4 p-3 rounded-3" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);">
+                                    <h6 class="fw-semibold text-light mb-3">Section Headers</h6>
+                                    <div class="row g-3 align-items-end">
+                                        <div class="col-md-3">
+                                            <label for="font_section_family" class="form-label text-light">Font</label>
+                                            <select id="font_section_family" class="form-select bg-dark text-light">
+                                                <option value="Arial">Arial</option>
+                                                <option value="Arial Black">Arial Black</option>
+                                                <option value="Calibri">Calibri</option>
+                                                <option value="Calibri Light">Calibri Light</option>
+                                                <option value="Cambria">Cambria</option>
+                                                <option value="Cambria Math">Cambria Math</option>
+                                                <option value="Candara">Candara</option>
+                                                <option value="Comic Sans MS">Comic Sans MS</option>
+                                                <option value="Consolas">Consolas</option>
+                                                <option value="Constantia">Constantia</option>
+                                                <option value="Corbel">Corbel</option>
+                                                <option value="Courier New">Courier New</option>
+                                                <option value="Times New Roman" selected>Times New Roman</option>
+                                                <option value="Dotum">Dotum</option>
+                                                <option value="DotumChe">DotumChe</option>
+                                                <option value="Ebrima">Ebrima</option>
+                                                <option value="Franklin Gothic Medium">Franklin Gothic Medium</option>
+                                                <option value="Gabriola">Gabriola</option>
+                                                <option value="Gadugi">Gadugi</option>
+                                                <option value="Georgia">Georgia</option>
+                                                <option value="Gulim">Gulim</option>
+                                                <option value="GulimChe">GulimChe</option>
+                                                <option value="Impact">Impact</option>
+                                                <option value="Javanese Text">Javanese Text</option>
+                                                <option value="Leelawadee UI">Leelawadee UI</option>
+                                                <option value="Leelawadee UI Semilight">Leelawadee UI Semilight</option>
+                                                <option value="Lucida Console">Lucida Console</option>
+                                                <option value="Lucida Sans Unicode">Lucida Sans Unicode</option>
+                                                <option value="Malgun Gothic">Malgun Gothic</option>
+                                                <option value="Malgun Gothic Semilight">Malgun Gothic Semilight</option>
+                                                <option value="Marlett">Marlett</option>
+                                                <option value="Microsoft Himalaya">Microsoft Himalaya</option>
+                                                <option value="Microsoft JhengHei">Microsoft JhengHei</option>
+                                                <option value="Microsoft JhengHei Light">Microsoft JhengHei Light</option>
+                                                <option value="Microsoft JhengHei UI">Microsoft JhengHei UI</option>
+                                                <option value="Microsoft JhengHei UI Light">Microsoft JhengHei UI Light</option>
+                                                <option value="Microsoft New Tai Lue">Microsoft New Tai Lue</option>
+                                                <option value="Microsoft PhagsPa">Microsoft PhagsPa</option>
+                                                <option value="Microsoft Sans Serif">Microsoft Sans Serif</option>
+                                                <option value="Microsoft Tai Le">Microsoft Tai Le</option>
+                                                <option value="Microsoft YaHei">Microsoft YaHei</option>
+                                                <option value="Microsoft YaHei Light">Microsoft YaHei Light</option>
+                                                <option value="Microsoft YaHei UI">Microsoft YaHei UI</option>
+                                                <option value="Microsoft YaHei UI Light">Microsoft YaHei UI Light</option>
+                                                <option value="Microsoft Yi Baiti">Microsoft Yi Baiti</option>
+                                                <option value="MingLiU">MingLiU</option>
+                                                <option value="MingLiU_HKSCS">MingLiU_HKSCS</option>
+                                                <option value="MingLiU_HKSCS-ExtB">MingLiU_HKSCS-ExtB</option>
+                                                <option value="MingLiU_ExtB">MingLiU_ExtB</option>
+                                                <option value="Mongolian Baiti">Mongolian Baiti</option>
+                                                <option value="MS Gothic">MS Gothic</option>
+                                                <option value="MS PGothic">MS PGothic</option>
+                                                <option value="MS UI Gothic">MS UI Gothic</option>
+                                                <option value="MV Boli">MV Boli</option>
+                                                <option value="Myanmar Text">Myanmar Text</option>
+                                                <option value="Mirmala UI">Mirmala UI</option>
+                                                <option value="Mirmala UI Semilight">Mirmala UI Semilight</option>
+                                                <option value="NSimSun">NSimSun</option>
+                                                <option value="Palatino Linotype">Palatino Linotype</option>
+                                                <option value="PMingLiU">PMingLiU</option>
+                                                <option value="PMingLiU-ExtB">PMingLiU-ExtB</option>
+                                                <option value="Segoe MDL2 Assets">Segoe MDL2 Assets</option>
+                                                <option value="Segoe Print">Segoe Print</option>
+                                                <option value="Segoe Script">Segoe Script</option>
+                                                <option value="Segoe UI">Segoe UI</option>
+                                                <option value="Segoe UI Black">Segoe UI Black</option>
+                                                <option value="Segoe UI Emoji">Segoe UI Emoji</option>
+                                                <option value="Segoe UI Historic">Segoe UI Historic</option>
+                                                <option value="Segoe UI Light">Segoe UI Light</option>
+                                                <option value="Segoe UI Semibold">Segoe UI Semibold</option>
+                                                <option value="Segoe UI Semilight">Segoe UI Semilight</option>
+                                                <option value="Segoe UI Symbol">Segoe UI Symbol</option>
+                                                <option value="SimSun">SimSun</option>
+                                                <option value="SimSun-ExtB">SimSun-ExtB</option>
+                                                <option value="Sitka Banner">Sitka Banner</option>
+                                                <option value="Sitka Display">Sitka Display</option>
+                                                <option value="Sitka Heading">Sitka Heading</option>
+                                                <option value="Sitka Small">Sitka Small</option>
+                                                <option value="Sitka Subheading">Sitka Subheading</option>
+                                                <option value="Sitka Text">Sitka Text</option>
+                                                <option value="Sylfaen">Sylfaen</option>
+                                                <option value="Symbol">Symbol</option>
+                                                <option value="Tahoma">Tahoma</option>
+                                                <option value="Times New Roman">Times New Roman</option>
+                                                <option value="Trebuchet MS">Trebuchet MS</option>
+                                                <option value="Verdana">Verdana</option>
+                                                <option value="Webdings">Webdings</option>
+                                                <option value="Yu Gothic">Yu Gothic</option>
+                                                <option value="Yu Gothic Light">Yu Gothic Light</option>
+                                                <option value="Yu Gothic Medium">Yu Gothic Medium</option>
+                                                <option value="Yu Gothic UI">Yu Gothic UI</option>
+                                                <option value="Yu Gothic UI Light">Yu Gothic UI Light</option>
+                                                <option value="Yu Gothic UI Semibold">Yu Gothic UI Semibold</option>
+                                                <option value="Yu Gothic UI Semilight">Yu Gothic UI Semilight</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label for="font_section_size" class="form-label text-light">Font Size</label>
+                                            <input type="number" id="font_section_size" class="form-control text-light bg-dark" step="0.25" placeholder="Size" value="11">
+                                        </div>
+                                        <div class="col-md-1 d-flex align-items-center justify-content-center">
+                                            <input type="checkbox" id="font_section_bold" class="form-check-input bg-dark me-2" style="width: 1.25em; height: 1.25em;" aria-label="Bold" checked>
+                                            <i class="bi bi-type-bold text-light fs-5" title="Bold"></i>
+                                        </div>
+                                        <div class="col-md-1 d-flex align-items-center justify-content-center">
+                                            <input type="checkbox" id="font_section_italics" class="form-check-input bg-dark me-2" style="width: 1.25em; height: 1.25em;" aria-label="Italics">
+                                            <i class="bi bi-type-italic text-light fs-5" title="Italics"></i>
+                                        </div>
+                                        <div class="col-md-1 d-flex align-items-center justify-content-center">
+                                            <input type="checkbox" id="font_section_underline" class="form-check-input bg-dark me-2" style="width: 1.25em; height: 1.25em;" aria-label="Underline">
+                                            <i class="bi bi-type-underline text-light fs-5" title="Underline"></i>
+                                        </div>
+                                        <div class="col-md-1 d-flex align-items-center justify-content-center">
+                                            <input type="checkbox" id="font_section_strikethrough" class="form-check-input bg-dark me-2" style="width: 1.25em; height: 1.25em;" aria-label="Strikethrough">
+                                            <i class="bi bi-type-strikethrough text-light fs-5" title="Strikethrough"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Field Label Font Settings -->
+                                <div class="mb-4 p-3 rounded-3" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);">
+                                    <h6 class="fw-semibold text-light mb-3">Field Labels</h6>
+                                    <div class="row g-3 align-items-end">
+                                        <div class="col-md-3">
+                                            <label for="font_fieldLabel_family" class="form-label text-light">Font</label>
+                                            <select id="font_fieldLabel_family" class="form-select bg-dark text-light">
+                                                <option value="Arial">Arial</option>
+                                                <option value="Arial Black">Arial Black</option>
+                                                <option value="Calibri">Calibri</option>
+                                                <option value="Calibri Light">Calibri Light</option>
+                                                <option value="Cambria">Cambria</option>
+                                                <option value="Cambria Math">Cambria Math</option>
+                                                <option value="Candara">Candara</option>
+                                                <option value="Comic Sans MS">Comic Sans MS</option>
+                                                <option value="Consolas">Consolas</option>
+                                                <option value="Constantia">Constantia</option>
+                                                <option value="Corbel">Corbel</option>
+                                                <option value="Courier New">Courier New</option>
+                                                <option value="Times New Roman" selected>Times New Roman</option>
+                                                <option value="Dotum">Dotum</option>
+                                                <option value="DotumChe">DotumChe</option>
+                                                <option value="Ebrima">Ebrima</option>
+                                                <option value="Franklin Gothic Medium">Franklin Gothic Medium</option>
+                                                <option value="Gabriola">Gabriola</option>
+                                                <option value="Gadugi">Gadugi</option>
+                                                <option value="Georgia">Georgia</option>
+                                                <option value="Gulim">Gulim</option>
+                                                <option value="GulimChe">GulimChe</option>
+                                                <option value="Impact">Impact</option>
+                                                <option value="Javanese Text">Javanese Text</option>
+                                                <option value="Leelawadee UI">Leelawadee UI</option>
+                                                <option value="Leelawadee UI Semilight">Leelawadee UI Semilight</option>
+                                                <option value="Lucida Console">Lucida Console</option>
+                                                <option value="Lucida Sans Unicode">Lucida Sans Unicode</option>
+                                                <option value="Malgun Gothic">Malgun Gothic</option>
+                                                <option value="Malgun Gothic Semilight">Malgun Gothic Semilight</option>
+                                                <option value="Marlett">Marlett</option>
+                                                <option value="Microsoft Himalaya">Microsoft Himalaya</option>
+                                                <option value="Microsoft JhengHei">Microsoft JhengHei</option>
+                                                <option value="Microsoft JhengHei Light">Microsoft JhengHei Light</option>
+                                                <option value="Microsoft JhengHei UI">Microsoft JhengHei UI</option>
+                                                <option value="Microsoft JhengHei UI Light">Microsoft JhengHei UI Light</option>
+                                                <option value="Microsoft New Tai Lue">Microsoft New Tai Lue</option>
+                                                <option value="Microsoft PhagsPa">Microsoft PhagsPa</option>
+                                                <option value="Microsoft Sans Serif">Microsoft Sans Serif</option>
+                                                <option value="Microsoft Tai Le">Microsoft Tai Le</option>
+                                                <option value="Microsoft YaHei">Microsoft YaHei</option>
+                                                <option value="Microsoft YaHei Light">Microsoft YaHei Light</option>
+                                                <option value="Microsoft YaHei UI">Microsoft YaHei UI</option>
+                                                <option value="Microsoft YaHei UI Light">Microsoft YaHei UI Light</option>
+                                                <option value="Microsoft Yi Baiti">Microsoft Yi Baiti</option>
+                                                <option value="MingLiU">MingLiU</option>
+                                                <option value="MingLiU_HKSCS">MingLiU_HKSCS</option>
+                                                <option value="MingLiU_HKSCS-ExtB">MingLiU_HKSCS-ExtB</option>
+                                                <option value="MingLiU_ExtB">MingLiU_ExtB</option>
+                                                <option value="Mongolian Baiti">Mongolian Baiti</option>
+                                                <option value="MS Gothic">MS Gothic</option>
+                                                <option value="MS PGothic">MS PGothic</option>
+                                                <option value="MS UI Gothic">MS UI Gothic</option>
+                                                <option value="MV Boli">MV Boli</option>
+                                                <option value="Myanmar Text">Myanmar Text</option>
+                                                <option value="Mirmala UI">Mirmala UI</option>
+                                                <option value="Mirmala UI Semilight">Mirmala UI Semilight</option>
+                                                <option value="NSimSun">NSimSun</option>
+                                                <option value="Palatino Linotype">Palatino Linotype</option>
+                                                <option value="PMingLiU">PMingLiU</option>
+                                                <option value="PMingLiU-ExtB">PMingLiU-ExtB</option>
+                                                <option value="Segoe MDL2 Assets">Segoe MDL2 Assets</option>
+                                                <option value="Segoe Print">Segoe Print</option>
+                                                <option value="Segoe Script">Segoe Script</option>
+                                                <option value="Segoe UI">Segoe UI</option>
+                                                <option value="Segoe UI Black">Segoe UI Black</option>
+                                                <option value="Segoe UI Emoji">Segoe UI Emoji</option>
+                                                <option value="Segoe UI Historic">Segoe UI Historic</option>
+                                                <option value="Segoe UI Light">Segoe UI Light</option>
+                                                <option value="Segoe UI Semibold">Segoe UI Semibold</option>
+                                                <option value="Segoe UI Semilight">Segoe UI Semilight</option>
+                                                <option value="Segoe UI Symbol">Segoe UI Symbol</option>
+                                                <option value="SimSun">SimSun</option>
+                                                <option value="SimSun-ExtB">SimSun-ExtB</option>
+                                                <option value="Sitka Banner">Sitka Banner</option>
+                                                <option value="Sitka Display">Sitka Display</option>
+                                                <option value="Sitka Heading">Sitka Heading</option>
+                                                <option value="Sitka Small">Sitka Small</option>
+                                                <option value="Sitka Subheading">Sitka Subheading</option>
+                                                <option value="Sitka Text">Sitka Text</option>
+                                                <option value="Sylfaen">Sylfaen</option>
+                                                <option value="Symbol">Symbol</option>
+                                                <option value="Tahoma">Tahoma</option>
+                                                <option value="Times New Roman">Times New Roman</option>
+                                                <option value="Trebuchet MS">Trebuchet MS</option>
+                                                <option value="Verdana">Verdana</option>
+                                                <option value="Webdings">Webdings</option>
+                                                <option value="Yu Gothic">Yu Gothic</option>
+                                                <option value="Yu Gothic Light">Yu Gothic Light</option>
+                                                <option value="Yu Gothic Medium">Yu Gothic Medium</option>
+                                                <option value="Yu Gothic UI">Yu Gothic UI</option>
+                                                <option value="Yu Gothic UI Light">Yu Gothic UI Light</option>
+                                                <option value="Yu Gothic UI Semibold">Yu Gothic UI Semibold</option>
+                                                <option value="Yu Gothic UI Semilight">Yu Gothic UI Semilight</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label for="font_fieldLabel_size" class="form-label text-light">Font Size</label>
+                                            <input type="number" id="font_fieldLabel_size" class="form-control text-light bg-dark" step="0.25" placeholder="Size" value="9">
+                                        </div>
+                                        <div class="col-md-1 d-flex align-items-center justify-content-center">
+                                            <input type="checkbox" id="font_fieldLabel_bold" class="form-check-input bg-dark me-2" style="width: 1.25em; height: 1.25em;" aria-label="Bold" checked>
+                                            <i class="bi bi-type-bold text-light fs-5" title="Bold"></i>
+                                        </div>
+                                        <div class="col-md-1 d-flex align-items-center justify-content-center">
+                                            <input type="checkbox" id="font_fieldLabel_italics" class="form-check-input bg-dark me-2" style="width: 1.25em; height: 1.25em;" aria-label="Italics">
+                                            <i class="bi bi-type-italic text-light fs-5" title="Italics"></i>
+                                        </div>
+                                        <div class="col-md-1 d-flex align-items-center justify-content-center">
+                                            <input type="checkbox" id="font_fieldLabel_underline" class="form-check-input bg-dark me-2" style="width: 1.25em; height: 1.25em;" aria-label="Underline">
+                                            <i class="bi bi-type-underline text-light fs-5" title="Underline"></i>
+                                        </div>
+                                        <div class="col-md-1 d-flex align-items-center justify-content-center">
+                                            <input type="checkbox" id="font_fieldLabel_strikethrough" class="form-check-input bg-dark me-2" style="width: 1.25em; height: 1.25em;" aria-label="Strikethrough">
+                                            <i class="bi bi-type-strikethrough text-light fs-5" title="Strikethrough"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Field Outputs Font Settings -->
+                                <div class="mb-4 p-3 rounded-3" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);">
+                                    <h6 class="fw-semibold text-light mb-3">Field Outputs</h6>
+                                    <div class="row g-3 align-items-end">
+                                        <div class="col-md-3">
+                                            <label for="font_fieldOutput_family" class="form-label text-light">Font</label>
+                                            <select id="font_fieldOutput_family" class="form-select bg-dark text-light">
+                                                <option value="Arial">Arial</option>
+                                                <option value="Arial Black">Arial Black</option>
+                                                <option value="Calibri">Calibri</option>
+                                                <option value="Calibri Light">Calibri Light</option>
+                                                <option value="Cambria">Cambria</option>
+                                                <option value="Cambria Math">Cambria Math</option>
+                                                <option value="Candara">Candara</option>
+                                                <option value="Comic Sans MS">Comic Sans MS</option>
+                                                <option value="Consolas">Consolas</option>
+                                                <option value="Constantia">Constantia</option>
+                                                <option value="Corbel">Corbel</option>
+                                                <option value="Courier New">Courier New</option>
+                                                <option value="Times New Roman" selected>Times New Roman</option>
+                                                <option value="Dotum">Dotum</option>
+                                                <option value="DotumChe">DotumChe</option>
+                                                <option value="Ebrima">Ebrima</option>
+                                                <option value="Franklin Gothic Medium">Franklin Gothic Medium</option>
+                                                <option value="Gabriola">Gabriola</option>
+                                                <option value="Gadugi">Gadugi</option>
+                                                <option value="Georgia">Georgia</option>
+                                                <option value="Gulim">Gulim</option>
+                                                <option value="GulimChe">GulimChe</option>
+                                                <option value="Impact">Impact</option>
+                                                <option value="Javanese Text">Javanese Text</option>
+                                                <option value="Leelawadee UI">Leelawadee UI</option>
+                                                <option value="Leelawadee UI Semilight">Leelawadee UI Semilight</option>
+                                                <option value="Lucida Console">Lucida Console</option>
+                                                <option value="Lucida Sans Unicode">Lucida Sans Unicode</option>
+                                                <option value="Malgun Gothic">Malgun Gothic</option>
+                                                <option value="Malgun Gothic Semilight">Malgun Gothic Semilight</option>
+                                                <option value="Marlett">Marlett</option>
+                                                <option value="Microsoft Himalaya">Microsoft Himalaya</option>
+                                                <option value="Microsoft JhengHei">Microsoft JhengHei</option>
+                                                <option value="Microsoft JhengHei Light">Microsoft JhengHei Light</option>
+                                                <option value="Microsoft JhengHei UI">Microsoft JhengHei UI</option>
+                                                <option value="Microsoft JhengHei UI Light">Microsoft JhengHei UI Light</option>
+                                                <option value="Microsoft New Tai Lue">Microsoft New Tai Lue</option>
+                                                <option value="Microsoft PhagsPa">Microsoft PhagsPa</option>
+                                                <option value="Microsoft Sans Serif">Microsoft Sans Serif</option>
+                                                <option value="Microsoft Tai Le">Microsoft Tai Le</option>
+                                                <option value="Microsoft YaHei">Microsoft YaHei</option>
+                                                <option value="Microsoft YaHei Light">Microsoft YaHei Light</option>
+                                                <option value="Microsoft YaHei UI">Microsoft YaHei UI</option>
+                                                <option value="Microsoft YaHei UI Light">Microsoft YaHei UI Light</option>
+                                                <option value="Microsoft Yi Baiti">Microsoft Yi Baiti</option>
+                                                <option value="MingLiU">MingLiU</option>
+                                                <option value="MingLiU_HKSCS">MingLiU_HKSCS</option>
+                                                <option value="MingLiU_HKSCS-ExtB">MingLiU_HKSCS-ExtB</option>
+                                                <option value="MingLiU_ExtB">MingLiU_ExtB</option>
+                                                <option value="Mongolian Baiti">Mongolian Baiti</option>
+                                                <option value="MS Gothic">MS Gothic</option>
+                                                <option value="MS PGothic">MS PGothic</option>
+                                                <option value="MS UI Gothic">MS UI Gothic</option>
+                                                <option value="MV Boli">MV Boli</option>
+                                                <option value="Myanmar Text">Myanmar Text</option>
+                                                <option value="Mirmala UI">Mirmala UI</option>
+                                                <option value="Mirmala UI Semilight">Mirmala UI Semilight</option>
+                                                <option value="NSimSun">NSimSun</option>
+                                                <option value="Palatino Linotype">Palatino Linotype</option>
+                                                <option value="PMingLiU">PMingLiU</option>
+                                                <option value="PMingLiU-ExtB">PMingLiU-ExtB</option>
+                                                <option value="Segoe MDL2 Assets">Segoe MDL2 Assets</option>
+                                                <option value="Segoe Print">Segoe Print</option>
+                                                <option value="Segoe Script">Segoe Script</option>
+                                                <option value="Segoe UI">Segoe UI</option>
+                                                <option value="Segoe UI Black">Segoe UI Black</option>
+                                                <option value="Segoe UI Emoji">Segoe UI Emoji</option>
+                                                <option value="Segoe UI Historic">Segoe UI Historic</option>
+                                                <option value="Segoe UI Light">Segoe UI Light</option>
+                                                <option value="Segoe UI Semibold">Segoe UI Semibold</option>
+                                                <option value="Segoe UI Semilight">Segoe UI Semilight</option>
+                                                <option value="Segoe UI Symbol">Segoe UI Symbol</option>
+                                                <option value="SimSun">SimSun</option>
+                                                <option value="SimSun-ExtB">SimSun-ExtB</option>
+                                                <option value="Sitka Banner">Sitka Banner</option>
+                                                <option value="Sitka Display">Sitka Display</option>
+                                                <option value="Sitka Heading">Sitka Heading</option>
+                                                <option value="Sitka Small">Sitka Small</option>
+                                                <option value="Sitka Subheading">Sitka Subheading</option>
+                                                <option value="Sitka Text">Sitka Text</option>
+                                                <option value="Sylfaen">Sylfaen</option>
+                                                <option value="Symbol">Symbol</option>
+                                                <option value="Tahoma">Tahoma</option>
+                                                <option value="Times New Roman">Times New Roman</option>
+                                                <option value="Trebuchet MS">Trebuchet MS</option>
+                                                <option value="Verdana">Verdana</option>
+                                                <option value="Webdings">Webdings</option>
+                                                <option value="Yu Gothic">Yu Gothic</option>
+                                                <option value="Yu Gothic Light">Yu Gothic Light</option>
+                                                <option value="Yu Gothic Medium">Yu Gothic Medium</option>
+                                                <option value="Yu Gothic UI">Yu Gothic UI</option>
+                                                <option value="Yu Gothic UI Light">Yu Gothic UI Light</option>
+                                                <option value="Yu Gothic UI Semibold">Yu Gothic UI Semibold</option>
+                                                <option value="Yu Gothic UI Semilight">Yu Gothic UI Semilight</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label for="font_fieldOutput_size" class="form-label text-light">Font Size</label>
+                                            <input type="number" id="font_fieldOutput_size" class="form-control text-light bg-dark" step="0.25" placeholder="Size" value="9">
+                                        </div>
+                                        <div class="col-md-1 d-flex align-items-center justify-content-center">
+                                            <input type="checkbox" id="font_fieldOutput_bold" class="form-check-input bg-dark me-2" style="width: 1.25em; height: 1.25em;" aria-label="Bold">
+                                            <i class="bi bi-type-bold text-light fs-5" title="Bold"></i>
+                                        </div>
+                                        <div class="col-md-1 d-flex align-items-center justify-content-center">
+                                            <input type="checkbox" id="font_fieldOutput_italics" class="form-check-input bg-dark me-2" style="width: 1.25em; height: 1.25em;" aria-label="Italics">
+                                            <i class="bi bi-type-italic text-light fs-5" title="Italics"></i>
+                                        </div>
+                                        <div class="col-md-1 d-flex align-items-center justify-content-center">
+                                            <input type="checkbox" id="font_fieldOutput_underline" class="form-check-input bg-dark me-2" style="width: 1.25em; height: 1.25em;" aria-label="Underline">
+                                            <i class="bi bi-type-underline text-light fs-5" title="Underline"></i>
+                                        </div>
+                                        <div class="col-md-1 d-flex align-items-center justify-content-center">
+                                            <input type="checkbox" id="font_fieldOutput_strikethrough" class="form-check-input bg-dark me-2" style="width: 1.25em; height: 1.25em;" aria-label="Strikethrough">
+                                            <i class="bi bi-type-strikethrough text-light fs-5" title="Strikethrough"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Help Tab -->
+                    <div class="tab-pane fade" id="help" role="tabpanel">
+                        <div id="help-container">
+                            <!-- The help content will be loaded here dynamically -->
+                            <p>Test 2</p>
                         </div>
                     </div>
                 </div>
