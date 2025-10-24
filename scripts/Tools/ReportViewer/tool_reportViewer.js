@@ -6,7 +6,7 @@ const MAX_ZOOM = 3;
 async function loadViewerComponent(containerId) {
   try {
     // Fetch the shared component HTML
-    const response = await fetch('components/devexpress-viewer.html');
+    const response = await fetch('components/comp_devexpress-viewer.html');
     const html = await response.text();
     
     // Insert the component into the specified container
@@ -19,7 +19,6 @@ async function loadViewerComponent(containerId) {
     // Now that the component is loaded, we can proceed with initialization
     return true;
   } catch (error) {
-    console.error('Error loading viewer component:', error);
     return false;
   }
 }

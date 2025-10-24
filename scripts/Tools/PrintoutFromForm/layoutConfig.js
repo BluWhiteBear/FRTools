@@ -10,7 +10,7 @@ export const LAYOUT = {
     PAGE_HEIGHT: 1120,
     VERTICAL_SPACING: 8,
     LABEL_HEIGHT: 30,
-    INPUT_HEIGHT: 30,
+    INPUT_HEIGHT: 35,
     DEFAULT_FONT: 'Times New Roman, 5pt',
     VERTICAL_GAP: 8,
 

@@ -1,53 +1,38 @@
-// Validation class for XML nodes
-export class XMLValidator {
-    // Repairs Ref numbers to be sequential starting from 1
-    static repairRefNumbers(node, currentRef = 1) {
-        let changes = [];
-        // If this node has a Ref attribute, resequence it
-        if (node.attributes?.Ref) {
-            const oldRef = node.attributes.Ref;
-            if (parseInt(oldRef) !== currentRef) {
-                changes.push({
-                    context: node.type,
-                    oldValue: oldRef,
-                    newValue: currentRef,
-                    name: node.attributes?.Name || 'unnamed'
-                });
-                node.attributes.Ref = currentRef.toString();
-            }
-            currentRef++;
-        }
-        // Recursively repair children
-        if (node.children && node.children.length > 0) {
-            node.children.forEach(child => {
-                currentRef = this.repairRefNumbers(child, currentRef).nextRef;
-                changes = changes.concat(this.repairRefNumbers(child, currentRef).changes);
-            });
-        }
-        return { changes, nextRef: currentRef };
-    }
-    static validateRefNumbers(node, currentRef = 1, parentContext = '') {
+export class XMLValidator 
+{
+    // ? Validates Ref numbers are sequential starting from 0  
+    static validateRefNumbers(node, currentRef = 0, parentContext = '')
+    {
         let issues = [];
         
-        // Check if this node has a Ref attribute
-        if (node.attributes?.Ref) {
+        // ? Check if this node has a Ref attribute
+        if (node.attributes?.Ref) 
+        {
             const refNum = parseInt(node.attributes.Ref);
-            if (isNaN(refNum)) {
+            if (isNaN(refNum))
+            {
                 issues.push(`${parentContext}Invalid Ref number format: ${node.attributes.Ref}`);
-            } else if (refNum !== currentRef) {
+            } 
+            else if (refNum !== currentRef) 
+            {
                 issues.push(`${parentContext}Non-sequential Ref number detected: ${refNum} in ${node.type} "${node.attributes.Name || 'unnamed'}" (expected ${currentRef})`);
             }
+
             currentRef = refNum + 1;
         }
 
-        // Process all children recursively, maintaining the currentRef count
-        if (node.children && node.children.length > 0) {
+        // ? Process all children recursively, maintaining the currentRef count
+        if (node.children && node.children.length > 0)
+        {
             const newContext = parentContext + (node.type ? node.type + ' > ' : '');
+
             node.children.forEach(child => {
                 const childIssues = this.validateRefNumbers(child, currentRef, newContext);
-                if (childIssues.issues.length > 0) {
+                if (childIssues.issues.length > 0)
+                {
                     issues = issues.concat(childIssues.issues);
                 }
+
                 currentRef = childIssues.nextRef;
             });
         }
@@ -55,7 +40,9 @@ export class XMLValidator {
         return { issues, nextRef: currentRef };
     }
 
-    static validateSequentialItemNumbers(node, parentContext = '') {
+    // ? Validates sequential Item numbers in containers
+    static validateSequentialItemNumbers(node, parentContext = '') 
+    {
         let issues = [];
         let sequenceBreakFound = false;
         let lastReportedNum = 0;
@@ -112,18 +99,24 @@ export class XMLValidator {
         return issues;
     }
 
-    static validateContainerItems(node, parentContext = '') {
+    // ? Validates items within specific container types for sequential numbering
+    static validateContainerItems(node, parentContext = '') 
+    {
         let issues = [];
         const containers = ['Controls', 'Rows', 'Cells', 'ExpressionBindings'];
         
-        // Check if this is a container that should have sequential items
-        if (containers.includes(node.type)) {
+        // ? Check if this is a container that should have sequential items
+        if (containers.includes(node.type))
+        {
             let itemNums = [];
-            let itemDetails = []; // Store both number and original node info
+            let itemDetails = []; // ? Store both number and original node info
+
             node.children.forEach(child => {
-                if (child.type?.startsWith('Item')) {
+                if (child.type?.startsWith('Item')) 
+                {
                     const itemNum = parseInt(child.type.replace('Item', ''));
-                    if (!isNaN(itemNum)) {
+                    if (!isNaN(itemNum))
+                    {
                         itemNums.push(itemNum);
                         itemDetails.push({
                             num: itemNum,
@@ -134,9 +127,11 @@ export class XMLValidator {
                 }
             });
 
+            // ! EARLY EXIT
+            // ? No items to validate
             if (itemNums.length === 0) return issues;
 
-            // Sort both arrays together to maintain the relationship
+            // ? Sort both arrays together to maintain the relationship
             const zipped = itemDetails.map((detail, i) => ({ detail, originalIndex: i }));
             zipped.sort((a, b) => a.detail.num - b.detail.num);
             itemDetails = zipped.map(z => z.detail);
@@ -146,22 +141,27 @@ export class XMLValidator {
             let sequenceBreakFound = false;
             let lastReportedNum = 0;
 
-            for (let i = 0; i < itemNums.length; i++) {
+            for (let i = 0; i < itemNums.length; i++) 
+            {
                 const currentNum = itemNums[i];
                 const details = itemDetails[i];
                 
-                // Calculate the deviation from expected sequence
+                // ? Calculate the deviation from expected sequence
                 const deviation = currentNum - expectedNum;
 
-                // Report issues based on specific conditions
-                if (deviation !== 0) {
-                    if (!sequenceBreakFound) {
-                        // First sequence break - always report it
+                // ? Report issues based on specific conditions
+                if (deviation !== 0)
+                {
+                    if (!sequenceBreakFound)
+                    {
+                        // ? First sequence break - always report it
                         issues.push(`${parentContext}${node.type}: First sequence break at Item${currentNum} (${details.type} "${details.name}") - Expected Item${expectedNum}`);
                         sequenceBreakFound = true;
                         lastReportedNum = currentNum;
-                    } else if (Math.abs(currentNum - lastReportedNum) > 1) {
-                        // Report additional issues only if there's a gap larger than 1
+                    } 
+                    else if (Math.abs(currentNum - lastReportedNum) > 1)
+                    {
+                        // ? Report additional issues only if there's a gap larger than 1. This indicates that ANOTHER sequence break has occurred.
                         issues.push(`${parentContext}${node.type}: Large sequence gap at Item${currentNum} (${details.type} "${details.name}") - Previous reported was Item${lastReportedNum}`);
                         lastReportedNum = currentNum;
                     }
@@ -171,8 +171,9 @@ export class XMLValidator {
             }
         }
 
-        // Recursively validate children
-        if (node.children && node.children.length > 0) {
+        // ? Recursively validate children
+        if (node.children && node.children.length > 0)
+        {
             const newContext = parentContext + (node.type ? node.type + ' > ' : '');
             node.children.forEach(child => {
                 const childIssues = this.validateContainerItems(child, newContext);
@@ -183,7 +184,9 @@ export class XMLValidator {
         return issues;
     }
 
-    static validateAll(rootNode) {
+    // ? Validates all aspects: sequential items, container items, and Ref numbers
+    static validateAll(rootNode) 
+    {
         const sequentialIssues = this.validateSequentialItemNumbers(rootNode);
         const containerIssues = this.validateContainerItems(rootNode);
         const refValidation = this.validateRefNumbers(rootNode);
@@ -196,12 +199,50 @@ export class XMLValidator {
         };
     }
 
-    static repairItemNumbers(node) {
+    // ? Repairs Ref numbers to be sequential starting from 0
+    static repairRefNumbers(node, currentRef = 0)
+    {
+        let changes = [];
+
+        // ? If this node has a Ref attribute, resequence it
+        if (node.attributes?.Ref)
+        {
+            const oldRef = node.attributes.Ref;
+            if (parseInt(oldRef) !== currentRef)
+            {
+                changes.push({
+                    context: node.type,
+                    oldValue: oldRef,
+                    newValue: currentRef,
+                    name: node.attributes?.Name || 'unnamed'
+                });
+                node.attributes.Ref = currentRef.toString();
+            }
+
+            currentRef++;
+        }
+
+        // ? Recursively repair children
+        if (node.children && node.children.length > 0)
+        {
+            node.children.forEach(child => {
+                currentRef = this.repairRefNumbers(child, currentRef).nextRef;
+                changes = changes.concat(this.repairRefNumbers(child, currentRef).changes);
+            });
+        }
+
+        return { changes, nextRef: currentRef };
+    }
+
+    // ? Repairs item numbers within containers to be sequential starting from 1
+    static repairItemNumbers(node) 
+    {
         const containers = ['Controls', 'Rows', 'Cells', 'ExpressionBindings'];
         let changes = [];
 
-        // If this is a container that should have sequential items
-        if (containers.includes(node.type)) {
+        // ? If this is a container that should have sequential items
+        if (containers.includes(node.type))
+        {
             let itemNodes = node.children
                 .filter(child => child.type?.startsWith('Item'))
                 .map(child => ({
@@ -213,7 +254,7 @@ export class XMLValidator {
                 .filter(info => !isNaN(info.num))
                 .sort((a, b) => a.num - b.num);
 
-            // Resequence the items
+            // ? Resequence the items
             let currentNum = 1;
             itemNodes.forEach(item => {
                 const oldType = item.node.type;
@@ -233,7 +274,8 @@ export class XMLValidator {
         }
 
         // Recursively repair children
-        if (node.children && node.children.length > 0) {
+        if (node.children && node.children.length > 0)
+        {
             node.children.forEach(child => {
                 const childChanges = this.repairItemNumbers(child);
                 changes = changes.concat(childChanges);
@@ -243,20 +285,24 @@ export class XMLValidator {
         return changes;
     }
 
-    static validateAndRepair(rootNode) {
-        // First validate to see if repairs are needed
+    // ? Validates and attempts to repair the XML structure
+    static validateAndRepair(rootNode) 
+    {
+        // ? First validate to see if repairs are needed
         const validation = this.validateAll(rootNode);
 
         console.log('Initial Validation:', validation);
         
-        if (validation.hasIssues) {
-            // Attempt repairs
+        // ? If issues are found, attempt repairs
+        if (validation.hasIssues)
+        {
+            // ? Attempt repairs
             const changes = this.repairItemNumbers(rootNode);
             
-            // Validate again after repairs
+            // ? Validate again after repairs
             const postRepairValidation = this.validateAll(rootNode);
 
-            // Compare original and remaining issues to determine which ones were fixed
+            // ? Compare original and remaining issues to determine which ones were fixed
             const fixedIssues = {
                 sequential: validation.sequentialIssues.filter(issue => 
                     !postRepairValidation.sequentialIssues.includes(issue)
@@ -277,7 +323,8 @@ export class XMLValidator {
                 success: !postRepairValidation.hasIssues
             };
         }
-        
+
+        // ? If no issues were found, return the original validation results
         return {
             originalIssues: validation,
             changes: [],

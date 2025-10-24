@@ -27,14 +27,20 @@ export class ComponentProcessor
         document.body.appendChild(this.measureDiv);
     }
 
+    // ? Check if a given component should be hidden
     isHidden(component)
     {
-        // ? Check if component or any of its parents are hidden
+        // ! EARLY EXIT
+        // ? Is component valid?
         if (!component) return false;
+
+        // ? Check if component or any of its parents are hidden
         if (component.hidden === true) return true;
+
         return false;
     }
 
+    // ? Calculate height needed for HTML content
     calculateHtmlHeight(content, width)
     {
         // ? Set width and reset height
@@ -64,36 +70,45 @@ export class ComponentProcessor
         // ? Clear content
         this.measureDiv.innerHTML = '';
 
-        // ? Return height, minimum 30px for empty content
-        return Math.max(30, height);
+        // ? Return height, minimum INPUT_HEIGHT for empty content
+    // Always use the latest value from window.LAYOUT.INPUT_HEIGHT
+    return Math.max(window.LAYOUT && window.LAYOUT.INPUT_HEIGHT ? window.LAYOUT.INPUT_HEIGHT : 35, height);
     }
 
     // ? Main entry point for processing components
     processComponents(components, containerWidth = (LAYOUT.PAGE_WIDTH - LAYOUT.MARGIN_LEFT - LAYOUT.MARGIN_RIGHT), xOffset = 0)
     {
+        // ! EARLY EXIT
+        // ? Check if components array is valid
         if (!components || components.length === 0) return [];
 
         const processedNodes = [];
-        const gridMarkers = [];  // Store grid components for separate processing
+        const gridMarkers = [];  // ? Store grid components for separate processing
         const startingItemNum = this.xmlProcessor.currentItemNum;
 
         components.forEach(component => {
             // ? Skip hidden components
-            if (this.isHidden(component)) {
+            if (this.isHidden(component))
+            {
                 this.xmlProcessor.currentItemNum++;
                 return;
             }
 
             const result = this.processComponent(component, containerWidth, xOffset);
 
-            // If this is a grid marker, push to both arrays
-            if (result && result.type === 'grid') {
+            // ? If this is a grid marker, push to both arrays
+            if (result && result.type === 'grid')
+            {
                 gridMarkers.push(result);
-                processedNodes.push(result); // Interleave grid marker in output order
-            } else {
+                processedNodes.push(result); // ? Interleave grid marker in output order
+            } 
+            else 
+            {
                 const nodesToAdd = Array.isArray(result) ? result : [result];
                 processedNodes.push(...nodesToAdd.filter(node => node != null));
-                if (nodesToAdd.length > 0) {
+
+                if (nodesToAdd.length > 0)
+                {
                     this.xmlProcessor.currentItemNum = Math.max(
                         this.xmlProcessor.currentItemNum,
                         startingItemNum + processedNodes.length
@@ -102,12 +117,13 @@ export class ComponentProcessor
             }
         });
 
-        // Store grid markers in a property that can be accessed by the template generator
+        // ? Store grid markers in a property that can be accessed by the template generator
         this.gridComponents = gridMarkers;
 
         return processedNodes;
     }
 
+    // ? Process individual component based on its type
     processComponent(component, containerWidth, xOffset)
     {
         // ? Pass component info to getComponentDef through the window object
@@ -115,45 +131,50 @@ export class ComponentProcessor
         const def = DevExpressHelpers.getComponentDef(component.type);
         window.currentComponent = null;
         
-        // Handle grids differently
-        if (component.type === 'datagrid' || component.type === 'formgrid') {
+        // ? We're handling grids differently, as they require special table structures
+        if (component.type === 'datagrid' || component.type === 'formgrid')
+        {
             const columns = component.components || [];
             const visibleColumns = columns.filter(col => col && !this.isHidden(col));
 
-            // Extract Y-position from Form.io component if available
+            // ? Extract Y-position from Form.io component if available
             let gridY = 0;
-            if (component.hasOwnProperty('y')) {
+            if (component.hasOwnProperty('y'))
+            {
                 gridY = parseInt(component.y) || 0;
-            } else if (component.hasOwnProperty('LocationFloat')) {
-                // Try to parse LocationFloat if present
+            } 
+            else if (component.hasOwnProperty('LocationFloat'))
+            {
                 const loc = typeof component.LocationFloat === 'string' ? component.LocationFloat : '';
-                if (loc.includes(',')) {
+
+                if (loc.includes(','))
+                {
                     const yPart = loc.split(',')[1];
                     gridY = parseInt(yPart) || 0;
                 }
             }
 
-            // Create the header table
+            // ? Create the header table
             const headerTable = this.xmlProcessor.createItemNode(this.xmlProcessor.currentItemNum++, 'XRTable', {
                 Name: `${component.key}_headers`,
-                SizeF: `${containerWidth},30`,
+                SizeF: `${containerWidth},${LAYOUT.LABEL_HEIGHT}`,
                 LocationFloat: `${xOffset},${gridY}`,
                 Borders: 'All',
                 BackColor: 'Gainsboro'
             });
 
-            // Create header rows container and row
+            // ? Create header rows container and row
             const headerRows = this.xmlProcessor.buildNode('Rows', {});
             const headerRow = this.xmlProcessor.createItemNode(1, 'XRTableRow', {
                 Weight: '1'
             });
 
-            // Create cells container
+            // ? Create cells container
             const headerCells = this.xmlProcessor.buildNode('Cells', {});
 
-            // Process each column to create header cells
+            // ? Process each column to create header cells
             visibleColumns.forEach((column, index) => {
-                console.log('[DEBUG] Creating XRTableCell for field label. Font:', LAYOUT.FONT_FIELDLABEL);
+                //console.log('[DEBUG] Creating XRTableCell for field label. Font:', LAYOUT.FONT_FIELDLABEL);
                 const cell = this.xmlProcessor.createItemNode(index + 1, 'XRTableCell', {
                     Text: column.label || column.key || '',
                     Weight: '1',
@@ -164,27 +185,28 @@ export class ComponentProcessor
                 headerCells.addChild(cell);
             });
 
-            // Build the header structure
+            // ? Build the header structure
             headerRow.addChild(headerCells);
             headerRows.addChild(headerRow);
             headerTable.addChild(headerRows);
 
-            // Create the data table for key bindings
+            // ? Create the data table for key bindings
             const dataTable = this.xmlProcessor.createItemNode(this.xmlProcessor.currentItemNum++, 'XRTable', {
                 Name: `${component.key}_data`,
-                SizeF: `${containerWidth},30`,
+                // Always use the latest value from window.LAYOUT.INPUT_HEIGHT
+                SizeF: `${containerWidth},${window.LAYOUT && window.LAYOUT.INPUT_HEIGHT ? window.LAYOUT.INPUT_HEIGHT : 35}`,
                 LocationFloat: `${xOffset},${gridY}`,
                 Borders: 'All'
             });
 
-            // Create data rows and cells
+            // ? Create data rows and cells
             const dataRows = this.xmlProcessor.buildNode('Rows', {});
             const dataRow = this.xmlProcessor.createItemNode(1, 'XRTableRow', {
                 Weight: '1'
             });
             const dataCells = this.xmlProcessor.buildNode('Cells', {});
 
-            // Process each column to create data cells with bindings
+            // ? Process each column to create data cells with bindings
             visibleColumns.forEach((column, index) => {
                 const cell = this.xmlProcessor.createItemNode(index + 1, 'XRTableCell', {
                     Weight: '1',
@@ -193,7 +215,7 @@ export class ComponentProcessor
                     Font: LAYOUT.FONT_FIELDOUTPUT
                 });
 
-                // Add data binding for each cell
+                // ? Add data binding for each cell
                 const binding = this.xmlProcessor.createExpressionBindings({
                     eventName: 'BeforePrint',
                     propertyName: 'Text',
@@ -203,12 +225,12 @@ export class ComponentProcessor
                 dataCells.addChild(cell);
             });
 
-            // Build the data structure
+            // ? Build the data structure
             dataRow.addChild(dataCells);
             dataRows.addChild(dataRow);
             dataTable.addChild(dataRows);
 
-            // Return the grid marker with both header and data content, and correct Y
+            // ? Return the grid marker with both header and data content, and correct Y
             return {
                 type: 'grid',
                 gridType: component.type,
@@ -236,7 +258,7 @@ export class ComponentProcessor
                     const result = this.createLabelNode(component, containerWidth, xOffset);
                     const labelNode = result.node !== undefined ? result.node : result;
                     nodes.push(labelNode);
-                    this.currentY += 30; // ? Label height
+                    this.currentY += LAYOUT.LABEL_HEIGHT; // ? Label height
                 }
 
                 // ? Process the subreport itself
@@ -248,7 +270,9 @@ export class ComponentProcessor
                 break;
 
             case 'panel':
+
             case 'fieldset':
+
             case 'well':
                 nodes.push(...this.processContainer(component, containerWidth, xOffset));
                 break;
@@ -281,27 +305,34 @@ export class ComponentProcessor
 
                 if (def.requiresLabel && component.label && !component.hideLabel)
                 {
-                    if (component.labelPosition === 'bottom') {
-                        // For bottom labels, we'll create and position the label after the value component
+                    if (component.labelPosition === 'bottom')
+                    {
+                        // ? For bottom labels, we'll create and position the label after the value component
                         componentX = xOffset;
                         componentWidth = containerWidth;
-                    } else {
-                        // For all other positions, create label immediately
+                    } 
+                    else
+                    {
+                        // ? For all other positions, create label immediately
                         const result = this.createLabelNode(component, containerWidth, xOffset);
                         
-                        if (result.node !== undefined) {
-                            // New format with positioning info
+                        if (result.node !== undefined)
+                        {
+                            // ? New format with positioning info
                             nodes.push(result.node);
                             componentX = result.componentX;
                             componentWidth = result.componentWidth;
                             
-                            if (component.labelPosition === 'top') {
-                                this.currentY += 30; // Top label behavior
+                            if (component.labelPosition === 'top')
+                            {
+                                this.currentY += LAYOUT.LABEL_HEIGHT;
                             }
-                        } else {
-                            // Old format (direct node)
+                        } 
+                        else
+                        {
+                            // ? Old format (direct node)
                             nodes.push(result);
-                            this.currentY += 30; // Default top label behavior
+                            this.currentY += LAYOUT.LABEL_HEIGHT;
                         }
                     }
                 }
@@ -310,8 +341,7 @@ export class ComponentProcessor
                 let componentHeight = def.defaultHeight;
                 
                 // ? Handle dynamic height components
-                if ((component.type === 'htmlelement' && component.content) ||
-                    (component.type === 'content' && component.html))
+                if ((component.type === 'htmlelement' && component.content) || (component.type === 'content' && component.html))
                 {
                     const htmlContent = component.content || component.html;
                     const cleanedHtml = this.xmlProcessor.cleanHtml(htmlContent);
@@ -322,27 +352,35 @@ export class ComponentProcessor
                     componentHeight = def.calculateHeight(component);
                 }
 
-                // Create the value component first
+                // ? Create the value component first
                 const valueNode = this.createValueNode(component, componentWidth, componentX);
                 nodes.push(valueNode);
                 
-                // Get value component height for positioning
+                // ? Get value component height for positioning
                 const valueHeight = parseFloat(valueNode.attributes.SizeF.split(',')[1]);
 
-                if (def.requiresLabel && component.label && component.labelPosition === 'bottom') {
-                    // For bottom labels, create the label after the value and position it below
+                if (def.requiresLabel && component.label && component.labelPosition === 'bottom')
+                {
+                    // ? For bottom labels, create the label after the value and position it below
                     const labelY = this.currentY + valueHeight + DevExpressDefinitions.commonAttributes.spacing.componentSpacing;
-                    this.currentY = labelY; // Temporarily move currentY to where label should go
+                    this.currentY = labelY; // ? Temporarily move currentY to where label should go
                     const result = this.createLabelNode(component, containerWidth, xOffset);
-                    if (result.node !== undefined) {
+
+                    if (result.node !== undefined)
+                    {
                         nodes.push(result.node);
-                        // Get label height for final positioning
+
+                        // ? Get label height for final positioning
                         const labelHeight = parseFloat(result.node.attributes.SizeF.split(',')[1]);
                         this.currentY += labelHeight + DevExpressDefinitions.commonAttributes.spacing.componentSpacing;
-                    } else {
+                    }
+                    else
+                    {
                         this.currentY = this.currentY + valueHeight + DevExpressDefinitions.commonAttributes.spacing.componentSpacing;
                     }
-                } else {
+                }
+                else
+                {
                     this.currentY += valueHeight + DevExpressDefinitions.commonAttributes.spacing.componentSpacing;
                 }
         }
@@ -350,6 +388,7 @@ export class ComponentProcessor
         return nodes;
     }
 
+    // ? Process container components like panels, fieldsets, wells
     processContainer(component, containerWidth, xOffset)
     {
         // ? Skip if container is hidden
@@ -371,8 +410,7 @@ export class ComponentProcessor
         });
 
         // ? Create Controls node for the container and add it to the container
-        const controlsNode = this.xmlProcessor.buildNode('Controls',
-        {});
+        const controlsNode = this.xmlProcessor.buildNode('Controls', {});
         containerNode.addChild(controlsNode);
 
         // ? Save current item number state
@@ -385,29 +423,29 @@ export class ComponentProcessor
         // ? Reset item numbering for container contents (including label)
         this.xmlProcessor.currentItemNum = 0;
 
-        // Container insets and styling
+        // ? Container insets and styling
         const containerInsets = {
-            top: 15,    // Top padding
-            left: 15,   // Left padding
-            right: 15   // Right padding
+            top: 10,    // ? Top padding
+            left: 10,   // ? Left padding
+            right: 10   // ? Right padding
         };
 
         // ? If container has a label and it's not hidden, add it first
         if (component.label && !component.hideLabel)
         {
-            // Estimate width needed for the label text
+            // ? Estimate label width needed for the label text
             const labelWidth = this.estimateLabelWidth(component.label);
-            
-            // Create label with text-based width and proper position (no extra inset for labels)
+
+            // ? Create label with text-based width and proper position (no extra inset for labels)
             const result = this.createLabelNode(component, labelWidth, xOffset);
             const labelNode = result.node !== undefined ? result.node : result;
             controlsNode.addChild(labelNode);
-            this.currentY += 30; // ? Label height
+            this.currentY += LAYOUT.LABEL_HEIGHT; // ? Label height
         }
 
         // ? Process nested components with adjusted width and offset
-        const nestedWidth = containerWidth - (containerInsets.left + containerInsets.right); // Account for padding
-        const nestedXOffset = containerInsets.left; // Consistent left padding
+        const nestedWidth = containerWidth - (containerInsets.left + containerInsets.right);
+        const nestedXOffset = containerInsets.left;
 
         if (component.components)
         {
@@ -416,14 +454,14 @@ export class ComponentProcessor
         }
 
         // ? Restore original Y position and item number state
-        this.currentY = originalY + this.calculateContainerHeight(component) +
-            DevExpressDefinitions.commonAttributes.spacing.sectionSpacing;
+        this.currentY = originalY + this.calculateContainerHeight(component) + DevExpressDefinitions.commonAttributes.spacing.sectionSpacing;
         this.xmlProcessor.currentItemNum = savedItemNum;
 
         nodes.push(containerNode);
         return nodes;
     }
 
+    // ? Process columns components
     processColumns(component, containerWidth, xOffset)
     {
         // ? Skip if columns component is hidden
@@ -439,31 +477,24 @@ export class ComponentProcessor
         // ? Filter out hidden columns
         const visibleColumns = component.columns.filter(col => !this.isHidden(col));
 
-        // console.log('Visible Columns:', visibleColumns.map(col => ({ 
-        //     key: col.key, 
-        //     width: col.width,
-        //     type: col.type 
-        // })));
-
         // ? Calculate total width units and adjust for any missing widths
         const totalUnits = visibleColumns.reduce((sum, col) => {
             const width = col.width || 0;
-            //console.log(`Column ${col.key} width: ${width}`);
+
             return sum + width;
         }, 0) || 12;
-        
-        //console.log('Total Units:', totalUnits);
         
         // ? Function to calculate pixel width from column units
         const calculateColumnPixelWidth = (columnWidth) => {
             // ! Default to equal width if no width specified
-            if (!columnWidth) {
-                //console.log('No width specified, using equal distribution');
+            if (!columnWidth)
+            {
                 return containerWidth / visibleColumns.length;
             }
+
             // ? Calculate width based on proportion of total units (default 12)
             const pixelWidth = (columnWidth / totalUnits) * containerWidth;
-            //console.log(`Column width ${columnWidth} -> pixel width ${pixelWidth}`);
+
             return pixelWidth;
         };
 
@@ -482,8 +513,7 @@ export class ComponentProcessor
         const savedItemNum = this.xmlProcessor.currentItemNum;
 
         // ? Create Rows container (no attributes needed)
-        const rowsNode = this.xmlProcessor.buildNode('Rows',
-        {});
+        const rowsNode = this.xmlProcessor.buildNode('Rows', {});
         tableNode.addChild(rowsNode);
 
         // ? Reset item numbering for the row
@@ -498,8 +528,7 @@ export class ComponentProcessor
         rowsNode.addChild(rowNode);
 
         // ? Create Cells container
-        const cellsNode = this.xmlProcessor.buildNode('Cells',
-        {});
+        const cellsNode = this.xmlProcessor.buildNode('Cells', {});
         rowNode.addChild(cellsNode);
 
         // ? Reset item numbering for cells
@@ -522,14 +551,6 @@ export class ComponentProcessor
             // ? Calculate weight - if no width specified, use equal distribution
             const colWeight = col.width ? (col.width / totalUnits) : (1 / visibleColumns.length);
             
-            // console.log(`Column ${col.key} calculations:`, {
-            //     width: col.width,
-            //     totalUnits,
-            //     colWidth,
-            //     colWeight,
-            //     visibleColumnsLength: visibleColumns.length
-            // });
-            
             // ? Convert weight to string before passing to createItemNode
             const weightStr = String(colWeight.toFixed(6));
             const widthStr = String(colWidth.toFixed(1));
@@ -547,8 +568,7 @@ export class ComponentProcessor
             // ? Process components within the column
             if (col.components)
             {
-                const controlsNode = this.xmlProcessor.buildNode('Controls',
-                {});
+                const controlsNode = this.xmlProcessor.buildNode('Controls', {});
                 cellNode.addChild(controlsNode);
 
                 // ? Reset item numbering for cell contents
@@ -558,7 +578,7 @@ export class ComponentProcessor
                 this.currentY = 0; // ? Reset Y for column content
 
                 // ? Use calculated pixel width for components, accounting for padding
-                const columnNodes = this.processComponents(col.components, colWidth - 16, 8);
+                const columnNodes = this.processComponents(col.components, colWidth - 16, 10); // ? 10px padding on each side
                 columnNodes.forEach(node => controlsNode.addChild(node));
 
                 this.currentY = savedY; // ? Restore Y position
@@ -577,13 +597,14 @@ export class ComponentProcessor
         return nodes;
     }
 
-    // Estimate width needed for label text
-    estimateLabelWidth(text) {
-        // Base calculation on average character width
-        const averageCharWidth = 10; // Pixels per character
-        const minWidth = 50; // Minimum width in pixels
+    // ? Estimates width needed for label text
+    estimateLabelWidth(text) 
+    {
+        // ? Base calculation on average character width
+        const averageCharWidth = 10;    // ? Pixels per character
+        const minWidth = 50;            // ? Minimum width in pixels
         
-        // Calculate width based on text length, only enforcing minimum width
+        // ? Calculate width based on text length
         const estimatedWidth = Math.max(
             minWidth,
             text.length * averageCharWidth
@@ -592,29 +613,20 @@ export class ComponentProcessor
         return estimatedWidth;
     }
 
+    // ? Calculate label and component positions based on labelPosition property
     calculateLabelPosition(position, componentWidth, labelWidth, xOffset) {
-        // Default to top position if not specified
+        // ? Default to top position if not specified
         position = position || 'top';
-        const spacing = 10; // Spacing between label and component
+        const spacing = 10;     // ? Spacing between label and component
 
-        // console.log('Label Position Calculation:', {
-        //     position,
-        //     componentWidth,
-        //     labelWidth,
-        //     xOffset,
-        //     spacing
-        // });
-
-        // Ensure label width is reasonable
+        // ? Ensure label width is reasonable
         labelWidth = Math.min(
             labelWidth,
-            // For side positions, don't let label take more than 40% of total width
+            // ? For side positions, don't let label take more than 40% of total width
             position.startsWith('left-') || position.startsWith('right-') 
-                ? Math.min(160, componentWidth * 0.3)  // Cap at 160px or 30% of width
+                ? Math.min(160, componentWidth * 0.3)  // ? Cap at 160px or 30% of width
                 : componentWidth
         );
-
-        //console.log('Adjusted Label Width:', labelWidth);
 
         switch (position) {
             case 'left-left':
@@ -645,16 +657,17 @@ export class ComponentProcessor
         }
     }
 
+    // ? Create label node with positioning logic
     createLabelNode(component, width, xOffset)
     {
         const def = DevExpressHelpers.getComponentDef(component.type);
         const isPanel = component.type === 'panel' || component.type === 'fieldset' || component.type === 'well';
         const labelStyle = DevExpressHelpers.getLabelStyle(component.isHeader ? 'header' : (isPanel ? 'sectionHeader' : 'default'));
-        const height = component.isHeader ? 50 : 30;
+        const height = component.isHeader ? 50 : LAYOUT.LABEL_HEIGHT;
 
-        // If no label position specified or it's a header, use default top positioning
-        if (!component.labelPosition || component.isHeader) {
-            console.log('[DEBUG] Creating XRLabel for field label "' + (component.label || '') + '" Font:' + LAYOUT.FONT_FIELDLABEL);
+        // ? If no labelPosition or isHeader, create simple label
+        if (!component.labelPosition || component.isHeader)
+        {
             return this.xmlProcessor.createItemNode(undefined, 'XRLabel',
             {
                 Name: `label_${component.key || `field${Date.now()}`}`,
@@ -665,11 +678,11 @@ export class ComponentProcessor
             });
         }
 
-        // Calculate a reasonable label width based on text length
+        // ? Calculate a reasonable label width based on text length
         const labelText = component.label || '';
         const estimatedLabelWidth = this.estimateLabelWidth(labelText);
 
-        // Calculate position for label based on labelPosition
+        // ? Calculate position for label based on labelPosition
         const position = this.calculateLabelPosition(
             component.labelPosition,
             width,
@@ -686,7 +699,7 @@ export class ComponentProcessor
             ...labelStyle
         });
 
-        // For normal fields (not headers) with label positioning
+        // ? For normal fields (not headers) with label positioning
         return {
             node: node,
             componentX: position.componentX,
@@ -694,6 +707,7 @@ export class ComponentProcessor
         };
     }
 
+    // ? Create value node for standard components
     createValueNode(component, width, xOffset)
     {
         const def = DevExpressHelpers.getComponentDef(component.type);
@@ -758,6 +772,7 @@ export class ComponentProcessor
         return node;
     }
 
+    // ? Calculate height of a container based on its components
     calculateContainerHeight(container)
     {
         let height = 0;
@@ -765,7 +780,7 @@ export class ComponentProcessor
         // ? Add label height if container has a label
         if (container.label)
         {
-            height += 30; // ? Label height plus spacing
+            height += LAYOUT.LABEL_HEIGHT; // ? Label height plus spacing
             height += DevExpressDefinitions.commonAttributes.spacing.componentSpacing;
         }
 
@@ -824,7 +839,7 @@ export class ComponentProcessor
                 }
 
                 // ? Add component height plus label height if needed
-                return total + componentHeight + (def.requiresLabel ? 30 : 0) +
+                return total + componentHeight + (def.requiresLabel ? LAYOUT.LABEL_HEIGHT : 0) +
                     DevExpressDefinitions.commonAttributes.spacing.componentSpacing;
             }, 0);
         }
@@ -833,7 +848,8 @@ export class ComponentProcessor
         return height + (DevExpressDefinitions.commonAttributes.spacing.sectionSpacing * 2);
     }
 
-    // Placeholder SubReport Creation
+    // ! Placeholder SubReport Creation
+    // ? Create subreport node
     createSubReportNode(component, width, xOffset)
     {
         // ! Temporarily disable nested subforms due to issues. Create the subreport label like normal,
@@ -843,7 +859,7 @@ export class ComponentProcessor
         {
             Name: `placeholder_${component.key || Date.now()}`,
             Text: 'REPLACE ME WITH SUBREPORT',
-            SizeF: `${width},30`,
+            SizeF: `${width},${LAYOUT.LABEL_HEIGHT}`,
             LocationFloat: `${xOffset},${this.currentY}`
         });
 
@@ -851,56 +867,60 @@ export class ComponentProcessor
         return placeholderNode;
     }
 
-    // REAL SubReport Creation
-    // createSubReportNode(component, width, xOffset)
-    // {
-    //     const def = DevExpressHelpers.getComponentDef('nestedsubform');
+    // ! REAL SubReport Creation (Disabled due to issues)
+    // ? Create subreport node
+    /*
+    createSubReportNode(component, width, xOffset)
+    {
+        const def = DevExpressHelpers.getComponentDef('nestedsubform');
 
-    //     // ? Create the subreport node
-    //     const node = this.xmlProcessor.createItemNode(undefined, def.controlType,
-    //     {
-    //         Name: `subreport_${component.key || Date.now()}`,
-    //         ...def.attributes,
-    //         SizeF: `${width},${def.defaultHeight}`,
-    //         LocationFloat: `${xOffset},${this.currentY}`,
-    //     });
+        // ? Create the subreport node
+        const node = this.xmlProcessor.createItemNode(undefined, def.controlType,
+        {
+            Name: `subreport_${component.key || Date.now()}`,
+            ...def.attributes,
+            SizeF: `${width},${def.defaultHeight}`,
+            LocationFloat: `${xOffset},${this.currentY}`,
+        });
 
-    //     // ? Create ReportSource node with required structure
-    //     const reportSource = this.xmlProcessor.buildNode('ReportSource',
-    //     {
-    //         Ref: (this.xmlProcessor.currentRef++).toString(),
-    //         ControlType: 'DevExpress.XtraReports.UI.XtraReport, DevExpress.XtraReports.v23.2, Version=23.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a',
-    //         PageWidth: '850',
-    //         PageHeight: '1100',
-    //         Version: '23.2',
-    //         Font: 'Arial, 9pt'
-    //     });
+        // ? Create ReportSource node with required structure
+        const reportSource = this.xmlProcessor.buildNode('ReportSource',
+        {
+            Ref: (this.xmlProcessor.currentRef++).toString(),
+            ControlType: 'DevExpress.XtraReports.UI.XtraReport, DevExpress.XtraReports.v23.2, Version=23.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a',
+            PageWidth: '850',
+            PageHeight: '1100',
+            Version: '23.2',
+            Font: 'Arial, 9pt'
+        });
 
-    //     // ? Add bands structure without a Ref attribute
-    //     const bandsNode = this.xmlProcessor.buildNode('Bands', null, [
-    //         this.xmlProcessor.buildNode('Item1',
-    //         {
-    //             Ref: (this.xmlProcessor.currentRef++).toString(),
-    //             ControlType: 'TopMarginBand'
-    //         }, null, true),
-    //         this.xmlProcessor.buildNode('Item2',
-    //         {
-    //             Ref: (this.xmlProcessor.currentRef++).toString(),
-    //             ControlType: 'DetailBand'
-    //         }, null, true),
-    //         this.xmlProcessor.buildNode('Item3',
-    //         {
-    //             Ref: (this.xmlProcessor.currentRef++).toString(),
-    //             ControlType: 'BottomMarginBand'
-    //         }, null, true)
-    //     ]);
+        // ? Add bands structure without a Ref attribute
+        const bandsNode = this.xmlProcessor.buildNode('Bands', null, [
+            this.xmlProcessor.buildNode('Item1',
+            {
+                Ref: (this.xmlProcessor.currentRef++).toString(),
+                ControlType: 'TopMarginBand'
+            }, null, true),
+            this.xmlProcessor.buildNode('Item2',
+            {
+                Ref: (this.xmlProcessor.currentRef++).toString(),
+                ControlType: 'DetailBand'
+            }, null, true),
+            this.xmlProcessor.buildNode('Item3',
+            {
+                Ref: (this.xmlProcessor.currentRef++).toString(),
+                ControlType: 'BottomMarginBand'
+            }, null, true)
+        ]);
 
-    //     reportSource.addChild(bandsNode);
-    //     node.addChild(reportSource);
+        reportSource.addChild(bandsNode);
+        node.addChild(reportSource);
 
-    //     return node;
-    // }
+        return node;
+    }
+    */
 
+    // ? Create radio buttons container with individual radio buttons
     createRadioButtonsNode(component, width, xOffset, def)
     {
         // ? Create container panel
@@ -914,8 +934,7 @@ export class ComponentProcessor
         });
 
         // ? Create Controls container
-        const controlsNode = this.xmlProcessor.buildNode('Controls',
-        {});
+        const controlsNode = this.xmlProcessor.buildNode('Controls', {});
         node.addChild(controlsNode);
 
         // ? Save and reset item numbering for the buttons
@@ -927,7 +946,7 @@ export class ComponentProcessor
         // ? Create a checkbox for each radio option
         let optionY = 0;
         let optionX = 0;
-        const buttonSpacing = window.LAYOUT.VERTICAL_SPACING;
+        const buttonSpacing = window.LAYOUT.INPUT_HEIGHT;
         
         if (component.values && Array.isArray(component.values))
         {
@@ -951,7 +970,8 @@ export class ComponentProcessor
                     Name: `radio_${component.key}_${index + 1}`,
                     ...def.child.attributes,
                     Text: this.xmlProcessor.escapeText(option.label),
-                    SizeF: `${buttonWidth},30`,
+                    // Always use the latest value from window.LAYOUT.INPUT_HEIGHT
+                    SizeF: `${buttonWidth},${window.LAYOUT && window.LAYOUT.INPUT_HEIGHT ? window.LAYOUT.INPUT_HEIGHT : 35}`,
                     LocationFloat: `${buttonX},${buttonY}`
                 });
 
@@ -970,7 +990,8 @@ export class ComponentProcessor
                 if (isInline) {
                     optionX += buttonWidth + buttonSpacing;
                 } else {
-                    optionY += 30;
+                    // Always use the latest value from window.LAYOUT.INPUT_HEIGHT
+                    optionY += window.LAYOUT && window.LAYOUT.INPUT_HEIGHT ? window.LAYOUT.INPUT_HEIGHT : 35;
                 }
             });
         }
@@ -981,6 +1002,7 @@ export class ComponentProcessor
         return node;
     }
 
+    // ? Process datagrid components
     processDataGrid(component, containerWidth, xOffset)
     {
         // ? Skip if datagrid component is hidden
@@ -990,8 +1012,8 @@ export class ComponentProcessor
             return [];
         }
 
-        // Return a special marker object instead of generating nodes
-        // This tells the parent process that this grid's content will be handled separately
+        // ? Return a special marker object instead of generating nodes
+        // ! This tells the parent process that this grid's content will be handled separately
         return {
             type: 'grid',
             gridType: 'datagrid',
@@ -1000,108 +1022,128 @@ export class ComponentProcessor
             width: containerWidth,
             xOffset: xOffset
         };
+    }
 
-        // ? Get columns from either components array or columns property
-        const columns = component.components || component.columns || [];
-
-        // ? Filter out hidden columns and ensure they are valid
-        const visibleColumns = columns.filter(col => col && !this.isHidden(col));
-
-        // ? If no valid columns found, return early
-        if (!visibleColumns.length)
+    // ? Process formgrid components
+    processFormGrid(component, containerWidth, xOffset)
+    {
+        // ? Skip if formgrid component is hidden
+        if (this.isHidden(component))
         {
-            console.warn(`No visible columns found in datagrid component ${component.key || 'unknown'}`);
+            this.xmlProcessor.currentItemNum++;
+            return [];
+        }
+
+        const nodes = [];
+        const def = DevExpressHelpers.getComponentDef(component.type || 'formgrid');
+
+        // ? First create the label if required
+        if (def.requiresLabel)
+        {
+            nodes.push(this.createLabelNode(component, containerWidth, xOffset));
+            this.currentY += LAYOUT.LABEL_HEIGHT; // ? Label height
+        }
+
+        // ? For formgrids, we get field information from the Form Fields property
+        const fields = component.formFields || [];
+
+        // ? If no fields found, return early
+        if (!fields.length)
+        {
+            console.warn(`No fields found in formgrid component ${component.key || 'unknown'}`);
             return nodes;
         }
 
-        // ? Track the starting item number and use sequential numbering
-        let currentItemNum = this.xmlProcessor.currentItemNum;
-
-        // ? Create header table as next item
-        const headerTableNode = this.xmlProcessor.createItemNode(++currentItemNum, 'XRTable',
+        // ? Create header table
+        const headerTableNode = this.xmlProcessor.createItemNode(undefined, 'XRTable',
         {
-            Name: `${component.key}_headers` || `datagrid_headers_${Date.now()}`,
+            Name: `${component.key}_headers` || `formgrid_headers_${Date.now()}`,
             ...def.headerTable.attributes,
-            SizeF: `${containerWidth},30`,
+            SizeF: `${containerWidth},${LAYOUT.HEADER_HEIGHT}`,
             LocationFloat: `${xOffset},${this.currentY}`
         });
 
-        // ? Create header rows container
-        const headerRowsNode = this.xmlProcessor.buildNode('Rows',
-        {});
+        // ? Create header rows container 
+        const headerRowsNode = this.xmlProcessor.buildNode('Rows', {});
         headerTableNode.addChild(headerRowsNode);
 
-        // ? Create header row (always Item1 within Rows)
+        // ? Save current item number state
+        const savedItemNum = this.xmlProcessor.currentItemNum;
+        this.xmlProcessor.currentItemNum = 0;
+
+        // ? Create header row
         const headerRowNode = this.xmlProcessor.createItemNode(1, 'XRTableRow',
         {
-            Name: `${component.key}_headerRow` || `datagrid_headerRow_${Date.now()}`,
+            Name: `${component.key}_headerRow` || `formgrid_headerRow_${Date.now()}`,
             ...def.headerTable.rowAttributes
         });
         headerRowsNode.addChild(headerRowNode);
 
         // ? Create header cells container
-        const headerCellsNode = this.xmlProcessor.buildNode('Cells',
-        {});
+        const headerCellsNode = this.xmlProcessor.buildNode('Cells', {});
         headerRowNode.addChild(headerCellsNode);
 
-        // ? Create header cells with column labels, using sequential numbers within their container
-        visibleColumns.forEach((col, index) =>
-        {
-            // ? Handle both direct properties and nested component properties
-            const key = col.key || col.component?.key || `col_${index}`;
-            const label = col.label || col.title || col.component?.label || key;
+        // ? Reset item numbering for header cells
+        this.xmlProcessor.currentItemNum = 0;
 
+        // ? Filter out button fields first
+        const validFields = fields.filter(field => field.type !== 'button');
+
+        // ? Create header cells with field labels
+        validFields.forEach((field, index) =>
+        {
             const cellNode = this.xmlProcessor.createItemNode(index + 1, 'XRTableCell',
             {
-                Name: `header_${key}`,
-                Text: label,
-                Weight: (1 / visibleColumns.length).toString(),
+                Name: `header_${field.key}`,
+                Text: field.label || field.key,
+                Weight: (1 / validFields.length).toString(),
                 ...def.headerTable.cellAttributes
             });
             headerCellsNode.addChild(cellNode);
         });
 
+        const headerTableItemNum = this.xmlProcessor.currentItemNum;
         nodes.push(headerTableNode);
-        this.currentY += 30; // ? Just move down by the height of the header row
+        this.currentY += LAYOUT.LABEL_HEIGHT; // ? Just move down by the height of the header row
 
-        // ? Create keys table as next item
-        const keysTableNode = this.xmlProcessor.createItemNode(++currentItemNum, 'XRTable',
+        // ? Increment the item number for the data table to ensure uniqueness
+        this.xmlProcessor.currentItemNum = headerTableItemNum + 1;
+
+        // ? Create data table
+        const dataTableNode = this.xmlProcessor.createItemNode(undefined, 'XRTable',
         {
-            Name: `${component.key}_keys` || `datagrid_keys_${Date.now()}`,
+            Name: `${component.key}_data` || `formgrid_data_${Date.now()}`,
             ...def.keysTable.attributes,
-            SizeF: `${containerWidth},30`,
+            SizeF: `${containerWidth},${LAYOUT.LABEL_HEIGHT}`,
             LocationFloat: `${xOffset},${this.currentY}`
         });
 
-        // ? Create keys rows container
-        const keysRowsNode = this.xmlProcessor.buildNode('Rows',
-        {});
-        keysTableNode.addChild(keysRowsNode);
+        // ? Create data rows container
+        const dataRowsNode = this.xmlProcessor.buildNode('Rows', {});
+        dataTableNode.addChild(dataRowsNode);
 
-        // ? Create keys row
-        const keysRowNode = this.xmlProcessor.createItemNode(1, 'XRTableRow',
+        // ? Create data row
+        const dataRowNode = this.xmlProcessor.createItemNode(1, 'XRTableRow',
         {
-            Name: `${component.key}_keysRow` || `datagrid_keysRow_${Date.now()}`,
+            Name: `${component.key}_dataRow` || `formgrid_dataRow_${Date.now()}`,
             ...def.keysTable.rowAttributes
         });
-        keysRowsNode.addChild(keysRowNode);
+        dataRowsNode.addChild(dataRowNode);
 
-        // ? Create keys cells container
-        const keysCellsNode = this.xmlProcessor.buildNode('Cells',
-        {});
-        keysRowNode.addChild(keysCellsNode);
+        // ? Create data cells container
+        const dataCellsNode = this.xmlProcessor.buildNode('Cells', {});
+        dataRowNode.addChild(dataCellsNode);
 
-        // ? Create key cells with field keys, keeping item numbers sequential within their container
-        visibleColumns.forEach((col, index) =>
+        // ? Reset item numbering for data cells
+        this.xmlProcessor.currentItemNum = 0;
+
+        // ? Create data cells with field values
+        validFields.forEach((field, index) =>
         {
-            // ? Handle both direct properties and nested component properties
-            const key = col.key || col.component?.key || `col_${index}`;
-
-            // ? Create cell with sequential numbering within its container
             const cellNode = this.xmlProcessor.createItemNode(index + 1, 'XRTableCell',
             {
-                Name: `key_${key}`,
-                Weight: (1 / visibleColumns.length).toString(),
+                Name: `data_${field.key}`,
+                Weight: (1 / validFields.length).toString(),
                 ...def.keysTable.cellAttributes
             });
 
@@ -1110,22 +1152,23 @@ export class ComponentProcessor
             {
                 eventName: 'BeforePrint',
                 propertyName: 'Text',
-                expression: `[${key}]`
+                expression: `[${field.key}]`
             });
             cellNode.addChild(expressionBindings);
 
-            keysCellsNode.addChild(cellNode);
+            dataCellsNode.addChild(cellNode);
         });
 
-        nodes.push(keysTableNode);
-        this.currentY += 30 + DevExpressDefinitions.commonAttributes.spacing.sectionSpacing; // ? Use section spacing after the entire datagrid
+        nodes.push(dataTableNode);
+        this.currentY += LAYOUT.LABEL_HEIGHT + DevExpressDefinitions.commonAttributes.spacing.sectionSpacing;
 
-        // ? Update the processor's item number to the last one we used
-        this.xmlProcessor.currentItemNum = currentItemNum;
+        // ? Restore original item number
+        this.xmlProcessor.currentItemNum = savedItemNum;
 
         return nodes;
     }
 
+    // ? Process table components
     processTable(component, containerWidth, xOffset)
     {
         // ? Skip if table is hidden
@@ -1151,8 +1194,7 @@ export class ComponentProcessor
         const savedItemNum = this.xmlProcessor.currentItemNum;
 
         // ? Create Rows container
-        const rowsNode = this.xmlProcessor.buildNode('Rows',
-        {});
+        const rowsNode = this.xmlProcessor.buildNode('Rows', {});
         tableNode.addChild(rowsNode);
 
         // ? Reset item numbering for rows
@@ -1223,6 +1265,7 @@ export class ComponentProcessor
         return nodes;
     }
 
+    // ? Process tabs components
     processTabs(component, containerWidth, xOffset)
     {
         // ? Skip if tabs container is hidden
@@ -1272,7 +1315,7 @@ export class ComponentProcessor
                     key: `${tab.key || `tab${index + 1}`}_label`
                 }, containerWidth - 10, 5);
                 controlsNode.addChild(labelNode);
-                this.currentY += 30; // ? Label height
+                this.currentY += LAYOUT.LABEL_HEIGHT; // ? Label height
             }
 
             // ? Process components in this tab
@@ -1295,6 +1338,7 @@ export class ComponentProcessor
         return nodes;
     }
 
+    // ? Calculate height needed for table component
     calculateTableHeight(tableComponent)
     {
         // ? For tables, we need to calculate the maximum height needed for each row
@@ -1303,7 +1347,7 @@ export class ComponentProcessor
         // ? Calculate each row's height
         tableComponent.rows.forEach(row =>
         {
-            let rowHeight = 30; // ? Minimum row height
+            let rowHeight = LAYOUT.LABEL_HEIGHT; // ? Minimum row height
 
             // ? Find the maximum height needed by any cell in this row
             row.forEach(cell =>
@@ -1323,7 +1367,7 @@ export class ComponentProcessor
                         componentHeight = this.calculateHtmlHeight(comp.content, (LAYOUT.PAGE_WIDTH - LAYOUT.MARGIN_LEFT - LAYOUT.MARGIN_RIGHT) / row.length);
                     }
 
-                    return total + componentHeight + (def.requiresLabel ? 30 : 0) +
+                    return total + componentHeight + (def.requiresLabel ? LAYOUT.LABEL_HEIGHT : 0) +
                         DevExpressDefinitions.commonAttributes.spacing.componentSpacing;
                 }, 0);
 
@@ -1337,6 +1381,7 @@ export class ComponentProcessor
         return totalHeight + DevExpressDefinitions.commonAttributes.spacing.sectionSpacing;
     }
 
+    // ? Calculate height needed for columns component
     calculateColumnsHeight(columnsComponent)
     {
         let maxHeight = 0;
@@ -1366,7 +1411,7 @@ export class ComponentProcessor
                     }
 
                     // ? Add component height plus label height if needed
-                    return total + componentHeight + (def.requiresLabel ? 30 : 0) +
+                    return total + componentHeight + (def.requiresLabel ? LAYOUT.LABEL_HEIGHT : 0) +
                         DevExpressDefinitions.commonAttributes.spacing.componentSpacing;
                 }, 0);
             }
@@ -1375,152 +1420,5 @@ export class ComponentProcessor
 
         // ? Add padding at top and bottom, but only once since columns are always inside another container
         return maxHeight + DevExpressDefinitions.commonAttributes.spacing.sectionSpacing;
-    }
-
-    processFormGrid(component, containerWidth, xOffset)
-    {
-        // ? Skip if formgrid component is hidden
-        if (this.isHidden(component))
-        {
-            this.xmlProcessor.currentItemNum++;
-            return [];
-        }
-
-        const nodes = [];
-        const def = DevExpressHelpers.getComponentDef(component.type || 'formgrid');
-
-        // ? First create the label if required
-        if (def.requiresLabel)
-        {
-            nodes.push(this.createLabelNode(component, containerWidth, xOffset));
-            this.currentY += 30; // ? Label height
-        }
-
-        // ? For formgrids, we get field information from the Form Fields property
-        const fields = component.formFields || [];
-
-        // ? If no fields found, return early
-        if (!fields.length)
-        {
-            console.warn(`No fields found in formgrid component ${component.key || 'unknown'}`);
-            return nodes;
-        }
-
-        // ? Create header table
-        const headerTableNode = this.xmlProcessor.createItemNode(undefined, 'XRTable',
-        {
-            Name: `${component.key}_headers` || `formgrid_headers_${Date.now()}`,
-            ...def.headerTable.attributes,
-            SizeF: `${containerWidth},30`,
-            LocationFloat: `${xOffset},${this.currentY}`
-        });
-
-        // ? Create header rows container 
-        const headerRowsNode = this.xmlProcessor.buildNode('Rows',
-        {});
-        headerTableNode.addChild(headerRowsNode);
-
-        // ? Save current item number state
-        const savedItemNum = this.xmlProcessor.currentItemNum;
-        this.xmlProcessor.currentItemNum = 0;
-
-        // ? Create header row
-        const headerRowNode = this.xmlProcessor.createItemNode(1, 'XRTableRow',
-        {
-            Name: `${component.key}_headerRow` || `formgrid_headerRow_${Date.now()}`,
-            ...def.headerTable.rowAttributes
-        });
-        headerRowsNode.addChild(headerRowNode);
-
-        // ? Create header cells container
-        const headerCellsNode = this.xmlProcessor.buildNode('Cells',
-        {});
-        headerRowNode.addChild(headerCellsNode);
-
-        // ? Reset item numbering for header cells
-        this.xmlProcessor.currentItemNum = 0;
-
-        // ? Filter out button fields first
-        const validFields = fields.filter(field => field.type !== 'button');
-
-        // ? Create header cells with field labels
-        validFields.forEach((field, index) =>
-        {
-            const cellNode = this.xmlProcessor.createItemNode(index + 1, 'XRTableCell',
-            {
-                Name: `header_${field.key}`,
-                Text: field.label || field.key,
-                Weight: (1 / validFields.length).toString(),
-                ...def.headerTable.cellAttributes
-            });
-            headerCellsNode.addChild(cellNode);
-        });
-
-        const headerTableItemNum = this.xmlProcessor.currentItemNum;
-        nodes.push(headerTableNode);
-        this.currentY += 30; // ? Just move down by the height of the header row
-
-        // ? Increment the item number for the data table to ensure uniqueness
-        this.xmlProcessor.currentItemNum = headerTableItemNum + 1;
-
-        // ? Create data table
-        const dataTableNode = this.xmlProcessor.createItemNode(undefined, 'XRTable',
-        {
-            Name: `${component.key}_data` || `formgrid_data_${Date.now()}`,
-            ...def.keysTable.attributes,
-            SizeF: `${containerWidth},30`,
-            LocationFloat: `${xOffset},${this.currentY}`
-        });
-
-        // ? Create data rows container
-        const dataRowsNode = this.xmlProcessor.buildNode('Rows',
-        {});
-        dataTableNode.addChild(dataRowsNode);
-
-        // ? Create data row
-        const dataRowNode = this.xmlProcessor.createItemNode(1, 'XRTableRow',
-        {
-            Name: `${component.key}_dataRow` || `formgrid_dataRow_${Date.now()}`,
-            ...def.keysTable.rowAttributes
-        });
-        dataRowsNode.addChild(dataRowNode);
-
-        // ? Create data cells container
-        const dataCellsNode = this.xmlProcessor.buildNode('Cells',
-        {});
-        dataRowNode.addChild(dataCellsNode);
-
-        // ? Reset item numbering for data cells
-        this.xmlProcessor.currentItemNum = 0;
-
-        // ? Create data cells with field values
-        validFields.forEach((field, index) =>
-        {
-            const cellNode = this.xmlProcessor.createItemNode(index + 1, 'XRTableCell',
-            {
-                Name: `data_${field.key}`,
-                Weight: (1 / validFields.length).toString(),
-                ...def.keysTable.cellAttributes
-            });
-
-            // ? Add expression binding for the data field
-            const expressionBindings = this.xmlProcessor.createExpressionBindings(
-            {
-                eventName: 'BeforePrint',
-                propertyName: 'Text',
-                expression: `[${field.key}]`
-            });
-            cellNode.addChild(expressionBindings);
-
-            dataCellsNode.addChild(cellNode);
-        });
-
-        nodes.push(dataTableNode);
-        this.currentY += 30 + DevExpressDefinitions.commonAttributes.spacing.sectionSpacing;
-
-        // ? Restore original item number
-        this.xmlProcessor.currentItemNum = savedItemNum;
-
-        return nodes;
     }
 }

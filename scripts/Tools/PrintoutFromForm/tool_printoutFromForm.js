@@ -1,3 +1,27 @@
+
+
+//#region Imports
+import { LAYOUT } from './layoutConfig.js';
+
+import { XMLProcessor } from './xmlProcessor.js';
+import { ComponentProcessor } from './componentProcessor.js';
+
+//#endregion
+
+//#region Configuration
+
+// ? Version info is used for generating both XML and SQL
+const VERSION_INFO = {
+    version: '0.4.2',
+    updated: '10/24/2025',
+    devexpressVersion: '23.2.5.0'
+};
+
+// ? Debugging flags
+const debugLevel = 0;       // ? 0: No Logging, 
+                            // ? 1: Basic Event Logging, 
+                            // ? 2: Detailed Component Processing Logging
+
 // Settings persistence utility
 const SettingsManager = {
     SETTINGS_KEY: 'printoutFormSettings',
@@ -11,6 +35,7 @@ const SettingsManager = {
             marginsTop: document.getElementById('settings_marginsTop')?.value,
             marginsBottom: document.getElementById('settings_marginsBottom')?.value,
             labelHeight: document.getElementById('settings_labelHeight')?.value,
+            outputHeight: document.getElementById('settings_outputHeight')?.value,
             verticalSpacing: document.getElementById('settings_verticalSpacing')?.value,
 
             fontHeaderFamily: document.getElementById('font_header_family')?.value,
@@ -41,25 +66,26 @@ const SettingsManager = {
             fontFieldOutputUnderline: document.getElementById('font_fieldOutput_underline')?.checked,
             fontFieldOutputStrikethrough: document.getElementById('font_fieldOutput_strikethrough')?.checked
         };
-    localStorage.setItem(this.SETTINGS_KEY, JSON.stringify(settings));
-    console.log('[SettingsManager] Settings saved:', settings);
+
+        localStorage.setItem(this.SETTINGS_KEY, JSON.stringify(settings));
+        //console.log('[SettingsManager] Settings saved:', settings);
     },
 
     loadSettings() {
         const settingsStr = localStorage.getItem(this.SETTINGS_KEY);
         if (!settingsStr) {
-            console.log('[SettingsManager] No saved settings found.');
+            console.warn('[SettingsManager] No saved settings found.');
             return;
         }
         const settings = JSON.parse(settingsStr);
-        console.log('[SettingsManager] Settings loaded:', settings);
-        //document.getElementById('settings_orientation').value = settings.orientation || 'orientation_portrait';
+        //console.log('[SettingsManager] Settings loaded:', settings);
         document.getElementById('settings_pageWidth').value = settings.pageWidth || 850;
         document.getElementById('settings_marginsLeft').value = settings.marginsLeft || 50;
         document.getElementById('settings_marginsRight').value = settings.marginsRight || 50;
         document.getElementById('settings_marginsTop').value = settings.marginsTop || 50;
         document.getElementById('settings_marginsBottom').value = settings.marginsBottom || 50;
         document.getElementById('settings_labelHeight').value = settings.labelHeight || 30;
+        document.getElementById('settings_outputHeight').value = settings.outputHeight || 30;
         document.getElementById('settings_verticalSpacing').value = settings.verticalSpacing || 10;
 
         document.getElementById('font_header_family').value = settings.fontHeaderFamily || 'Times New Roman';
@@ -95,7 +121,7 @@ const SettingsManager = {
         // Save settings on change for all relevant fields
         const fields = [
             'settings_orientation', 'settings_pageWidth', 'settings_marginsLeft', 'settings_marginsRight',
-            'settings_marginsTop', 'settings_marginsBottom', 'settings_labelHeight', 'settings_verticalSpacing',
+            'settings_marginsTop', 'settings_marginsBottom', 'settings_labelHeight', 'settings_outputHeight', 'settings_verticalSpacing',
 
             'font_header_family', 'font_header_size', 'font_header_bold', 'font_header_italics',
             'font_header_underline', 'font_header_strikethrough',
@@ -110,7 +136,7 @@ const SettingsManager = {
             'font_fieldOutput_underline', 'font_fieldOutput_strikethrough'
         ];
 
-        console.log('[DEBUG] Setting up auto-save for fields:', fields);
+        //console.log('[DEBUG] Setting up auto-save for fields:', fields);
 
         fields.forEach(id => {
             const el = document.getElementById(id);
@@ -120,29 +146,6 @@ const SettingsManager = {
         });
     }
 };
-//#region Imports
-import { LAYOUT } from './layoutConfig.js';
-
-import { XMLProcessor } from './xmlProcessor.js';
-import { ComponentProcessor } from './componentProcessor.js';
-
-//#endregion
-
-//#region Constants
-
-// ? Version info is used for generating both XML and SQL
-const VERSION_INFO = {
-    version: '0.4.1',
-    updated: '10/23/2025',
-    devexpressVersion: '23.2.5.0'
-};
-
-// ? Debugging flags
-const debugLevel = 0;       // ? 0: No Logging, 
-                            // ? 1: Basic Event Logging, 
-                            // ? 2: Detailed Component Processing Logging
-
-// ? Details basic layout conventions for XML generation
 
 // Utility to pull settings from the Settings tab
 // Auto-load and auto-save settings on DOM ready
@@ -158,13 +161,14 @@ window.addEventListener('DOMContentLoaded', () => {
     if (resetBtn) {
         resetBtn.addEventListener('click', () => {
             // Set all fields to their default values
-            document.getElementById('settings_orientation').value = 'orientation_portrait';
+            //document.getElementById('settings_orientation').value = 'orientation_portrait';
             document.getElementById('settings_pageWidth').value = 850;
             document.getElementById('settings_marginsLeft').value = 50;
             document.getElementById('settings_marginsRight').value = 50;
             document.getElementById('settings_marginsTop').value = 50;
             document.getElementById('settings_marginsBottom').value = 50;
             document.getElementById('settings_labelHeight').value = 30;
+            document.getElementById('settings_outputHeight').value = 30;
             document.getElementById('settings_verticalSpacing').value = 10;
 
             document.getElementById('font_header_family').value = 'Times New Roman';
@@ -190,7 +194,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
             document.getElementById('font_fieldOutput_family').value = 'Times New Roman';
             document.getElementById('font_fieldOutput_size').value = 9;
-            document.getElementById('font_fieldOutput_bold').checked = true;
+            document.getElementById('font_fieldOutput_bold').checked = false;
             document.getElementById('font_fieldOutput_italics').checked = false;
             document.getElementById('font_fieldOutput_underline').checked = false;
             document.getElementById('font_fieldOutput_strikethrough').checked = false;
@@ -199,7 +203,46 @@ window.addEventListener('DOMContentLoaded', () => {
             console.log('[SettingsManager] Settings reset to defaults.');
         });
     }
+
+    // Add apply settings button handler
+    const applyBtn = document.getElementById('applySettingsBtn');
+    if (applyBtn) {
+        applyBtn.addEventListener('click', () => {
+            SettingsManager.saveSettings();
+            applyLayoutSettingsFromUI();
+            // Use the most up-to-date form data reference
+            const formData = window.currentFormioData || window.lastUploadedForm;
+            if (formData) {
+                DevExpressConverter.applySettings();
+                DevExpressConverter.initialize();
+                // Generate DevExpress report output
+                const devExpressJson = DevExpressConverter.transformToDevExpress(formData);
+                DevExpressConverter.state.devExpressJson = devExpressJson;
+
+                // Update DevExpress JSON preview
+                const devExpressJsonContainer = document.getElementById('devexpress-json');
+                if (devExpressJsonContainer) {
+                    devExpressJsonContainer.innerHTML = `<code class="language-json">${JSON.stringify(devExpressJson, null, 2)}</code>`;
+                    Prism.highlightAll();
+                }
+
+                // Regenerate SQL preview
+                Utils.generateSqlQuery(formData);
+
+                if (window.showToast) {
+                    window.showToast('Settings applied and printout regenerated.', 'success');
+                }
+                //console.log('[SettingsManager] Settings applied and printout regenerated.');
+            } else {
+                if (window.showToast) {
+                    window.showToast('No form uploaded. Cannot regenerate printout.', 'warning');
+                }
+                //console.warn('[SettingsManager] No form uploaded. Cannot regenerate printout.');
+            }
+        });
+    }
 });
+
 function applyLayoutSettingsFromUI() {
     // Get the Page Width field value
     const pageWidthInput = document.getElementById('settings_pageWidth');
@@ -208,6 +251,7 @@ function applyLayoutSettingsFromUI() {
     const marginTopInput = document.getElementById('settings_marginsTop');
     const marginBottomInput = document.getElementById('settings_marginsBottom');
     const labelHeightInput = document.getElementById('settings_labelHeight');
+    const outputHeightInput = document.getElementById('settings_outputHeight');
     const verticalSpacingInput = document.getElementById('settings_verticalSpacing');
 
     const fontHeaderFamilyInput = document.getElementById('font_header_family');
@@ -245,6 +289,7 @@ function applyLayoutSettingsFromUI() {
     LAYOUT.MARGIN_TOP = parseFloat(marginTopInput.value);
     LAYOUT.MARGIN_BOTTOM = parseFloat(marginBottomInput.value);
     LAYOUT.LABEL_HEIGHT = parseFloat(labelHeightInput.value);
+    window.LAYOUT.INPUT_HEIGHT = parseFloat(outputHeightInput.value);
     LAYOUT.VERTICAL_SPACING = parseFloat(verticalSpacingInput.value);
 
     // Build style string for header font
@@ -283,18 +328,8 @@ function applyLayoutSettingsFromUI() {
     LAYOUT.FONT_FIELDOUTPUT = `${fontFieldOutputFamilyInput.value}, ${fontFieldOutputSizeInput.value}pt`
         + (fieldOutputStyles.length ? `, style=${fieldOutputStyles.join(',')}` : '');
 
-    console.log('[Settings] Applied:', LAYOUT);
+    //console.log('[Settings] Applied:', LAYOUT);
 }
-
-// ? Layout conventions for tables. 
-// ? For our purposes this includes Form.io Columns, Tables, FormGrids, and DataGrids
-const TABLE_LAYOUT = {
-    HEADER_HEIGHT: 30,      // ? Height of table headers
-    ROW_HEIGHT: 30,         // ? Height of table rows
-    CELL_PADDING: 5,        // ? Padding within table cells
-    DEFAULT_ROWS: 1,        // ? Default number of rows in a table
-    BORDER_WIDTH: 1,        // ? Width of table borders
-};
 
 //#endregion
 
@@ -737,7 +772,7 @@ class DevExpressConverter
             const columnsHeight = Math.max(...visibleColumns.map(col =>
                 col.components ? context.calculateNestedHeight(col.components.filter(c =>
                     DevExpressConverter.isComponentVisible(c))) : 0
-            )) || context.LAYOUT.INPUT_HEIGHT;
+            )) || context.window.LAYOUT.INPUT_HEIGHT;
 
             const tableItemNum = context.itemCounter++;
 
@@ -1003,401 +1038,6 @@ class DevExpressConverter
         },
 
     };
-
-    static core = {
-        processComponent(component, itemNum, ref, componentWidth, xOffset, currentY, parentWidth = componentWidth, parentVisible = true)
-        {
-            // First check visibility using updated rules
-            const isVisible = DevExpressConverter.isComponentVisible(component, parentVisible);
-
-            // Return empty string for hidden components
-            if (!isVisible)
-            {
-                return '';
-            }
-
-            const handler = DevExpressConverter.handlers[component.type];
-            if (handler)
-            {
-                // Pass visibility state through context
-                const context = {
-                    itemCounter: itemNum,
-                    escapeXml: Utils.escapeXml,
-                    LAYOUT,
-                    TABLE_LAYOUT,
-                    calculateNestedHeight: (comps) =>
-                    {
-                        // Only calculate height for visible components
-                        const visibleComps = (comps || []).filter(c => DevExpressConverter.isComponentVisible(c, isVisible));
-                        return DevExpressConverter.core.calculateNestedHeight(visibleComps);
-                    },
-                    processNestedComponents: (nestedComps, nestedRef, nestedWidth, nestedXOffset, nestedYOffset) =>
-                    {
-                        return DevExpressConverter.core.processNestedComponents(
-                            nestedComps,
-                            nestedRef,
-                            nestedWidth,
-                            nestedXOffset,
-                            nestedYOffset,
-                            true
-                        );
-                    },
-                    generateLabel: DevExpressConverter.core.generateLabel,
-                    generatePanelContent: DevExpressConverter.core.generatePanelContent,
-                    generateControl: DevExpressConverter.core.generateControl,
-                    generateControls: DevExpressConverter.core.generateControls,
-                    parentWidth: parentWidth,
-                    parentVisible: isVisible // Pass down current visibility state
-                };
-                return handler(component, itemNum, ref, componentWidth, xOffset, currentY, context);
-            }
-
-            // Default handler 
-            return DevExpressConverter.core.generateControl(component,
-            {
-                escapeXml: Utils.escapeXml,
-                LAYOUT
-            });
-        },
-
-        calculateComponentHeight(component, parentVisible = true)
-        {
-            // Return 0 height for hidden components
-            if (!DevExpressConverter.isComponentVisible(component, parentVisible))
-            {
-                return 0;
-            }
-
-            switch (component.type)
-            {
-                case 'panel':
-                case 'fieldset':
-                {
-                    const padding = LAYOUT.VERTICAL_SPACING * 2;
-                    const headerHeight = component.label ? LAYOUT.LABEL_HEIGHT : 0;
-                    // Only calculate height for visible components
-                    const contentHeight = component.components?.length ?
-                        DevExpressConverter.core.calculateNestedHeight(
-                            component.components.filter(c => DevExpressConverter.isComponentVisible(c, true)),
-                            true
-                        ) : 0;
-                    return headerHeight + contentHeight + padding;
-                }
-                case 'columns':
-                {
-                    // Only consider visible columns
-                    const visibleColumns = (component.columns || []).filter(col =>
-                        DevExpressConverter.isComponentVisible(col, true));
-
-                    // Calculate max height among visible columns with visible components
-                    const columnHeights = visibleColumns.map(col =>
-                    {
-                        const visibleComponents = (col.components || []).filter(c =>
-                            DevExpressConverter.isComponentVisible(c, DevExpressConverter.isComponentVisible(col)));
-                        return DevExpressConverter.core.calculateNestedHeight(visibleComponents, true);
-                    });
-
-                    return columnHeights.length ? Math.max(...columnHeights) : 0;
-                }
-                case 'checkbox':
-                    return LAYOUT.INPUT_HEIGHT;
-                default:
-                    return LAYOUT.LABEL_HEIGHT + LAYOUT.INPUT_HEIGHT + LAYOUT.VERTICAL_SPACING;
-            }
-        },
-
-        calculateNestedHeight(components, parentVisible = true)
-        {
-            if (!components) return 0;
-
-            // Only calculate heights for visible components
-            return components.reduce((total, component) =>
-            {
-                // Skip hidden components
-                if (!DevExpressConverter.isComponentVisible(component, parentVisible))
-                {
-                    return total;
-                }
-
-                switch (component.type)
-                {
-                    case 'panel':
-                    case 'fieldset':
-                    {
-                        const headerHeight = component.label ? LAYOUT.LABEL_HEIGHT + LAYOUT.VERTICAL_SPACING : 0;
-                        // Only calculate height for visible nested components
-                        const visibleComponents = component.components?.filter(c =>
-                            DevExpressConverter.isComponentVisible(c, true)) || [];
-
-                        // Calculate nested components height with proper spacing
-                        const innerHeight = visibleComponents.reduce((compTotal, comp) =>
-                        {
-                            const compHeight = DevExpressConverter.core.calculateComponentHeight(comp, true);
-                            // Add extra spacing for nested panels
-                            const extraSpacing = (comp.type === 'panel' || comp.type === 'fieldset') ?
-                                LAYOUT.VERTICAL_SPACING * 2 : LAYOUT.VERTICAL_SPACING;
-                            return compTotal + compHeight + extraSpacing;
-                        }, 0);
-
-                        return total + headerHeight + innerHeight + (LAYOUT.VERTICAL_SPACING * 2);
-                    }
-                    case 'columns':
-                    {
-                        // Only consider visible columns
-                        const visibleColumns = component.columns.filter(col =>
-                            DevExpressConverter.isComponentVisible(col, true));
-
-                        // Calculate height for visible components in each visible column
-                        const colHeights = visibleColumns.map(col =>
-                        {
-                            const visibleComponents = (col.components || []).filter(c =>
-                                DevExpressConverter.isComponentVisible(c, DevExpressConverter.isComponentVisible(col)));
-                            return visibleComponents.length ?
-                                DevExpressConverter.core.calculateNestedHeight(visibleComponents, true) : 0;
-                        });
-
-                        return total + (colHeights.length ? Math.max(...colHeights) : 0);
-                    }
-                    case 'checkbox':
-                        return total + LAYOUT.INPUT_HEIGHT + LAYOUT.VERTICAL_SPACING;
-                    case 'textfield':
-                    case 'textarea':
-                    case 'number':
-                    case 'email':
-                    case 'select':
-                        return total + LAYOUT.LABEL_HEIGHT + LAYOUT.INPUT_HEIGHT + LAYOUT.VERTICAL_SPACING;
-                    default:
-                        return total + LAYOUT.INPUT_HEIGHT + LAYOUT.VERTICAL_SPACING;
-                }
-            }, 0);
-        },
-
-        processNestedComponents(components, startRef, parentWidth, xOffset, yOffset = 0, parentVisible = true)
-        {
-            let currentY = yOffset;
-
-            // Validate input components
-            if (!components || !Array.isArray(components))
-            {
-                console.warn('No components to process or invalid components array');
-                return '';
-            }
-
-            // Sort components by Y position before processing
-            const visibleComponents = components.filter(component => DevExpressConverter.isComponentVisible(component, parentVisible));
-            
-            // Sort by top position (y coordinate)
-            visibleComponents.sort((a, b) => {
-                const aY = (a.formio?.top || a.top || 0);
-                const bY = (b.formio?.top || b.top || 0);
-                return aY - bY;
-            });
-
-            // Process sorted components
-            const results = visibleComponents.map((component) => {
-
-                console.log(`Processing nested component: ${component.key || 'unnamed'}`,
-                {
-                    type: component.type,
-                    currentY,
-                    hasChildren: Boolean(component.components?.length)
-                });
-
-                // Calculate component width (percentage or absolute)
-                const componentWidth = component.width ?
-                    (component.width / 100) * parentWidth :
-                    Math.min(parentWidth - (LAYOUT.MARGIN * 2), LAYOUT.DEFAULT_WIDTH);
-
-                // Handle component centering
-                const centerOffset = component.width && component.width < 100 ?
-                    (parentWidth - componentWidth) / 2 :
-                    xOffset;
-
-                // Process the component
-                const ref = startRef++;
-                const result = this.processComponent(
-                    component,
-                    DevExpressConverter.state.itemCounter,
-                    ref,
-                    componentWidth,
-                    centerOffset,
-                    currentY,
-                    parentWidth,
-                    true // Component already verified as visible
-                );
-
-                // Update vertical position if content was generated
-                if (result)
-                {
-                    const componentHeight = this.calculateComponentHeight(component);
-                    currentY += componentHeight + LAYOUT.VERTICAL_SPACING;
-                    //console.log(`Component processed, new Y: ${currentY}`);
-                }
-
-                return result || '';
-            });
-
-            // Filter out empty results and combine
-            return results.filter(Boolean).join('\n');
-        },
-
-        generateLabel(component, context)
-        {
-            const labelItemNum = context.itemCounter++;
-            return `<Item${labelItemNum} Ref="${context.refCounter++}" ControlType="XRLabel" Name="label_${context.escapeXml(component.key || `field${labelItemNum}`)}"
-        Text="${context.escapeXml(component.label || '')}"
-        TextAlignment="MiddleLeft"
-        SizeF="${context.LAYOUT.PAGE_WIDTH - (context.LAYOUT.MARGIN * 2)},${context.LAYOUT.LABEL_HEIGHT}"
-        LocationFloat="0,0"
-        Font="${LAYOUT.FONT_SECTIONHEADER}"
-        Padding="2,2,0,0,100">
-        Borders="None"
-        <StylePriority UseFont="true"/>
-      </Item${labelItemNum}>`;
-        },
-
-        generatePanelContent(component, context)
-        {
-            if (!component.components || component.components.length === 0)
-            {
-                return '';
-            }
-
-            const width = context.LAYOUT.PAGE_WIDTH - (context.LAYOUT.MARGIN * 2);
-            const yOffset = component.label ? context.LAYOUT.LABEL_HEIGHT + context.LAYOUT.VERTICAL_SPACING : 0;
-
-            return context.processNestedComponents(
-                component.components,
-                DevExpressConverter.state.refCounter++,
-                width,
-                0,
-                yOffset
-            );
-        },
-
-        generateControl(component, context)
-        {
-            const width = LAYOUT.DEFAULT_WIDTH;
-            const height = LAYOUT.INPUT_HEIGHT;
-
-            return `<Item1 ControlType="XRLabel" Name="${context.escapeXml(component.key || 'label')}"
-        Text="${context.escapeXml(component.label || '')}"
-        SizeF="${width},${height}"
-        LocationFloat="0,0"
-        Padding="2,2,0,0,100"
-        Font="${LAYOUT.FONT_FIELDLABEL}">
-        <StylePriority UseFont="true" UseBorders="false" UseTextAlignment="false"/>
-      </Item1>`;
-        },
-
-        generatePanelWithTable(component, itemCounter)
-        {
-            const context = {
-                itemCounter,
-                escapeXml: Utils.escapeXml,
-                LAYOUT,
-                TABLE_LAYOUT,
-                calculateNestedHeight: DevExpressConverter.core.calculateNestedHeight,
-                processNestedComponents: DevExpressConverter.core.processNestedComponents,
-                generateControls: DevExpressConverter.core.generateControls
-            };
-
-            return `
-        <Item1 ControlType="XRPanel" Name="panel_${context.escapeXml(component.key || `panel${itemCounter}`)}"
-          SizeF="${LAYOUT.PAGE_WIDTH - (LAYOUT.MARGIN * 2)},${DevExpressConverter.core.calculateComponentHeight(component)}"
-          LocationFloat="0,0"
-          Borders="Left, Right, Bottom">
-          <Controls>
-            <Item1 ControlType="XRTable" Name="table_${context.escapeXml(component.key || `table${itemCounter}`)}"
-              SizeF="${LAYOUT.PAGE_WIDTH - (LAYOUT.MARGIN * 2)},${DevExpressConverter.core.calculateComponentHeight(component)}"
-              LocationFloat="0,0"
-              Padding="2,2,0,0,100"
-              Borders="All">
-              <Rows>
-                <Item1 ControlType="XRTableRow" Name="row_${component.key || `row${itemCounter}`}" Weight="1">
-                  <Cells>
-                    <Item1 ControlType="XRTableCell" Name="cell_${component.key || `cell${itemCounter}`}" Weight="1">
-                      <Controls>
-                        ${context.generateControls(component, context)}
-                      </Controls>
-                    </Item1>
-                  </Cells>
-                </Item1>
-              </Rows>
-              <StylePriority UseBorders="false"/>
-            </Item1>
-          </Controls>
-          <StylePriority UseBorders="false"/>
-        </Item1>`;
-        },
-
-        generateBindings(component)
-        {
-            return `
-        <ExpressionBindings>
-          <Item1 EventName="BeforePrint" 
-            PropertyName="Text" 
-            Expression="[${component.key}]"/>
-        </ExpressionBindings>`;
-        },
-
-        generateControls(component, context)
-        {
-            // Use processComponent to generate controls
-            return DevExpressConverter.core.processComponent(
-                component,
-                context.itemCounter,
-                FieldGenerator.getNextRef(),
-                LAYOUT.PAGE_WIDTH - (LAYOUT.MARGIN * 2),
-                LAYOUT.MARGIN,
-                0,
-                context
-            );
-        },
-
-        // Generate field label component (bold)
-        generateFieldValue(component, itemNum, width, xOffset, yOffset, context, borderStyle = "Bottom")
-        {
-            const valueItemNum = context.itemCounter++;
-            return `<Item${valueItemNum} Ref="${FieldGenerator.getNextRef()}" ControlType="XRLabel"
-        Name="${context.escapeXml(component.key || `value${valueItemNum}`)}"
-        TextAlignment="MiddleLeft"
-        SizeF="${width},${context.LAYOUT.INPUT_HEIGHT}"
-        LocationFloat="${xOffset},${yOffset}"
-        Padding="2,2,0,0,100"
-        Borders="${borderStyle}">
-        <ExpressionBindings>
-          <Item1 Ref="${FieldGenerator.getNextRef()}"
-            EventName="BeforePrint" 
-            PropertyName="Text" 
-            Expression="${this.getTypeCastedFieldExpression(component)}"/>
-        </ExpressionBindings Ref="${FieldGenerator.getNextRef()}" UseBorders="false"/>
-      </Item${valueItemNum}>`;
-        },
-    };
-
-    // ? Generate SubBands for each top-level component
-    // ? Returns XML string
-    static generateSubBands(components)
-    {
-        if (!components || components.length === 0)
-        {
-            // ? Return an empty SubBand with Controls element for validation
-            return `
-        <Item1 ControlType="SubBand" Name="SubBand1" HeightF="0">
-          <Controls></Controls>
-        </Item1>`;
-        }
-
-        // ? Generate SubBand for each component
-        return components.map((component, index) => `
-        <Item${index + 1} ControlType="SubBand" Name="SubBand${index + 1}" 
-          HeightF="${DevExpressConverter.core.calculateComponentHeight(component)}">
-          <Controls>
-            ${DevExpressConverter.core.generatePanelWithTable(component, this.state.itemCounter++)}
-          </Controls>
-        </Item${index + 1}>`).join('\n');
-    }
 
     // ? Main transformation function
     // ? Takes Form.io JSON and returns compressed base64 DevExpress report template
@@ -1993,6 +1633,9 @@ const UIHandlers = {
             {
                 let jsonData = JSON.parse(e.target.result);
 
+                // Store the uploaded form globally for regeneration
+                window.lastUploadedForm = jsonData;
+
                 if (debugLevel >= 1)
                 {
                     console.log("File loaded, raw data:",
@@ -2004,10 +1647,11 @@ const UIHandlers = {
 
                 if (jsonData.FormioTemplate)
                 {
-                    // ? Enable preview tabs
+                    // ? Enable preview and settings tabs
                     // ! These are disabled by default until a valid form is loaded
                     document.querySelector('#preview-tab')?.classList.remove('disabled');
                     document.querySelector('#devexpress-preview-tab')?.classList.remove('disabled');
+                    document.querySelector('#settings-tab')?.classList.remove('disabled');
                     document.getElementById('output-wrapper').style.display = 'block';
 
                     // ? Parse FormioTemplate if needed
@@ -2494,189 +2138,6 @@ const FieldGenerator = {
     {
         this.usedRefs.add(ref);
     },
-
-    // ? Generate a field based on component type
-    // ? Returns a string
-    // ! This function routes to specific field generators based on component type
-    generateComponentField(component, width, xOffset, yOffset)
-    {
-        console.log("Generating field for component:", component.key, component.type);
-        const key = component.key;
-        const label = component.label || component.key;
-
-        // ? Handle specific component types
-        switch (component.type)
-        {
-            case 'checkbox':
-                return this.generateCheckbox(key, label, width, xOffset, yOffset);
-
-            case 'datetime':
-                return this.generateField(key, label, width, xOffset, yOffset, 'datetime');
-
-            case 'textarea':
-            {
-                // ? For textareas, use taller input height
-                const labelXml = this.generateFieldLabel(key, label, width, xOffset, yOffset);
-
-                // ? Create a taller text field for textarea
-                const fieldRef = this.getNextRef();
-                const styleRef = this.getNextRef();
-                const exprRef = this.getNextRef();
-
-                const fieldValue = `<Item${fieldRef} ControlType="XRLabel" Name="${Utils.escapeXml(key)}"
-          SizeF="${width},${LAYOUT.INPUT_HEIGHT * 2}"
-          LocationFloat="${xOffset},${yOffset + LAYOUT.LABEL_HEIGHT + 2}"
-          TextAlignment="TopLeft"
-          Multiline="true"
-          Padding="2,2,0,0,100"
-          Borders="Bottom">
-          <ExpressionBindings>
-            <Item1 Ref="${exprRef}" EventName="BeforePrint" PropertyName="Text" Expression="[${Utils.escapeXml(key)}]" />
-          </ExpressionBindings>
-          <StylePriority Ref="${styleRef}" UseTextAlignment="false" UseBorders="false" />
-        </Item${fieldRef}>`;
-                console.log("Generated textarea fields:", key);
-                return labelXml + fieldValue;
-            }
-
-            case 'textfield':
-
-            case 'email':
-
-            case 'number':
-            {
-                const fieldType = component.type === 'number' ? 'number' : 'text';
-                return this.generateField(key, label, width, xOffset, yOffset, fieldType);
-            }
-
-            case 'select':
-            {
-                const labelXml = this.generateFieldLabel(key, label, width, xOffset, yOffset);
-                const valueXml = this.generateFieldValue(
-                    key,
-                    width,
-                    xOffset,
-                    yOffset + LAYOUT.LABEL_HEIGHT + 2,
-                    "Bottom",
-                    "text"
-                );
-                return labelXml + valueXml;
-            }
-
-            default:
-                return this.generateField(key, label, width, xOffset, yOffset);
-        }
-    },
-
-    // ? Generate field label element
-    // ? Returns a string
-    // TODO: Move the XML definition to the template class in dexepxress-definitions.js
-    generateFieldLabel(key, label, width, xOffset, yOffset)
-    {
-        const labelRef = this.getNextRef();
-        const styleRef = this.getNextRef();
-        const itemNum = this.getNextItemNum();
-
-        return `<Item${itemNum} ControlType="XRLabel" Name="label_${Utils.escapeXml(key || `field${itemNum}`)}"
-      Text="${Utils.escapeXml(label || '')}"
-      SizeF="${width},${LAYOUT.LABEL_HEIGHT}"
-      LocationFloat="${xOffset},${yOffset}"
-      TextAlignment="MiddleLeft"
-      Font="${LAYOUT.FONT_FIELDLABEL}"
-      Padding="2,2,0,0,100"
-      Borders="None">
-      <StylePriority Ref="${styleRef}" UseFont="true" UseTextAlignment="false" UseBorders="false" />
-    </Item${itemNum}>`;
-    },
-
-    // ? Generate field value element
-    // ? Returns a string
-    // TODO: Move the XML definition to the template class in devexpress-definitions.js
-    generateFieldValue(key, width, xOffset, yOffset, borderStyle = "Bottom", fieldType = "text")
-    {
-        const fieldRef = this.getNextRef();
-        const styleRef = this.getNextRef();
-        const exprRef = this.getNextRef();
-
-        // ? Helper to get proper type cast
-        // TODO: Investigate this function further. I'm almost certain this functionality has been deprecated by pulling the expression bindings from the element definitions
-        const getTypeCast = (type, fieldKey) =>
-        {
-            switch (type)
-            {
-                case 'datetime':
-                    return `ToString(Format(ToDateTime([${Utils.escapeXml(fieldKey)}]), 'g'))`;
-                case 'number':
-                    return `ToString(Format(ToDecimal([${Utils.escapeXml(fieldKey)}], CultureInfo.InvariantCulture), 'n2'))`;
-                case 'boolean':
-                    return `IIF(ToBoolean([${Utils.escapeXml(fieldKey)}]), 'Yes', 'No')`;
-                default:
-                    return `[${Utils.escapeXml(fieldKey)}]`;
-            }
-        };
-
-        // ? Get expression with proper type casting
-        const expression = getTypeCast(fieldType, key);
-
-        // ? Text alignment based on field type  
-        const textAlignment = fieldType === 'number' ? "MiddleRight" :
-            fieldType === 'textarea' ? "TopLeft" : "MiddleLeft";
-
-        // ? Handle multiline for textareas
-        const multilineAttribute = fieldType === 'textarea' ? '\n      Multiline="true"' : '';
-
-        return `<Item${fieldRef} ControlType="XRLabel" Name="${Utils.escapeXml(key || `field${fieldRef}`)}"
-      SizeF="${width},${fieldType === 'textarea' ? LAYOUT.INPUT_HEIGHT * 2 : LAYOUT.INPUT_HEIGHT}"
-      LocationFloat="${xOffset},${yOffset}"
-      TextAlignment="${textAlignment}"${multilineAttribute}
-      Padding="2,2,0,0,100"
-      Borders="${borderStyle}">
-      <ExpressionBindings>
-        <Item1 Ref="${exprRef}" EventName="BeforePrint" PropertyName="Text" Expression="${expression}" />
-      </ExpressionBindings>
-      <StylePriority Ref="${styleRef}" UseTextAlignment="true" UseBorders="false" />
-    </Item${fieldRef}>`;
-    },
-
-    // ? Generate a checkbox element
-    // ? Returns a string
-    generateCheckbox(key, label, width, xOffset, yOffset)
-    {
-        const checkboxRef = this.getNextRef();
-        const styleRef = this.getNextRef();
-        const exprRef = this.getNextRef();
-        const glyphRef = this.getNextRef();
-
-        return `<Item${checkboxRef} ControlType="XRCheckBox" Name="${Utils.escapeXml(key || `checkbox${checkboxRef}`)}"
-      Text="${Utils.escapeXml(label || '')}"
-      SizeF="${width},${LAYOUT.INPUT_HEIGHT}"
-      LocationFloat="${xOffset},${yOffset}"
-      Padding="2,2,0,0,100"
-      Borders="None">
-      <GlyphOptions Ref="${glyphRef}" Size="13,13" />
-      <ExpressionBindings>
-        <Item1 Ref="${exprRef}" EventName="BeforePrint" PropertyName="CheckState" Expression="IIF(ISNULL([${Utils.escapeXml(key)}], False), False, ToBoolean([${Utils.escapeXml(key)}]))" />
-      </ExpressionBindings>
-      <StylePriority Ref="${styleRef}" UseBorders="false" UseTextAlignment="true" />
-    </Item${checkboxRef}>`;
-    },
-
-    // ? Generates a generic Label and Output label pair
-    // ? Returns a string
-    generateField(key, label, width, xOffset, yOffset, fieldType = "text")
-    {
-        const labelXml = this.generateFieldLabel(key, label, width, xOffset, yOffset);
-        const valueXml = this.generateFieldValue(
-            key,
-            width,
-            xOffset,
-            yOffset + LAYOUT.LABEL_HEIGHT + 2,
-            "Bottom",
-            fieldType
-        );
-
-        return labelXml + valueXml;
-    }
 };
 
 // ? Generates a minimal XML template for DevExpress reports that we can then populate with element nodes
@@ -2699,6 +2160,7 @@ function generateMinimalXmlTemplate()
             ControlType: "DevExpress.XtraReports.UI.XtraReport, DevExpress.XtraReports.v23.2, Version=23.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a",
             Name: "Report",
             DisplayName: displayName,
+            SnapGridSize: "10.0",
             Margins: `${LAYOUT.MARGIN_LEFT}, ${LAYOUT.MARGIN_RIGHT}, ${LAYOUT.MARGIN_TOP}, ${LAYOUT.MARGIN_BOTTOM}`,
             PaperKind: "Custom",
             PageWidth: `${LAYOUT.PAGE_WIDTH}`,
@@ -2752,10 +2214,12 @@ function generateMinimalXmlTemplate()
                 LAYOUT.DEFAULT_WIDTH,   // ? Default width for components
                 0                       // ? Starting X offset
             );
-            console.log('Processed components:', processedNodes); // Debug logging
-            console.log('Grid markers:', componentProcessor.gridComponents); // Debug logging
 
-            console.log('Starting to process nodes into groups...');
+            if (debugLevel >= 2) {
+                console.log('Processed components:', processedNodes);
+                console.log('Grid markers:', componentProcessor.gridComponents);
+                console.log('Starting to process nodes into groups...');
+            }
             
             // Improved grouping: split processedNodes into groups at grid markers
             const groups = [];
@@ -2785,20 +2249,19 @@ function generateMinimalXmlTemplate()
             componentGroups.push(...groups);
 
             // Debug output
-            console.log('Final component groups (split at grids):', {
-                totalGroups: componentGroups.length,
-                groups: componentGroups.map(g => ({
-                    type: g.type,
-                    count: g.type === 'components' ? g.components.length : 'N/A',
-                    gridIndex: g.type === 'grid' ? g.gridIndex : 'N/A'
-                }))
-            });
+            if (debugLevel >= 2) {
+                console.log('Final component groups (split at grids):', {
+                    totalGroups: componentGroups.length,
+                    groups: componentGroups.map(g => ({
+                        type: g.type,
+                        count: g.type === 'components' ? g.components.length : 'N/A',
+                        gridIndex: g.type === 'grid' ? g.gridIndex : 'N/A'
+                    }))
+                });
+            }
 
             // Add initial components to the main detail band
             if (componentGroups.length > 0 && componentGroups[0].type === 'components') {
-                console.log('Adding initial components to main detail band:', {
-                    count: componentGroups[0].components.length
-                });
                 // Reset Y positions for main detail band components
                 let detailBandY = LAYOUT.VERTICAL_SPACING;
                 componentGroups[0].components.forEach(component => {
@@ -2807,8 +2270,8 @@ function generateMinimalXmlTemplate()
                         const [x, _] = locationStr.split(',').map(Number);
                         const sizeStr = component.attributes?.SizeF;
                         const componentHeight = sizeStr ? 
-                            parseInt(sizeStr.split(',')[1]) || LAYOUT.INPUT_HEIGHT :
-                            LAYOUT.INPUT_HEIGHT;
+                            parseInt(sizeStr.split(',')[1]) || window.LAYOUT.INPUT_HEIGHT :
+                            window.LAYOUT.INPUT_HEIGHT;
                         component.attributes.LocationFloat = `${x},${detailBandY}`;
                         detailBandY += componentHeight + LAYOUT.VERTICAL_SPACING;
                     }
@@ -2866,7 +2329,7 @@ function generateMinimalXmlTemplate()
                             const sizeStr = component.attributes?.SizeF;
                             const locationStr = component.attributes?.LocationFloat;
                             if (sizeStr && locationStr) {
-                                const height = parseInt(sizeStr.split(',')[1]) || LAYOUT.INPUT_HEIGHT;
+                                const height = parseInt(sizeStr.split(',')[1]) || window.LAYOUT.INPUT_HEIGHT;
                                 const y = parseInt(locationStr.split(',')[1]) || 0;
                                 maxY = Math.max(maxY, y + height);
                             }
@@ -2887,12 +2350,12 @@ function generateMinimalXmlTemplate()
                 // Create header band with nested DetailBand
                 const headerReport = processor.createItemNode(undefined, "DetailReportBand", {
                     Name: `DetailReport_${gridBaseName}_header`,
-                    HeightF: "30"
+                    HeightF: LAYOUT.LABEL_HEIGHT.toString()
                 });
                 const headerBands = processor.buildNode('Bands', {}, [
                     processor.createItemNode(1, "DetailBand", {
                         Name: `Detail_${gridBaseName}_header`,
-                        HeightF: "30"
+                        HeightF: LAYOUT.LABEL_HEIGHT.toString()
                     })
                 ]);
                 if (grid.headerContent && grid.headerContent.length > 0) {
@@ -2912,12 +2375,12 @@ function generateMinimalXmlTemplate()
                 // Create keys band with nested DetailBand
                 const keysReport = processor.createItemNode(undefined, "DetailReportBand", {
                     Name: `DetailReport_${gridBaseName}_keys`,
-                    HeightF: "30"
+                    HeightF: window.LAYOUT.INPUT_HEIGHT.toString()
                 });
                 const keysBands = processor.buildNode('Bands', {}, [
                     processor.createItemNode(1, "DetailBand", {
                         Name: `Detail_${gridBaseName}_keys`,
-                        HeightF: "30"
+                        HeightF: window.LAYOUT.INPUT_HEIGHT.toString()
                     })
                 ]);
                 if (grid.dataContent && grid.dataContent.length > 0) {
@@ -2937,7 +2400,7 @@ function generateMinimalXmlTemplate()
                 // Create spacer band with nested DetailBand
                 const spacerReport = processor.createItemNode(undefined, "DetailReportBand", {
                     Name: `DetailReport_${gridBaseName}_spacer`,
-                    HeightF: "30"
+                    HeightF: LAYOUT.LABEL_HEIGHT.toString()
                 });
                 // Use the next components group for spacer
                 let nextComponents = [];
@@ -2971,8 +2434,8 @@ function generateMinimalXmlTemplate()
                             const [x, _] = locationStr.split(',').map(Number);
                             const sizeStr = component.attributes?.SizeF;
                             const componentHeight = sizeStr ?
-                                parseInt(sizeStr.split(',')[1]) || LAYOUT.INPUT_HEIGHT :
-                                LAYOUT.INPUT_HEIGHT;
+                                parseInt(sizeStr.split(',')[1]) || window.LAYOUT.INPUT_HEIGHT :
+                                window.LAYOUT.INPUT_HEIGHT;
                             component.attributes.LocationFloat = `${x},${bandY}`;
                             maxY = Math.max(maxY, bandY + componentHeight);
                             bandY += componentHeight + LAYOUT.VERTICAL_SPACING;
@@ -3106,16 +2569,6 @@ const Init = {
         {
             copySqlBtn.addEventListener('click', UIHandlers.copySQL);
         } else { console.warn('Copy SQL button not found'); }
-
-        if (previewTab)
-        {
-            previewTab.classList.add('disabled');
-        } else { console.warn('Preview tab element not found'); }
-
-        if (devexpressPreviewTab)
-        {
-            devexpressPreviewTab.classList.add('disabled');
-        } else { console.warn('DevExpress preview tab element not found'); }
     }
 };
 

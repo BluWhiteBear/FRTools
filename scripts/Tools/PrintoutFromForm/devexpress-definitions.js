@@ -3,7 +3,7 @@ import { LAYOUT } from "./layoutConfig.js";
 export const DevExpressDefinitions = {
     // Component Support Status:
     /*
-        === Basic Fields ===
+        ! === Basic Fields ===
         Textfield: Single-line text input | FULLY SUPPORTED
         Textarea: Multi-line text input | FULLY SUPPORTED
         Number: Numeric input | FULLY SUPPORTED
@@ -12,8 +12,8 @@ export const DevExpressDefinitions = {
         Radio: Radio button group input | FULLY SUPPORTED
         Button: Button input | NOT SUPPORTED
 
-        === Advanced Fields ===
-        Nested Form: Subform/nested form input | PARTIALLY SUPPORTED
+        ! === Advanced Fields ===
+        Nested Form: Subform/nested form input | NOT SUPPORTED
         Email: Email input | FULLY SUPPORTED
         URL: URL input | FULLY SUPPORTED
         Phone Number: Phone number input | FULLY SUPPORTED
@@ -24,7 +24,7 @@ export const DevExpressDefinitions = {
         Currency: Currency input | FULLY SUPPORTED
         Signature: Signature input | PARTIALLY SUPPORTED
 
-        === Layout Components ===
+        ! === Layout Components ===
         HTML Element: Static HTML content | FULLY SUPPORTED
         Content: Static text content | NOT SUPPORTED
         Columns: Multi-column layout | FULLY SUPPORTED
@@ -34,7 +34,7 @@ export const DevExpressDefinitions = {
         Tabs: Tabbed container | FULLY SUPPORTED
         Well: Simple container with border | FULLY SUPPORTED
 
-        === Data Components ===
+        ! === Data Components ===
         Form Grid: Grid of Dialog forms | PARTIALLY SUPPORTED
         Hidden: ???? | NOT SUPPORTED
         Container: ???? | NOT SUPPORTED
@@ -46,7 +46,7 @@ export const DevExpressDefinitions = {
     
     // Component Property Definitions:
     /*
-        === Text & Label ===
+        ! === Text & Label ===
         controlType: The DevExpress control type to use (e.g., XRLabel, XRCheckBox)
         requiresLabel: Whether a separate label component is needed above the field component
         useContentAsText: For HTML elements, use the content property as the Text attribute
@@ -56,7 +56,7 @@ export const DevExpressDefinitions = {
         Multiline: Whether text can span multiple lines
         AllowMarkupText: Whether HTML/markup content is allowed in text
 
-        === Sizing & Layout ===
+        ! === Sizing & Layout ===
         defaultHeight: Default height in pixels for the component
         widthMultiplier: Optional multiplier (0-1) to adjust the final width of the component
         calculateHeight: For containers, function to calculate height based on children and spacing
@@ -68,48 +68,44 @@ export const DevExpressDefinitions = {
         SizeF: Size format for components
         LocationFloat: Position coordinates
 
-        === Appearance ===
+        ! === Appearance ===
         Borders: Standard border options (None, Bottom, All, etc.)
         GlyphOptions: For checkboxes, options for the checkbox glyph
             Size: For glyphs, size in pixels 'width,height'
         Sizing: For images, how to size the content (e.g., ZoomImage)
 
-        === Data & Expressions ===
+        ! === Data & Expressions ===
         attributes: Default attributes to apply to the component
         expression: Function to generate the ExpressionBindings for data fields
 
-        === Table/Container Specific ===
+        ! === Table/Container Specific ===
         rowAttributes: For tables, default attributes for rows
         cellAttributes: For tables, default attributes for cells
     */
     
     
-    // Data Field Component Definitions
+    // ? Data Field Component Definitions
     componentTypes: 
     {
-        // === Basic Fields ===
-        textfield: 
-        {
+        // ! === Basic Fields ===
+        textfield: {
             controlType: 'XRLabel',
-            defaultHeight: 30,
+            get defaultHeight() { return window.LAYOUT && window.LAYOUT.INPUT_HEIGHT ? window.LAYOUT.INPUT_HEIGHT : 5; },
             widthMultiplier: 0.75,
             requiresLabel: true,
-            attributes: 
-            {
+            attributes: {
                 TextAlignment: 'MiddleLeft',
                 Borders: 'Bottom',
                 Padding: '2,2,0,0,100'
             }
         },
 
-        textarea: 
-        {
+        textarea: {
             controlType: 'XRLabel',
-            defaultHeight: 50,
+            get defaultHeight() { return (window.LAYOUT && window.LAYOUT.INPUT_HEIGHT ? window.LAYOUT.INPUT_HEIGHT : 5) * 2; },
             widthMultiplier: 0.75,
             requiresLabel: true,
-            attributes: 
-            {
+            attributes: {
                 TextAlignment: 'BottomLeft',
                 Multiline: 'true',
                 Borders: 'Bottom',
@@ -117,31 +113,26 @@ export const DevExpressDefinitions = {
             }
         },
 
-        number: 
-        {
+        number: {
             controlType: 'XRLabel',
-            defaultHeight: 30,
+            get defaultHeight() { return window.LAYOUT && window.LAYOUT.INPUT_HEIGHT ? window.LAYOUT.INPUT_HEIGHT : 5; },
             widthMultiplier: 0.25,
             requiresLabel: true,
-            attributes: 
-            {
+            attributes: {
                 TextAlignment: 'MiddleLeft',
                 Borders: 'Bottom',
                 Padding: '2,2,0,0,100'
             }
         },
 
-        checkbox: 
-        {
+        checkbox: {
             controlType: 'XRCheckBox',
-            defaultHeight: 30,
+            get defaultHeight() { return window.LAYOUT && window.LAYOUT.INPUT_HEIGHT ? window.LAYOUT.INPUT_HEIGHT : 5; },
             widthMultiplier: 1.0,
             requiresLabel: false,
-            attributes: 
-            {
+            attributes: {
                 Padding: '2,2,0,0,100',
-                GlyphOptions: 
-                {
+                GlyphOptions: {
                     Size: '13,13'
                 }
             },
@@ -149,14 +140,12 @@ export const DevExpressDefinitions = {
             expression: (key) => `IIF([${key}] == 'true', True, False)`
         },
 
-        select: 
-        {
+        select: {
             controlType: 'XRLabel',
-            defaultHeight: 30,
+            get defaultHeight() { return window.LAYOUT && window.LAYOUT.INPUT_HEIGHT ? window.LAYOUT.INPUT_HEIGHT : 5; },
             widthMultiplier: 0.75,
             requiresLabel: true,
-            attributes: 
-            {
+            attributes: {
                 TextAlignment: 'MiddleLeft',
                 Borders: 'Bottom',
                 Padding: '2,2,0,0,100'
@@ -164,37 +153,29 @@ export const DevExpressDefinitions = {
             expression: (key) => `[${key}]`
         },
 
-        radio: 
-        {
+        radio: {
             controlType: 'XRPanel',
-            defaultHeight: 30,
+            get defaultHeight() { return window.LAYOUT && window.LAYOUT.INPUT_HEIGHT ? window.LAYOUT.INPUT_HEIGHT : 5; },
             requiresLabel: true,
             calculateHeight: (options) => {
-                // If inline, only need one row of height plus label
                 if (options.inline === true) {
-                    return 30 + (!options.hideLabel ? 30 : 0);
+                    return window.LAYOUT && window.LAYOUT.INPUT_HEIGHT ? window.LAYOUT.INPUT_HEIGHT : 5;
                 }
-                // Otherwise, stack vertically
-                return (options.values.length * 30) + (!options.hideLabel ? 30 : 0);
+                return (options.values.length * (window.LAYOUT && window.LAYOUT.INPUT_HEIGHT ? window.LAYOUT.INPUT_HEIGHT : 5));
             },
-            attributes: 
-            {
+            attributes: {
                 TextAlignment: 'MiddleLeft',
                 Padding: '2,2,0,0,100',
                 CanShrink: 'true'
             },
-
-            child: // Each option in a radio button group is a checkbox with special expression logic
-            {
+            child: {
                 controlType: 'XRCheckBox',
-                defaultHeight: 30,
+                get defaultHeight() { return window.LAYOUT && window.LAYOUT.INPUT_HEIGHT ? window.LAYOUT.INPUT_HEIGHT : 5; },
                 widthMultiplier: 1.0,
                 requiresLabel: false,
-                attributes: 
-                {
+                attributes: {
                     Padding: '2,2,0,0,100',
-                    GlyphOptions: 
-                    {
+                    GlyphOptions: {
                         Size: '13,13'
                     }
                 },
@@ -206,7 +187,7 @@ export const DevExpressDefinitions = {
         button: // ! Not supported in reports
         {
             controlType: 'XRLabel',
-            defaultHeight: 30,
+            get defaultHeight() { return window.LAYOUT && window.LAYOUT.INPUT_HEIGHT ? window.LAYOUT.INPUT_HEIGHT : 5; },
             requiresLabel: false,
             attributes: 
             {
@@ -214,11 +195,11 @@ export const DevExpressDefinitions = {
             }
         },
 
-        // === Advanced Fields ===
+        // ! === Advanced Fields ===
         fileupload: // ! Not supported in reports
         {
             controlType: 'XRLabel',
-            defaultHeight: 30,
+            get defaultHeight() { return window.LAYOUT && window.LAYOUT.INPUT_HEIGHT ? window.LAYOUT.INPUT_HEIGHT : 5; },
             requiresLabel: false,
             attributes: 
             {
@@ -241,7 +222,7 @@ export const DevExpressDefinitions = {
         email: 
         {
             controlType: 'XRLabel',
-            defaultHeight: 30,
+            get defaultHeight() { return window.LAYOUT && window.LAYOUT.INPUT_HEIGHT ? window.LAYOUT.INPUT_HEIGHT : 5; },
             widthMultiplier: 0.75,
             requiresLabel: true,
             attributes: 
@@ -256,7 +237,7 @@ export const DevExpressDefinitions = {
         url: 
         {
             controlType: 'XRLabel',
-            defaultHeight: 30,
+            get defaultHeight() { return window.LAYOUT && window.LAYOUT.INPUT_HEIGHT ? window.LAYOUT.INPUT_HEIGHT : 5; },
             widthMultiplier: 0.75,
             requiresLabel: true,
             attributes: 
@@ -271,7 +252,7 @@ export const DevExpressDefinitions = {
         phoneNumber: 
         {
             controlType: 'XRLabel',
-            defaultHeight: 30,
+            get defaultHeight() { return window.LAYOUT && window.LAYOUT.INPUT_HEIGHT ? window.LAYOUT.INPUT_HEIGHT : 5; },
             widthMultiplier: 0.75,
             requiresLabel: true,
             attributes: 
@@ -286,7 +267,7 @@ export const DevExpressDefinitions = {
         address: 
         {
             controlType: 'XRLabel',
-            defaultHeight: 30,
+            get defaultHeight() { return window.LAYOUT && window.LAYOUT.INPUT_HEIGHT ? window.LAYOUT.INPUT_HEIGHT : 5; },
             widthMultiplier: 0.75,
             requiresLabel: true,
             attributes: 
@@ -302,7 +283,7 @@ export const DevExpressDefinitions = {
         datetime: 
         {
             controlType: 'XRLabel',
-            defaultHeight: 30,
+            get defaultHeight() { return window.LAYOUT && window.LAYOUT.INPUT_HEIGHT ? window.LAYOUT.INPUT_HEIGHT : 5; },
             widthMultiplier: 0.5,
             requiresLabel: true,
             attributes: 
@@ -317,7 +298,7 @@ export const DevExpressDefinitions = {
         day: 
         {
             controlType: 'XRLabel',
-            defaultHeight: 30,
+            get defaultHeight() { return window.LAYOUT && window.LAYOUT.INPUT_HEIGHT ? window.LAYOUT.INPUT_HEIGHT : 5; },
             widthMultiplier: 0.5,
             requiresLabel: true,
             attributes: 
@@ -332,7 +313,7 @@ export const DevExpressDefinitions = {
         time: 
         {
             controlType: 'XRLabel',
-            defaultHeight: 30,
+            get defaultHeight() { return window.LAYOUT && window.LAYOUT.INPUT_HEIGHT ? window.LAYOUT.INPUT_HEIGHT : 5; },
             widthMultiplier: 0.5,
             requiresLabel: true,
             attributes: 
@@ -347,7 +328,7 @@ export const DevExpressDefinitions = {
         currency: 
         {
             controlType: 'XRLabel',
-            defaultHeight: 30,
+            get defaultHeight() { return window.LAYOUT && window.LAYOUT.INPUT_HEIGHT ? window.LAYOUT.INPUT_HEIGHT : 5; },
             widthMultiplier: 0.25,
             requiresLabel: true,
             attributes: 
@@ -373,11 +354,11 @@ export const DevExpressDefinitions = {
             expression: key => `[${key}]`
         },
 
-        // === Layout Components ===
+        // ! === Layout Components ===
         htmlelement: 
         {
             controlType: 'XRLabel',
-            defaultHeight: 30,
+            get defaultHeight() { return window.LAYOUT && window.LAYOUT.INPUT_HEIGHT ? window.LAYOUT.INPUT_HEIGHT : 5; },
             requiresLabel: false,
             attributes: 
             {
@@ -393,7 +374,7 @@ export const DevExpressDefinitions = {
         content: 
         {
             controlType: 'XRLabel',
-            defaultHeight: 30,
+            get defaultHeight() { return window.LAYOUT && window.LAYOUT.INPUT_HEIGHT ? window.LAYOUT.INPUT_HEIGHT : 5; },
             requiresLabel: false,
             attributes: 
             {
@@ -406,7 +387,7 @@ export const DevExpressDefinitions = {
             useContentAsText: true
         },
 
-        // === Data Components ===
+        // ! === Data Components ===
         datagrid: 
         {
             controlType: 'XRLabel',
@@ -520,7 +501,7 @@ export const DevExpressDefinitions = {
         },
     },
 
-    // Container Component Definitions
+    // ? Container Component Definitions
     containerTypes: 
     {
         fieldset: 
@@ -533,7 +514,7 @@ export const DevExpressDefinitions = {
                 Padding: '2,2,0,0,100'
             },
             calculateHeight: (components, spacing) => {
-                return components.reduce((total, comp) => total + (comp.defaultHeight || 30) + spacing, 0);
+                return components.reduce((total, comp) => total + (comp.defaultHeight || window.LAYOUT.INPUT_HEIGHT) + spacing, 0);
             }
         },
 
@@ -550,7 +531,7 @@ export const DevExpressDefinitions = {
                 if (!components) return 0;
 
                 return components.reduce((total, comp) => {
-                    let height = comp.defaultHeight || 30;
+                    let height = comp.defaultHeight || window.LAYOUT.INPUT_HEIGHT;
 
                     if (comp.type === 'panel' || comp.type === 'fieldset')
                     {
@@ -573,7 +554,7 @@ export const DevExpressDefinitions = {
                 Padding: '10,10,10,10,100'
             },
             calculateHeight: (components, spacing) => {
-                return components.reduce((total, comp) => total + (comp.defaultHeight || 30) + spacing, 0);
+                return components.reduce((total, comp) => total + (comp.defaultHeight || window.LAYOUT.INPUT_HEIGHT) + spacing, 0);
             }
         },
 
@@ -588,7 +569,7 @@ export const DevExpressDefinitions = {
             },
             calculateHeight: (components, spacing) => {
                 return components.reduce((total, tabComponents) => {
-                    const tabHeight = tabComponents.reduce((tabTotal, comp) => tabTotal + (comp.defaultHeight || 30) + spacing, 0);
+                    const tabHeight = tabComponents.reduce((tabTotal, comp) => tabTotal + (comp.defaultHeight || window.LAYOUT.INPUT_HEIGHT) + spacing, 0);
 
                     return total + tabHeight + spacing;
                 }, 0);
@@ -636,7 +617,7 @@ export const DevExpressDefinitions = {
         }
     },
 
-    // Predefined styles that can be referenced by components
+    // ? Predefined styles that can be referenced by components
     styles: 
     {
         labels: {
@@ -664,7 +645,7 @@ export const DevExpressDefinitions = {
         }
     },
 
-    // Predefined attribute combinations
+    // ? Predefined attribute combinations
     commonAttributes:
     {
         spacing: 
@@ -694,15 +675,15 @@ export const DevExpressDefinitions = {
         }
     },
 
-    // XML Templates for each component type
+    // ? XML Templates for each component type
     templates: {
-        // === Fields ===
+        // ! === Fields ===
         textfield: {
             template: (component, context, { itemNum, componentWidth, xOffset, currentY }) => `
                 <Item${itemNum} ControlType="XRLabel" 
                 Name="${context.escapeXml(component.key || `textfield${itemNum}`)}"
                 Text="${context.escapeXml(!component.hideLabel ? (component.label || '') : '')}"
-                SizeF="${componentWidth},${context.LAYOUT.INPUT_HEIGHT}"
+                SizeF="${componentWidth},${window.LAYOUT.INPUT_HEIGHT}"
                 LocationFloat="${xOffset},${currentY}"
                 Padding="2,2,0,0,100">
                 <ExpressionBindings>
@@ -719,7 +700,7 @@ export const DevExpressDefinitions = {
                 <Item${itemNum} ControlType="XRLabel" 
                 Name="${context.escapeXml(component.key || `html${itemNum}`)}"
                 Text="${context.escapeXml(context.cleanHtml(component.content))}"
-                SizeF="${componentWidth},${context.LAYOUT.INPUT_HEIGHT}"
+                SizeF="${componentWidth},${window.LAYOUT.INPUT_HEIGHT}"
                 LocationFloat="${xOffset},${currentY}"
                 Padding="2,2,0,0,100"
                 AllowMarkupText="true"/>`
@@ -735,9 +716,9 @@ export const DevExpressDefinitions = {
                 return `
                 <Item${itemNum} ControlType="XRRichText" 
                 Name="${context.escapeXml(component.key || `richText${itemNum}`)}"
-                SizeF="${componentWidth},${context.LAYOUT.INPUT_HEIGHT * 2}"
+                SizeF="${componentWidth},${window.LAYOUT.INPUT_HEIGHT * 2}"
                 LocationFloat="${xOffset},${currentY}"
-                Font="${context.LAYOUT.FONT_FIELDOUTPUT}"
+                Font="${LAYOUT.FONT_FIELDOUTPUT}"
                 Padding="2,2,0,0,100">
                 <ExpressionBindings>
                     <Item1 Ref="${context.getNextRef()}" EventName="BeforePrint" 
@@ -752,7 +733,7 @@ export const DevExpressDefinitions = {
                 <Item${itemNum} ControlType="XRCheckBox" 
                 Name="${context.escapeXml(component.key || `checkbox${itemNum}`)}"
                 Text="${context.escapeXml(!component.hideLabel ? (component.label || '') : '')}"
-                SizeF="${componentWidth},${context.LAYOUT.INPUT_HEIGHT}"
+                SizeF="${componentWidth},${window.LAYOUT.INPUT_HEIGHT}"
                 LocationFloat="${xOffset},${currentY}"
                 Padding="2,2,0,0,100"
                 Borders="None">
@@ -771,7 +752,7 @@ export const DevExpressDefinitions = {
                 <Item${itemNum} ControlType="XRLabel" 
                 Name="${context.escapeXml(component.key || `date${itemNum}`)}"
                 Text="FormatDateTime(ToDateTime([${context.escapeXml(component.key)}]), 'g')"
-                SizeF="${componentWidth},${context.LAYOUT.INPUT_HEIGHT}"
+                SizeF="${componentWidth},${window.LAYOUT.INPUT_HEIGHT}"
                 LocationFloat="${xOffset},${currentY}"
                 TextAlignment="MiddleLeft"
                 Padding="2,2,0,0,100">
@@ -790,7 +771,7 @@ export const DevExpressDefinitions = {
                 
                 return `<Item${itemNum} ControlType="XRPictureBox" 
                     Name="${context.escapeXml(component.key || `picture${itemNum}`)}"
-                    SizeF="${componentWidth},${context.LAYOUT.INPUT_HEIGHT}"
+                    SizeF="${componentWidth},${window.LAYOUT.INPUT_HEIGHT}"
                     LocationFloat="${xOffset},${currentY}"
                     Padding="2,2,0,0,100"
                     Sizing="ZoomImage">
@@ -805,7 +786,7 @@ export const DevExpressDefinitions = {
             template: (component, context, { itemNum, componentWidth, xOffset, currentY }) => `
                 <Item${itemNum} ControlType="XRBarCode" 
                 Name="${context.escapeXml(component.key || `barcode${itemNum}`)}"
-                SizeF="${componentWidth},${context.LAYOUT.INPUT_HEIGHT}"
+                SizeF="${componentWidth},${window.LAYOUT.INPUT_HEIGHT}"
                 LocationFloat="${xOffset},${currentY}"
                 Padding="2,2,0,0,100"
                 Symbology="QRCode"
@@ -861,7 +842,7 @@ export const DevExpressDefinitions = {
                 </Item${itemNum}>`
         },
 
-        // === Layout Components ===
+        // ! === Layout Components ===
         panel: {
             template: (component, context, { panelItemNum, componentWidth, totalHeight, xOffset, currentY, nestedContext }) => `
                 <Item${panelItemNum} ControlType="XRPanel" 
@@ -877,9 +858,9 @@ export const DevExpressDefinitions = {
                     context.processNestedComponents(
                         component.components,
                         context.getNextRef(),
-                        componentWidth - (context.LAYOUT.MARGIN * 2),
-                        context.LAYOUT.MARGIN,
-                        (component.label && !component.hideLabel) ? context.LAYOUT.LABEL_HEIGHT + context.LAYOUT.VERTICAL_SPACING : 0,
+                        componentWidth - (LAYOUT.MARGIN * 2),
+                        LAYOUT.MARGIN,
+                        (component.label && !component.hideLabel) ? LAYOUT.LABEL_HEIGHT + LAYOUT.VERTICAL_SPACING : 0,
                         nestedContext
                     ) : ''}
                 </Controls>
@@ -948,7 +929,7 @@ export const DevExpressDefinitions = {
                                         0, 
                                         currentCellY
                                     );
-                                    currentCellY += componentHeight + context.LAYOUT.VERTICAL_GAP;
+                                    currentCellY += componentHeight + LAYOUT.VERTICAL_GAP;
                                 });
 
                                 return `<Item${colIndex + 1} ControlType="XRTableCell" 
@@ -973,10 +954,12 @@ export const DevExpressDefinitions = {
 
 export const DevExpressHelpers = {
 
+    // ? Retrieve the component definition for a given type
     getComponentDef(type)
     {
         const def = DevExpressDefinitions.componentTypes[type];
 
+        // ! If no definition found, log a warning and return the textfield definition as a fallback
         if (!def)
         {
             const DevExpressConverter = window.DevExpressConverter;
@@ -1002,14 +985,16 @@ export const DevExpressHelpers = {
         return def;
     },
 
+    // ? Retrieve the container definition for a given type
     getContainerDef(type)
     {
         return DevExpressDefinitions.containerTypes[type];
     },
 
+    // ? Retrieve a label style by name
     getLabelStyle(style = 'default')
     {
-        // Always return a fresh style object using the current LAYOUT values
+        // ? Always return a fresh style object using the current LAYOUT values
         switch (style) {
             case 'header':
                 return {
@@ -1036,6 +1021,7 @@ export const DevExpressHelpers = {
         }
     },
 
+    // ? Calculate the width of a component based on its definition
     calculateComponentWidth(width, componentDef) 
     {
         if (!componentDef || typeof width !== 'number') 
@@ -1055,15 +1041,17 @@ export const DevExpressHelpers = {
         return Math.floor(width * clampedMultiplier);
     },
 
+    // ? Combine two sets of attributes
     combineAttributes(baseAttrs, additionalAttrs) 
     {
         return { ...baseAttrs, ...additionalAttrs };
     },
 
+    // ? Calculate the height of a component based on its definition
     calculateComponentHeight(component) 
     {
         const def = this.getComponentDef(component.type);
-        const labelHeight = (def.requiresLabel && !component.hideLabel) ? 30 : 0;
+        const labelHeight = (def.requiresLabel && !component.hideLabel) ? window.LAYOUT.INPUT_HEIGHT : 0;
         const spacing = DevExpressDefinitions.commonAttributes.spacing.componentSpacing;
 
         return def.defaultHeight + labelHeight + spacing;

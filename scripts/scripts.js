@@ -7,7 +7,7 @@ function loadHTML(elementId, file) {
 }
 
 function loadComponents() {
-    loadHTML("navbar-placeholder", "comp_navbar.html");
+    loadHTML("navbar-placeholder", "components/comp_navbar.html");
     //loadHTML("footer-placeholder", "footer.html");
 }
 
