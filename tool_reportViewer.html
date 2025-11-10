@@ -3,22 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Report Viewer</title>
-
+    <title>DevExpress Report Viewer</title>
+    
     <!-- Favicon -->
     <link rel="icon" href="img/faviconLarge.png" type="image/png" sizes="1024x1024">
 
-      <!-- Stylesheets -->
+    <!-- Stylesheets -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
     <link href="styles/style.css" rel="stylesheet">
-    
-    <!-- Scripts for Code Highlighting -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+    <link href="styles/reportViewer.css" rel="stylesheet">
 </head>
 <body>
     <!-- Nav Bar -->
@@ -29,7 +25,7 @@
         <!-- Header Section -->
         <header class="text-center mb-5">
             <h1 class="display-4 fw-bold mb-2">Report Viewer</h1>
-            <p class="text-light">Previews DevExpress reports and extracts their XML</p>
+            <p class="text-light">Previews DevExpress reports and extracts their XML (NEW)</p>
         </header>
 
         <!-- Card Section -->
@@ -52,13 +48,14 @@
 
             <!-- Tab Content -->
             <div class="card-body p-4">
-                <div class="tab-content">                    <!-- Upload Tab -->
-                    <div class="tab-pane fade show active" id="upload" role="tabpanel">
+                <div class="tab-content">
+                    <!-- Upload Tab -->
+                    <div class="tab-pane fade show active" id="upload">
                         <div class="upload-area d-flex flex-column align-items-center justify-content-center p-5 rounded-3 text-center mb-4">
-                            <label for="fileUpload" class="form-label h5 mb-3 text-light">Upload DevExpress JSON File</label>
-                            <input type="file" id="fileUpload" class="form-control form-control-lg" accept=".json" style="max-width: 400px;">
+                            <label for="reportUpload" class="form-label h5 mb-3 text-light">Upload DevExpress JSON File</label>
+                            <input type="file" id="reportUpload" class="form-control form-control-lg" accept=".json" style="max-width: 400px;">
                         </div>
-                        
+
                         <!-- Output Section -->
                         <div id="output-wrapper" style="display: none;" class="mb-4">
                             <!-- DevExpress JSON Output -->
@@ -102,11 +99,36 @@
                             </div>
                         </div>
                     </div>
-                    
-                <!-- Preview Tab -->
-                    <div class="tab-pane fade" id="preview" role="tabpanel">
-                        <div id="viewer-container">
-                            <!-- The DevExpress viewer component will be loaded here dynamically -->
+
+                    <!-- Preview Tab -->
+                    <div class="tab-pane fade" id="preview">
+                        <!-- Controls Section -->
+                        <div class="devexpress-viewer">
+                            <div class="zoom-controls mb-3">
+                                <div>
+                                    <input type="checkbox" class="form-check-input" id="showBoundaries">
+                                    <label class="form-check-label" for="showBoundaries">Show Boundaries</label>
+                                </div>
+                                <div class="btn-group">
+                                    <button id="zoomOut" class="btn btn-secondary">
+                                        <i class="bi bi-zoom-out"></i>
+                                    </button>
+                                    <button id="zoomLevel" class="btn btn-secondary">100%</button>
+                                    <button id="zoomIn" class="btn btn-secondary">
+                                        <i class="bi bi-zoom-in"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Report Preview Section -->
+                        <div class="preview-area">
+                            <!-- Report Container -->
+                            <div class="report-container-wrapper bg-darker rounded-3 p-3">
+                                <div id="reportContainer" class="report-container">
+                                    <!-- Report content will be rendered here -->
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -114,89 +136,46 @@
         </div>
     </div>
 
+    <!-- Inspector Modal -->
+    <div class="modal" id="inspectorModal" tabindex="-1" aria-labelledby="inspectorModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content bg-darker text-light">
+                <div class="modal-header border-bottom border-secondary">
+                    <h5 class="modal-title" id="inspectorModalLabel">Component Inspector</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs nav-tabs-dark mb-3" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="properties-tab" data-bs-toggle="tab" href="#properties">Properties</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="xml-tab" data-bs-toggle="tab" href="#xml">XML</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="properties">
+                            <div id="propertyInspector" class="text-light"></div>
+                        </div>
+                        <div class="tab-pane fade" id="xml">
+                            <pre id="xmlViewer" class="xml-viewer text-light"></pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="scripts/scripts.js"></script>    <script type="module">
-        import { createDevExpressPreview, decodeReportTemplate } from './scripts/Tools/ReportViewer/tool_reportViewer.js';
-    
-        document.addEventListener('DOMContentLoaded', () => {
-            // Setup copy buttons for JSON and XML
-            const copyJsonBtn = document.getElementById('copyJsonBtn');
-            const copyXmlBtn = document.getElementById('copyXmlBtn');
-            
-            if (copyJsonBtn) {
-                copyJsonBtn.addEventListener('click', () => {
-                    const json = document.getElementById('devexpress-json').textContent;
-                    navigator.clipboard.writeText(json)
-                        .then(() => {
-                            copyJsonBtn.textContent = 'Copied!';
-                            setTimeout(() => copyJsonBtn.textContent = 'Copy JSON', 2000);
-                        })
-                        .catch(err => console.error('Copy failed:', err));
-                });
-            }
-            
-            if (copyXmlBtn) {
-                copyXmlBtn.addEventListener('click', () => {
-                    const xml = document.getElementById('devexpress-xml').textContent;
-                    navigator.clipboard.writeText(xml)
-                        .then(() => {
-                            copyXmlBtn.textContent = 'Copied!';
-                            setTimeout(() => copyXmlBtn.textContent = 'Copy XML', 2000);
-                        })
-                        .catch(err => console.error('Copy failed:', err));
-                });
-            }
-            
-            // Handle file upload
-            document.getElementById('fileUpload').addEventListener('change', function(event) {
-                const file = event.target.files[0];
-                if (!file) return;
-    
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        const devExpressData = JSON.parse(e.target.result);
-                        const decodedTemplate = decodeReportTemplate(devExpressData[0].ReportTemplate);
-                        if (decodedTemplate) {
-                            // Display the output sections
-                            document.getElementById('output-wrapper').style.display = 'block';
-                            
-                            // Populate JSON output
-                            const devExpressJsonContainer = document.getElementById('devexpress-json');
-                            if (devExpressJsonContainer) {
-                                devExpressJsonContainer.innerHTML = `<code class="language-json">${JSON.stringify(devExpressData, null, 2)}</code>`;
-                            }
-                            
-                            // Populate XML output
-                            const devExpressXmlContainer = document.getElementById('devexpress-xml');
-                            if (devExpressXmlContainer && decodedTemplate.content) {
-                                const escapedXml = decodedTemplate.content
-                                    .replace(/&/g, '&amp;')
-                                    .replace(/</g, '&lt;')
-                                    .replace(/>/g, '&gt;');
-                                devExpressXmlContainer.innerHTML = `<code class="language-markup">${escapedXml}</code>`;
-                            }
-                            
-                            // Apply syntax highlighting
-                            Prism.highlightAll();
-                            
-                            // Load the preview
-                            createDevExpressPreview(devExpressData, decodedTemplate);
-                            
-                            // Enable and activate the preview tab
-                            const previewTab = document.getElementById('preview-tab');
-                            previewTab.classList.remove('disabled');
-                            previewTab.click();
-                        }
-                    } catch (error) {
-                        console.error('Error parsing report definition:', error);
-                    }
-                };
-                reader.readAsText(file);
-            });
-        });
-    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.0.4/pako.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+    <script src="scripts/scripts.js"></script>
+    <script type="module" src="scripts/Tools/ReportViewer/tool_reportViewer.js"></script>
 </body>
 </html>

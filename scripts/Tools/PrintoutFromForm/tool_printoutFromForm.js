@@ -1,5 +1,3 @@
-
-
 //#region Imports
 import { LAYOUT } from './layoutConfig.js';
 
@@ -12,8 +10,8 @@ import { ComponentProcessor } from './componentProcessor.js';
 
 // ? Version info is used for generating both XML and SQL
 const VERSION_INFO = {
-    version: '0.4.2',
-    updated: '10/24/2025',
+    version: '0.4.4',
+    updated: '10/30/2025',
     devexpressVersion: '23.2.5.0'
 };
 
@@ -352,7 +350,7 @@ class DevExpressConverter
     {
         this.state.devExpressJson = null;   // ? Reset generated JSON
         this.state.warnings = [];           // ? Reset warnings
-        FieldGenerator.initRefs();          // ? Reset ref and item counters at start
+        //FieldGenerator.initRefs();          // ? Reset ref and item counters at start
     }
 
     // ? Counts all components recursively, including nested ones
@@ -688,7 +686,7 @@ class DevExpressConverter
             const nestedContext = {
                 ...context,
                 parentVisible: isVisible,
-                getNextRef: FieldGenerator.getNextRef,
+                getNextRef: XMLProcessor.currentRef,
                 itemCounter: 1  // Reset item counter for panel children
             };
 
@@ -742,7 +740,7 @@ class DevExpressConverter
             const newContext = {
                 ...context,
                 itemCounter: context.itemCounter++,
-                getNextRef: FieldGenerator.getNextRef
+                getNextRef: XMLProcessor.currentRef
             };
 
             return DevExpressDefinitions.templates.table.template(
@@ -804,7 +802,7 @@ class DevExpressConverter
 
             const newContext = {
                 ...context,
-                getNextRef: FieldGenerator.getNextRef,
+                getNextRef: XMLProcessor.currentRef,
                 columnsHeight,
                 isComponentVisible: DevExpressConverter.isComponentVisible
             };
@@ -830,7 +828,7 @@ class DevExpressConverter
             const newContext = {
                 ...context,
                 itemCounter: context.itemCounter++,
-                getNextRef: FieldGenerator.getNextRef
+                getNextRef: XMLProcessor.currentRef
             };
 
             return DevExpressDefinitions.templates.datagrid.template(
@@ -852,7 +850,7 @@ class DevExpressConverter
             const newContext = {
                 ...context,
                 itemCounter: context.itemCounter++,
-                getNextRef: FieldGenerator.getNextRef,
+                getNextRef: XMLProcessor.currentRef,
                 getTypeCastedFieldExpression: DevExpressConverter.getTypeCastedFieldExpression
             };
 
@@ -894,7 +892,7 @@ class DevExpressConverter
             const newContext = {
                 ...context,
                 itemCounter: context.itemCounter++,
-                getNextRef: FieldGenerator.getNextRef
+                getNextRef: XMLProcessor.currentRef
             };
 
             return DevExpressDefinitions.templates.checkbox.template(
@@ -920,7 +918,7 @@ class DevExpressConverter
             const newContext = {
                 ...context,
                 itemCounter: context.itemCounter++,
-                getNextRef: FieldGenerator.getNextRef
+                getNextRef: XMLProcessor.currentRef
             };
 
             return DevExpressDefinitions.templates.datetime.template(
@@ -940,7 +938,7 @@ class DevExpressConverter
         {
             const newContext = {
                 ...context,
-                getNextRef: FieldGenerator.getNextRef
+                getNextRef: XMLProcessor.currentRef
             };
 
             return DevExpressDefinitions.templates.htmlelement.template(
@@ -961,7 +959,7 @@ class DevExpressConverter
             const newContext = {
                 ...context,
                 itemCounter: context.itemCounter++,
-                getNextRef: FieldGenerator.getNextRef
+                getNextRef: XMLProcessor.currentRef
             };
 
             return DevExpressDefinitions.templates.picturebox.template(
@@ -982,7 +980,7 @@ class DevExpressConverter
             const newContext = {
                 ...context,
                 itemCounter: context.itemCounter++,
-                getNextRef: FieldGenerator.getNextRef
+                getNextRef: XMLProcessor.currentRef
             };
 
             return DevExpressDefinitions.templates.pagebreak.template(
@@ -1001,7 +999,7 @@ class DevExpressConverter
             // Use the passed itemNum parameter instead of redeclaring it
             const newContext = {
                 ...context,
-                getNextRef: FieldGenerator.getNextRef
+                getNextRef: XMLProcessor.currentRef
             };
 
             return DevExpressDefinitions.templates.richtext.template(
@@ -1022,7 +1020,7 @@ class DevExpressConverter
             const newContext = {
                 ...context,
                 itemCounter: context.itemCounter++,
-                getNextRef: FieldGenerator.getNextRef
+                getNextRef: XMLProcessor.currentRef
             };
 
             return DevExpressDefinitions.templates.barcode.template(
@@ -1688,6 +1686,9 @@ const UIHandlers = {
                         formioTemplate = jsonData.FormioTemplate;
                     }
 
+                    // ? Pre-process: Hoist grids and subforms out of containers
+                    ComponentCleaner.hoistGridsAndSubforms(formioTemplate);
+                    
                     // ? Clean form definition
                     if (formioTemplate.components)
                     {
@@ -2088,57 +2089,66 @@ const ComponentCleaner = {
         }
 
         return comp;
+    },
+
+    // ? Hoists DataGrids, EditGrids, Subforms, and Forms out of container components
+    // ! This is done to prevent a common issue with the band splitting process we do later
+    hoistGridsAndSubforms(formJson) {
+        // ! EARLY EXIT
+        // ? Validate input
+        if (!formJson || !Array.isArray(formJson.components)) return formJson;
+
+        //console.warn('[hoistGridsAndSubforms] Starting hoisting process');
+        //console.warn('[hoistGridsAndSubforms] Original JSON:', JSON.stringify(formJson, null, 2));
+
+        // ? Containers to handle
+        const containerTypes = ['panel', 'fieldset', 'well', 'columns', 'tabs'];
+        // ? Element types to hoist
+        const hoistTypes = ['datagrid', 'nestedsubform'];
+
+
+        // Helper: recursively flatten containers, hoisting grids/subforms to root and preserving order
+        function flattenComponents(arr, rootArr) {
+            if (!Array.isArray(arr)) return [];
+            let result = [];
+            for (let comp of arr) {
+                if (hoistTypes.includes((comp.type || '').toLowerCase())) {
+                    // Hoist to root
+                    result.push({ hoist: true, comp });
+                } else if (containerTypes.includes((comp.type || '').toLowerCase()) && Array.isArray(comp.components)) {
+                    // Flatten container: replace with its children (recursively)
+                    const flattened = flattenComponents(comp.components, rootArr);
+                    result = result.concat(flattened);
+                } else {
+                    // Keep as-is
+                    result.push({ hoist: false, comp });
+                }
+            }
+            return result;
+        }
+
+        // Flatten the top-level components array
+        const flattened = flattenComponents(formJson.components, formJson.components);
+        // Rebuild root array: non-hoisted in order, then hoisted in order at their original positions
+        const newRoot = [];
+        flattened.forEach(item => {
+            if (item.hoist) {
+                //console.warn(`[hoistGridsAndSubforms] Hoisting '${getLabelOrKey(item.comp)}' (type: ${item.comp.type}) to root level.`);
+                newRoot.push(item.comp);
+            } else {
+                newRoot.push(item.comp);
+            }
+        });
+        formJson.components = newRoot;
+
+        //console.warn('[hoistGridsAndSubforms] Hoisting complete. Hoisted JSON:', JSON.stringify(formJson, null, 2));
+        return formJson;
     }
 };
 
 //#endregion
 
-//#region Field Generation
-
-const FieldGenerator = {
-    refCounter: 1,          // ? Start at 1 for main report
-    itemCounter: 1,         // ? Start at 1 for numbered items (Item1, Item2, etc.)
-    usedRefs: new Set(),    // ? Track used reference numbers
-
-    // ? Initialize or reset both counters
-    initRefs()
-    {
-        this.refCounter = 1;    // ? Always start at 1 for refs
-        this.itemCounter = 1;   // ? Always start at 1 for items
-        this.usedRefs.clear();  // ? Clear used refs
-    },
-
-    // ? Get next sequential reference number
-    // ? Returns an integer
-    getNextRef()
-    {
-        const ref = this.refCounter++;
-        this.usedRefs.add(ref);
-
-        // ? Debug logging
-        if (debugLevel >= 2)
-        {
-            console.log(`Assigned Ref="${ref}"`);
-        }
-
-        return ref;
-    },
-
-    // ? Get next sequential item number
-    // ? Returns an integer
-    getNextItemNum()
-    {
-        return this.itemCounter++;
-    },
-
-    // ? Reserve a specific reference number
-    // ! This is used when a specific ref is needed to avoid conflicts
-    // ! It does not change the current refCounter, just marks the ref as used
-    reserveRef(ref)
-    {
-        this.usedRefs.add(ref);
-    },
-};
+//#region Generation
 
 // ? Generates a minimal XML template for DevExpress reports that we can then populate with element nodes
 function generateMinimalXmlTemplate()
@@ -2218,6 +2228,7 @@ function generateMinimalXmlTemplate()
             if (debugLevel >= 2) {
                 console.log('Processed components:', processedNodes);
                 console.log('Grid markers:', componentProcessor.gridComponents);
+                console.log('Nested form markers:', componentProcessor.nestedFormComponents);
                 console.log('Starting to process nodes into groups...');
             }
             
@@ -2226,7 +2237,10 @@ function generateMinimalXmlTemplate()
             let currentComponents = [];
             let gridIdx = 0;
             processedNodes.forEach((node) => {
-                if (node.type === 'grid') {
+                if (node.type === 'grid')
+                {
+                    console.warn("GRID DETECTED");
+
                     // If there are components collected, push them as a group
                     if (currentComponents.length > 0) {
                         groups.push({ type: 'components', components: currentComponents.slice(), afterGridIndex: gridIdx - 1 });
@@ -2235,7 +2249,22 @@ function generateMinimalXmlTemplate()
                     // Push the grid marker
                     groups.push({ type: 'grid', gridIndex: gridIdx });
                     gridIdx++;
-                } else {
+                } 
+                else if (node.type === 'nestedsubform')
+                {
+                    console.warn("NESTEDSUBFORM DETECTED");
+
+                    // If there are components collected, push them as a group
+                    if (currentComponents.length > 0) {
+                        groups.push({ type: 'components', components: currentComponents.slice(), afterGridIndex: gridIdx - 1 });
+                        currentComponents = [];
+                    }
+                    // Push the nested form marker
+                    groups.push({ type: 'nestedForm', component: node });
+                } 
+                else 
+                {
+                    console.warn("REGULAR COMPONENT DETECTED. TYPE:", node.type, "NAME:", node.name, "KEY:", node.key);
                     currentComponents.push(node);
                 }
             });
@@ -2306,6 +2335,9 @@ function generateMinimalXmlTemplate()
         
         // Get the grid components that were processed by ComponentProcessor
         const gridComponents = componentProcessor.gridComponents || [];
+
+        // Get the nested form components that were processed by ComponentProcessor
+        const nestedFormComponents = componentProcessor.nestedFormComponents || [];
         
         const bandsArray = [
             processor.createItemNode(undefined, "TopMarginBand",
@@ -2340,10 +2372,13 @@ function generateMinimalXmlTemplate()
             })
         ];
 
-        // Iterate through componentGroups in order, creating bands for each grid and using the next components group for spacer
+        // Iterate through componentGroups in order, creating bands for each grid/nestedform and using the next components group for spacer
         for (let i = 0; i < componentGroups.length; i++) {
+
             const group = componentGroups[i];
-            if (group.type === 'grid') {
+
+            if (group.type === 'grid') 
+            {
                 const grid = gridComponents[group.gridIndex];
                 const gridBaseName = grid.key || `Grid${group.gridIndex + 1}`;
 
@@ -2447,6 +2482,69 @@ function generateMinimalXmlTemplate()
                 }
                 spacerReport.addChild(spacerBands);
                 bandsArray.push(spacerReport);
+            }
+            else if (group.type === 'nestedForm') {
+                const nestedForm = group.component;
+                const nestedFormBaseName = nestedForm.key || `NestedForm${i + 1}`;
+
+                console.log(`Processing Nested Form: ${nestedFormBaseName}`);
+
+                // Create nested form band
+                const nestedFormReport = processor.createItemNode(undefined, "DetailReportBand", {
+                    Name: `DetailReport_${nestedFormBaseName}`,
+                    HeightF: (nestedForm.height || LAYOUT.INPUT_HEIGHT).toString() // Fallback to INPUT_HEIGHT if height is undefined
+                });
+                console.log(`Creating nested form band for: ${nestedFormBaseName}`, nestedForm); // Log nestedForm for debugging
+
+                const nestedFormBands = processor.buildNode('Bands', {}, [
+                    processor.createItemNode(1, "DetailBand", {
+                        Name: `Detail_${nestedFormBaseName}`,
+                        HeightF: (nestedForm.height || LAYOUT.INPUT_HEIGHT).toString() // Fallback to INPUT_HEIGHT if height is undefined
+                    })
+                ]);
+                const nestedFormControls = processor.buildNode('Controls', {});
+
+                // Add the subreport element to the nested form band
+                const subreportNode = componentProcessor.createSubReportNode(nestedForm, (LAYOUT.PAGE_WIDTH - LAYOUT.MARGIN_LEFT - LAYOUT.MARGIN_RIGHT), 0);
+                nestedFormControls.addChild(subreportNode);
+                nestedFormBands.children[0].addChild(nestedFormControls);
+                nestedFormReport.addChild(nestedFormBands);
+                bandsArray.push(nestedFormReport);
+
+                // Create post-nested form band
+                const postNestedFormReport = processor.createItemNode(undefined, "DetailReportBand", {
+                    Name: `DetailReport_${nestedFormBaseName}_postContent`,
+                    HeightF: LAYOUT.LABEL_HEIGHT.toString()
+                });
+                console.log(`Creating post-nested form band for: ${nestedFormBaseName}`);
+
+                // Add post-content components if available
+                if (i + 1 < componentGroups.length && componentGroups[i + 1].type === 'components') {
+                    const postContentControls = processor.buildNode('Controls', {});
+                    const postContentElements = componentGroups[i + 1].components;
+                    let currentYOffset = LAYOUT.VERTICAL_SPACING;
+                    postContentElements.forEach(component => {
+                        if (typeof component !== 'string' && component.attributes) {
+                            // Reset Y offset for each component in the new band
+                            const height = component.attributes.SizeF ? parseFloat(component.attributes.SizeF.split(',')[1]) : LAYOUT.INPUT_HEIGHT;
+                            component.attributes.LocationFloat = `0,${currentYOffset}`;
+                            currentYOffset += height + LAYOUT.VERTICAL_SPACING;
+                            postContentControls.addChild(component);
+                        } else if (typeof component === 'string') {
+                            // If string, parse as XML and add (no offset logic)
+                            postContentControls.addChild(processor.parseXml(component));
+                        }
+                    });
+                    const postBands = processor.buildNode('Bands', {}, [
+                        processor.createItemNode(1, "DetailBand", {
+                            Name: `Detail_${nestedFormBaseName}_postContent`,
+                            HeightF: LAYOUT.LABEL_HEIGHT.toString()
+                        })
+                    ]);
+                    postBands.children[0].addChild(postContentControls);
+                    postNestedFormReport.addChild(postBands);
+                }
+                bandsArray.push(postNestedFormReport);
             }
         }
 
@@ -2582,7 +2680,6 @@ export
     Utils,
     UIHandlers,
     Init,
-    FieldGenerator,
     generateMinimalXmlTemplate
 };
 

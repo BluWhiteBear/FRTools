@@ -64,6 +64,8 @@ class XMLProcessor
         this.currentItemNum = 0;
         this.validateOnGenerate = true;     // ? Should we validate on generate
         this.hasBeenValidated = false;      // ? Track if we've already validated
+
+        console.log('[XMLProcessor] Initialized with currentRef:', this.currentRef);
     }
 
     // ? Escapes special XML characters in text content
@@ -215,6 +217,7 @@ class XMLProcessor
     // ? Resets the internal state for processing a new XML structure
     reset()
     {
+        console.log('Resetting XMLProcessor state');
         this.currentRef = 0;
         this.currentItemNum = 0;
     }
@@ -277,7 +280,14 @@ class XMLProcessor
         // ? Assign ref count if needed
         if (node.needsRef)
         {
+            // console.log('[assignReferences] Assigning Ref:', {
+            //     currentRef: this.currentRef,
+            //     nodeType: node.type,
+            //     nodeName: node.attributes?.Name || 'unnamed'
+            // });
+            //console.log('[assignReferences] Before increment, currentRef:', this.currentRef);
             node.attributes.Ref = this.currentRef++;
+            //console.log('[assignReferences] After increment, currentRef:', this.currentRef);
         }
 
         // ? Recursively process all children elements if they exist

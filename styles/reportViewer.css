@@ -1,0 +1,559 @@
+/* Report Container */
+.report-container {
+    position: relative;
+    overflow: auto;
+    min-height: calc(100vh - 300px);
+    background: #fff;
+    padding: 20px;
+    border-radius: 4px;
+}
+
+/* Inspector Modal */
+.modal-lg {
+    max-width: 800px;
+}
+
+/* Hide modal backdrop */
+.modal-backdrop {
+    display: none !important;
+}
+
+/* Ensure modal appears above backdrop */
+.modal-backdrop {
+    z-index: 1040;
+}
+
+.modal {
+    z-index: 1050;
+}
+
+#inspectorModal {
+    z-index: 1050;
+}
+
+#inspectorModal .modal-content {
+    background-color: #2d2d2d !important;
+    color: #e0e0e0;
+    border: 1px solid #444;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+#inspectorModal .modal-header,
+#inspectorModal .modal-footer {
+    border-color: #444;
+    background-color: #1a1a1a;
+}
+
+#inspectorModal .nav-tabs {
+    border-bottom-color: #444;
+}
+
+/* Checkbox specific styles */
+.checkbox-wrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2px;
+}
+
+.report-checkbox {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #666;
+    border-radius: 3px;
+    background-color: white;
+    cursor: default;
+    position: relative;
+}
+
+.report-checkbox:checked {
+    background-color: #0066cc;
+    border-color: #0066cc;
+}
+
+.report-checkbox:checked::after {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 1px;
+    width: 5px;
+    height: 9px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+/* Expression field indicator for checkboxes */
+.report-component[data-type="XRCheckBox"].expression-field .checkbox-wrapper {
+    position: relative;
+}
+
+.report-component[data-type="XRCheckBox"].expression-field .checkbox-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+}
+
+/* Panel component styles */
+.report-component[data-type="XRPanel"] {
+    background: transparent;
+}
+
+.report-component[data-type="XRPanel"] .panel-wrapper {
+    border-radius: 2px;
+    overflow: visible;
+}
+
+.report-component[data-type="XRPanel"].selected .panel-wrapper {
+    outline: 2px solid #0066cc;
+    outline-offset: 1px;
+}
+
+/* Position context for panel children */
+.panel-wrapper {
+    position: relative;
+    pointer-events: none;
+}
+
+.panel-wrapper > .report-component {
+    pointer-events: all;
+}
+
+#inspectorModal .nav-tabs .nav-link {
+    color: #e0e0e0;
+    border: none;
+}
+
+#inspectorModal .nav-tabs .nav-link:hover {
+    background-color: #3a3a3a;
+}
+
+#inspectorModal .nav-tabs .nav-link.active {
+    color: #e0e0e0;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-bottom: 2px solid #0d6efd;
+}
+
+#inspectorModal .xml-viewer {
+    background: #1a1a1a;
+    padding: 1rem;
+    border-radius: 4px;
+    border: 1px solid #444;
+    max-height: 400px;
+    overflow: auto;
+}
+
+#inspectorModal .table {
+    color: #e0e0e0;
+}
+
+#inspectorModal .table td,
+#inspectorModal .table th {
+    border-color: #444;
+}
+
+/* Report Page */
+.report-page {
+    position: relative;
+    background: white;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    margin: 0 auto;
+    transform-origin: top left;
+}
+
+/* Band Styles */
+.report-band {
+    position: absolute;
+    left: 0;
+    right: 0;
+    box-sizing: border-box;
+    min-height: 1px;
+    width: 100%;
+    overflow: visible;
+}
+
+/* Component Base Styles */
+.report-component {
+    position: absolute;
+    box-sizing: border-box;
+    pointer-events: all;
+    font-family: Arial, sans-serif;
+}
+
+/* Component Categories */
+.component-text {
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    white-space: pre-wrap;
+}
+
+.component-input {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.component-media {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.component-container {
+    display: block;
+    overflow: visible;
+}
+
+/* Specific Component Types */
+.component-label {
+    
+}
+
+.component-checkbox {
+    
+}
+
+.component-picture-box img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.component-panel {
+    background: transparent;
+}
+
+.component-rich-text {
+    overflow-y: auto;
+    padding: 2px;
+}
+
+.component-table {
+    overflow: hidden;
+}
+
+.component-line {
+    padding: 0;
+    overflow: visible;
+}
+
+.component-shape {
+    padding: 0;
+    overflow: visible;
+}
+
+/* Show boundaries when enabled */
+.show-boundaries .report-component {
+}
+
+.show-boundaries .component-panel {
+    --band-color-picker: rgb(255, 96, 96);
+    --band-color: 255, 96, 96;
+    background: repeating-linear-gradient(
+        45deg,
+        rgba(var(--band-color), 0.1),
+        rgba(var(--band-color), 0.1) 10px,
+        rgba(var(--band-color), 0.2) 10px,
+        rgba(var(--band-color), 0.2) 20px
+    );
+}
+
+.show-boundaries .component-checkbox {
+    outline: 1px dashed rgba(255, 0, 0, 0.2);
+}
+
+.show-boundaries .component-picture-box {
+    outline: 1px dashed rgba(128, 0, 128, 0.2);
+}
+
+/* Component States */
+.report-component:hover {
+    outline: 1px solid rgba(0, 102, 204, 0.5);
+}
+
+.report-component.selected {
+    outline: 2px solid #0066cc !important;
+    outline-offset: 1px;
+}
+
+/* Expression Fields */
+.report-component.expression-field {
+    position: relative;
+}
+
+.report-component.expression-field::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+}
+
+/* Panel specific styles */
+.component-panel {
+    position: absolute;
+    overflow: visible;
+}
+
+/* Margin Bands */
+.band-margin {
+    background-color: rgba(255, 255, 255, 0);
+}
+
+.band-top-margin {
+    background-color: rgba(255, 255, 255, 0);
+}
+
+.band-bottom-margin {
+    background-color: rgba(255, 255, 255, 0);
+}
+
+/* Header Bands */
+.band-header {
+    background-color: rgba(255, 255, 255, 0);
+}
+
+.band-report-header {
+    background-color: rgba(255, 255, 255, 0);
+}
+
+.band-page-header {
+    background-color: rgba(255, 255, 255, 0);
+}
+
+/* Footer Bands */
+.band-footer {
+    background-color: rgba(255, 255, 255, 0);
+}
+
+.band-report-footer {
+    background-color: rgba(255, 255, 255, 0);
+}
+
+.band-page-footer {
+    background-color: rgba(255, 255, 255, 0);
+}
+
+/* Content Bands */
+.band-content {
+    background-color: rgba(255, 255, 255, 0);
+}
+
+.band-detail {
+    background-color: rgba(255, 255, 255, 0);
+}
+
+/* Show boundaries mode - Band specific */
+.show-boundaries .report-band {
+    outline: 1px dashed rgb(0, 0, 0);
+}
+
+.show-boundaries .band-margin {
+    outline-color: rgba(128, 128, 128, 0.4);
+    outline-style: dotted;
+}
+
+.show-boundaries .band-header {
+    outline-color: rgb(21, 255, 0);
+}
+
+.show-boundaries .band-footer {
+    outline-color: rgba(0, 0, 255, 0.4);
+}
+
+.show-boundaries .band-content {
+    outline-color: rgba(0, 128, 0, 0.4);
+}
+
+/* Band labels in boundary mode */
+.show-boundaries .report-band::before {
+    content: attr(data-band-type);
+    position: absolute;
+    left: 4px;
+    top: 2px;
+    font-size: 9px;
+    color: #666;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 1px 4px;
+    border-radius: 2px;
+    z-index: 1;
+}
+
+/* Component Styles */
+.report-component {
+    position: absolute;
+    box-sizing: border-box;
+}
+
+/* Boundary Visualization */
+.show-boundaries .report-band {
+    outline: 2px dashed rgb(0, 0, 0);
+}
+
+/* Band Type Colors (visible when boundaries are shown) */
+.show-boundaries .report-band[data-band-type="TopMarginBand"] {
+    --band-color-picker: rgb(255, 153, 0);
+    --band-color: 255, 153, 0;
+    background: repeating-linear-gradient(
+        45deg,
+        rgba(var(--band-color), 0.1),
+        rgba(var(--band-color), 0.1) 10px,
+        rgba(var(--band-color), 0.2) 10px,
+        rgba(var(--band-color), 0.2) 20px
+    );
+}
+
+.show-boundaries .report-band[data-band-type="ReportHeaderBand"] {
+    --band-color-picker: rgb(65, 255, 113);
+    --band-color: 65, 255, 113;
+    background: repeating-linear-gradient(
+        45deg,
+        rgba(var(--band-color), 0.1),
+        rgba(var(--band-color), 0.1) 10px,
+        rgba(var(--band-color), 0.2) 10px,
+        rgba(var(--band-color), 0.2) 20px
+    );
+}
+
+.show-boundaries .report-band[data-band-type="PageHeaderBand"] {
+    --band-color-picker: rgb(65, 255, 113);
+    --band-color: 65, 255, 113;
+    background: repeating-linear-gradient(
+        45deg,
+        rgba(var(--band-color), 0.1),
+        rgba(var(--band-color), 0.1) 10px,
+        rgba(var(--band-color), 0.2) 10px,
+        rgba(var(--band-color), 0.2) 20px
+    );
+}
+
+.show-boundaries .report-band[data-band-type="DetailBand"] {
+    --band-color-picker: rgb(96, 191, 255);
+    --band-color: 96, 191, 255;
+    background: repeating-linear-gradient(
+        45deg,
+        rgba(var(--band-color), 0.1),
+        rgba(var(--band-color), 0.1) 10px,
+        rgba(var(--band-color), 0.2) 10px,
+        rgba(var(--band-color), 0.2) 20px
+    );
+}
+
+.show-boundaries .report-band[data-band-type="DetailReportBand"] {
+    --band-color-picker: rgb(255, 96, 96);
+    --band-color: 255, 96, 96;
+    background: repeating-linear-gradient(
+        45deg,
+        rgba(var(--band-color), 0.1),
+        rgba(var(--band-color), 0.1) 10px,
+        rgba(var(--band-color), 0.2) 10px,
+        rgba(var(--band-color), 0.2) 20px
+    );
+}
+
+.show-boundaries .report-band[data-band-type="PageFooterBand"] {
+    --band-color-picker: rgb(65, 255, 113);
+    --band-color: 65, 255, 113;
+    background: repeating-linear-gradient(
+        45deg,
+        rgba(var(--band-color), 0.1),
+        rgba(var(--band-color), 0.1) 10px,
+        rgba(var(--band-color), 0.2) 10px,
+        rgba(var(--band-color), 0.2) 20px
+    );
+}
+
+.show-boundaries .report-band[data-band-type="BottomMarginBand"] {
+    --band-color-picker: rgb(255, 153, 0);
+    --band-color: 255, 153, 0;
+    background: repeating-linear-gradient(
+        45deg,
+        rgba(var(--band-color), 0.1),
+        rgba(var(--band-color), 0.1) 10px,
+        rgba(var(--band-color), 0.2) 10px,
+        rgba(var(--band-color), 0.2) 20px
+    );
+}
+
+/* Component boundary visualization */
+.show-boundaries .report-component {
+    outline: 1px dashed rgb(0, 0, 0);
+}
+
+.show-boundaries .report-component[data-type="XRLabel"] {
+    background-color: rgba(0, 0, 255, 0.1);
+}
+
+.show-boundaries .report-component[data-type="XRPictureBox"] {
+    background-color: rgba(255, 0, 0, 0.1);
+}
+
+.show-boundaries .report-component[data-type="XRCheckBox"] {
+    background-color: rgba(195, 0, 255, 0.1);
+}
+
+/* Component hover effects */
+.report-component:hover {
+    outline: 2px solid rgba(0,123,255,0.5);
+}
+
+/* Selected component */
+.report-component.selected {
+    outline: 2px solid rgb(0,123,255);
+}
+
+/* XML Viewer */
+.xml-viewer {
+    font-family: monospace;
+    font-size: 12px;
+    white-space: pre-wrap;
+    max-height: calc(100vh - 300px);
+    overflow: auto;
+}
+
+.btn-primary {
+    background: var(--accent-color) !important;
+    border: none !important;
+    color: #121212 !important;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: var(--accent-color-dark) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(200, 223, 143, 0.2);
+}
+
+/* Property Inspector */
+#propertyInspector {
+    max-height: calc(100vh - 300px);
+    overflow: auto;
+}
+
+.property-group {
+    margin-bottom: 1rem;
+}
+
+.property-label {
+    font-weight: bold;
+    font-size: 0.875rem;
+}
+
+.property-value {
+    font-family: monospace;
+    font-size: 0.875rem;
+    word-break: break-all;
+}

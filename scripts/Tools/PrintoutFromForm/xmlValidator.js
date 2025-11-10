@@ -11,11 +11,15 @@ export class XMLValidator
             const refNum = parseInt(node.attributes.Ref);
             if (isNaN(refNum))
             {
-                issues.push(`${parentContext}Invalid Ref number format: ${node.attributes.Ref}`);
+                const issue = `${parentContext}Invalid Ref number format: ${node.attributes.Ref}`;
+                issues.push(issue);
+                //console.warn('[validateRefNumbers] Issue detected:', issue);
             } 
             else if (refNum !== currentRef) 
             {
-                issues.push(`${parentContext}Non-sequential Ref number detected: ${refNum} in ${node.type} "${node.attributes.Name || 'unnamed'}" (expected ${currentRef})`);
+                const issue = `${parentContext}Non-sequential Ref number detected: ${refNum} in ${node.type} "${node.attributes.Name || 'unnamed'}" (expected ${currentRef})`;
+                issues.push(issue);
+                //console.warn('[validateRefNumbers] Issue detected:', issue);
             }
 
             currentRef = refNum + 1;
@@ -200,38 +204,23 @@ export class XMLValidator
     }
 
     // ? Repairs Ref numbers to be sequential starting from 0
-    static repairRefNumbers(node, currentRef = 0)
-    {
-        let changes = [];
+    static repairRefNumbers(xmlString) {
+        if (typeof xmlString !== 'string') {
+            throw new TypeError('Expected xmlString to be a string, but received ' + typeof xmlString);
+        }
 
-        // ? If this node has a Ref attribute, resequence it
-        if (node.attributes?.Ref)
-        {
-            const oldRef = node.attributes.Ref;
-            if (parseInt(oldRef) !== currentRef)
-            {
-                changes.push({
-                    context: node.type,
-                    oldValue: oldRef,
-                    newValue: currentRef,
-                    name: node.attributes?.Name || 'unnamed'
-                });
-                node.attributes.Ref = currentRef.toString();
+        let currentRef = 0;
+
+        // Replace all Ref="" attributes with sequential numbers, including nested references
+        const updatedXml = xmlString.replace(/Ref="(\d*)"/g, (match, p1, offset, string) => {
+            // Ensure ReportSource Ref attributes are also updated
+            if (string.slice(offset - 12, offset).includes('ReportSource')) {
+                return `Ref="${currentRef++}"`;
             }
+            return `Ref="${currentRef++}"`;
+        });
 
-            currentRef++;
-        }
-
-        // ? Recursively repair children
-        if (node.children && node.children.length > 0)
-        {
-            node.children.forEach(child => {
-                currentRef = this.repairRefNumbers(child, currentRef).nextRef;
-                changes = changes.concat(this.repairRefNumbers(child, currentRef).changes);
-            });
-        }
-
-        return { changes, nextRef: currentRef };
+        return updatedXml; // Return the updated XML string
     }
 
     // ? Repairs item numbers within containers to be sequential starting from 1
@@ -296,8 +285,18 @@ export class XMLValidator
         // ? If issues are found, attempt repairs
         if (validation.hasIssues)
         {
-            // ? Attempt repairs
-            const changes = this.repairItemNumbers(rootNode);
+            // Handle plain objects by converting them to XML strings
+            let xmlString;
+            if (rootNode instanceof Node) {
+                xmlString = new XMLSerializer().serializeToString(rootNode);
+            } else if (typeof rootNode === 'object') {
+                xmlString = JSON.stringify(rootNode); // Convert object to string representation
+            } else {
+                throw new TypeError('Expected rootNode to be a Node or object, but received ' + typeof rootNode);
+            }
+
+            const refChanges = this.repairRefNumbers(xmlString);
+            const itemChanges = this.repairItemNumbers(rootNode);
             
             // ? Validate again after repairs
             const postRepairValidation = this.validateAll(rootNode);
@@ -314,10 +313,12 @@ export class XMLValidator
                     !postRepairValidation.refIssues.includes(issue)
                 )
             };
+
+            console.warn('[validateAndRepair] Fixed Ref Issues:', fixedIssues.ref);
             
             return {
                 originalIssues: validation,
-                changes: changes,
+                changes: { refChanges, itemChanges },
                 remainingIssues: postRepairValidation,
                 fixedIssues: fixedIssues,
                 success: !postRepairValidation.hasIssues

@@ -754,9 +754,9 @@
                             <hr class="my-4" style="border-color: rgba(255,255,255,0.2);">
                             <h3 class="fw-bold text-light mb-3"><i class="bi bi-exclamation-triangle me-2"></i>Known Issues</h3>
                             <ul class="text-light">
-                                <li>Nested Grids are not supported. Grids nested within other components will not render correctly.</li>
-                                <li>Nested Form components are not supported. These will be rendered as placeholder labels.</li>
-                                <li>Container component vertical scaling is overly generous, which may lead to excessive spacing in the printout.</li>
+                                <li>Nested Grids are not supported. Grids nested within other components will be moved outside of their parent containers. This may cause visual inconsistencies.</li>
+                                <li>Nested Nested Form components are not supported. Nested Forms within other components will be moved outside of their parent containers. This may cause visual inconsistencies.</li>
+                                <li>Container component vertical scaling is overly generous in some edge cases, which may lead to excessive spacing in the printout.</li>
                                 <li>For more information on supported functionality, please review the <a href="patchNotes.html" class="text-info">Patch Notes.</a>.</li>
                                 <li>If you encounter an undocumented issue, please reach out to me with details.</li>
                             </ul>

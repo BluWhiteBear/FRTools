@@ -1,10 +1,11 @@
 /* === Form.io Container Override === */
 #formio-rendered {
   /* Reset form container */
-  background: white !important;
-  color: #212529 !important;
+  background: var(--component-bg) !important;
+  color: var(--text-color) !important;
   padding: 1rem !important;
   border-radius: 0.25rem !important;
+  border: 1px solid var(--border-color) !important;
 }
 
 /* Target only Form.io specific elements */
@@ -17,7 +18,8 @@
 .formio-component-button {
   /* Reset Form.io component styles */
   font-family: inherit !important;
-  color: #212529 !important;
+  color: var(--text-color) !important;
+  background-color: var(--component-bg) !important;
 }
 
 /* Keep global form styling light */

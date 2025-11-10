@@ -22,8 +22,10 @@ export class ComponentProcessor
         this.measureDiv = document.createElement('div');
         this.measureDiv.style.position = 'absolute';
         this.measureDiv.style.visibility = 'hidden';
-        this.measureDiv.style.fontFamily = LAYOUT.FONT_FIELDOUTPUT;
-        this.measureDiv.style.fontSize = '9.75pt';
+        this.measureDiv.style.fontFamily = LAYOUT.FONT_FIELDOUTPUT.split(',')[0];
+        this.measureDiv.style.fontSize = LAYOUT.FONT_FIELDOUTPUT.split(',')[1];
+        this.measureDiv.style.fontWeight = LAYOUT.FONT_FIELDOUTPUT.split(',')[2] || 'normal';
+
         document.body.appendChild(this.measureDiv);
     }
 
@@ -84,12 +86,15 @@ export class ComponentProcessor
 
         const processedNodes = [];
         const gridMarkers = [];  // ? Store grid components for separate processing
+        const nestedFormMarkers = []; // ? Store nested form components for separate processing
         const startingItemNum = this.xmlProcessor.currentItemNum;
 
         components.forEach(component => {
+            // Log the type of each component being processed
+            console.log(`Processing component with type: ${component.type}`);
+
             // ? Skip hidden components
-            if (this.isHidden(component))
-            {
+            if (this.isHidden(component)) {
                 this.xmlProcessor.currentItemNum++;
                 return;
             }
@@ -97,12 +102,17 @@ export class ComponentProcessor
             const result = this.processComponent(component, containerWidth, xOffset);
 
             // ? If this is a grid marker, push to both arrays
-            if (result && result.type === 'grid')
+            if (result && result.type === 'grid') 
             {
                 gridMarkers.push(result);
                 processedNodes.push(result); // ? Interleave grid marker in output order
             } 
-            else 
+            else if (result && result.type === 'nestedsubform')
+            {
+                nestedFormMarkers.push(result);
+                processedNodes.push(result); // ? Interleave nested subform marker in output order
+            }
+            else
             {
                 const nodesToAdd = Array.isArray(result) ? result : [result];
                 processedNodes.push(...nodesToAdd.filter(node => node != null));
@@ -120,6 +130,8 @@ export class ComponentProcessor
         // ? Store grid markers in a property that can be accessed by the template generator
         this.gridComponents = gridMarkers;
 
+        this.nestedFormComponents = nestedFormMarkers;
+
         return processedNodes;
     }
 
@@ -130,7 +142,17 @@ export class ComponentProcessor
         window.currentComponent = component;
         const def = DevExpressHelpers.getComponentDef(component.type);
         window.currentComponent = null;
-        
+
+        // ? Handle nestedsubform components as markers
+        if (component.type === 'nestedsubform') {
+            console.log('Processing nestedsubform as marker:', component);
+            return {
+                type: 'nestedsubform',
+                key: component.key,
+                content: component.components || []
+            };
+        }
+
         // ? We're handling grids differently, as they require special table structures
         if (component.type === 'datagrid' || component.type === 'formgrid')
         {
@@ -263,7 +285,7 @@ export class ComponentProcessor
 
                 // ? Process the subreport itself
                 nodes.push(this.createSubReportNode(component, containerWidth, xOffset));
-                this.currentY += def.defaultHeight + DevExpressDefinitions.commonAttributes.spacing.componentSpacing;
+                this.currentY += def.defaultHeight + LAYOUT.VERTICAL_SPACING;
 
                 // ? Restore item number state
                 this.xmlProcessor.currentItemNum = savedItemNum + 1; // ? +1 for the subreport itself
@@ -362,7 +384,7 @@ export class ComponentProcessor
                 if (def.requiresLabel && component.label && component.labelPosition === 'bottom')
                 {
                     // ? For bottom labels, create the label after the value and position it below
-                    const labelY = this.currentY + valueHeight + DevExpressDefinitions.commonAttributes.spacing.componentSpacing;
+                    const labelY = this.currentY + valueHeight + LAYOUT.VERTICAL_SPACING;
                     this.currentY = labelY; // ? Temporarily move currentY to where label should go
                     const result = this.createLabelNode(component, containerWidth, xOffset);
 
@@ -372,16 +394,16 @@ export class ComponentProcessor
 
                         // ? Get label height for final positioning
                         const labelHeight = parseFloat(result.node.attributes.SizeF.split(',')[1]);
-                        this.currentY += labelHeight + DevExpressDefinitions.commonAttributes.spacing.componentSpacing;
+                        this.currentY += labelHeight + LAYOUT.VERTICAL_SPACING;
                     }
                     else
                     {
-                        this.currentY = this.currentY + valueHeight + DevExpressDefinitions.commonAttributes.spacing.componentSpacing;
+                        this.currentY = this.currentY + valueHeight + LAYOUT.VERTICAL_SPACING;
                     }
                 }
                 else
                 {
-                    this.currentY += valueHeight + DevExpressDefinitions.commonAttributes.spacing.componentSpacing;
+                    this.currentY += valueHeight + LAYOUT.VERTICAL_SPACING;
                 }
         }
 
@@ -454,8 +476,13 @@ export class ComponentProcessor
         }
 
         // ? Restore original Y position and item number state
-        this.currentY = originalY + this.calculateContainerHeight(component) + DevExpressDefinitions.commonAttributes.spacing.sectionSpacing;
+        this.currentY = originalY + this.calculateContainerHeight(component) + LAYOUT.VERTICAL_SPACING;
         this.xmlProcessor.currentItemNum = savedItemNum;
+
+        // console.log('[processContainer] createItemNode', {
+        //     currentRef: this.xmlProcessor.currentRef,
+        //     Name: component.key || `${component.type}${Date.now()}`
+        // });
 
         nodes.push(containerNode);
         return nodes;
@@ -591,7 +618,12 @@ export class ComponentProcessor
         this.xmlProcessor.currentItemNum = savedItemNum;
 
         this.currentY += this.calculateColumnsHeight(component) +
-            DevExpressDefinitions.commonAttributes.spacing.sectionSpacing;
+            LAYOUT.VERTICAL_SPACING;
+
+        // console.log('[processColumns] createItemNode', {
+        //     currentRef: this.xmlProcessor.currentRef,
+        //     Name: component.key || `columns${Date.now()}`
+        // });
 
         nodes.push(tableNode);
         return nodes;
@@ -769,6 +801,11 @@ export class ComponentProcessor
             node.addChild(expressionBindings);
         }
 
+        // console.log('[createValueNode] createItemNode', {
+        //     currentRef: this.xmlProcessor.currentRef,
+        //     Name: component.key || `field${Date.now()}`
+        // });
+
         return node;
     }
 
@@ -777,99 +814,82 @@ export class ComponentProcessor
     {
         let height = 0;
 
-        // ? Add label height if container has a label
-        if (container.label)
-        {
-            height += LAYOUT.LABEL_HEIGHT; // ? Label height plus spacing
+        // Add label height if container has a label
+        if (container.label) {
+            height += LAYOUT.LABEL_HEIGHT; // Label height plus spacing
             height += DevExpressDefinitions.commonAttributes.spacing.componentSpacing;
+            console.log(`[calculateContainerHeight] Added label height: ${LAYOUT.LABEL_HEIGHT}, spacing: ${DevExpressDefinitions.commonAttributes.spacing.componentSpacing}`);
         }
 
-        // ? Calculate height of visible components only
-        if (container.components)
-        {
-            const containerWidth = (LAYOUT.PAGE_WIDTH - LAYOUT.MARGIN_LEFT - LAYOUT.MARGIN_RIGHT) - 20; // ? Standard width minus padding
-            height += container.components.reduce((total, comp, index) =>
-            {
-                // ? Skip hidden components in height calculation
-                if (this.isHidden(comp))
-                {
+        // Calculate height of visible components only
+        if (container.components) {
+            const containerWidth = (LAYOUT.PAGE_WIDTH - LAYOUT.MARGIN_LEFT - LAYOUT.MARGIN_RIGHT) - 20; // Standard width minus padding
+            height += container.components.reduce((total, comp, index, components) => {
+                if (this.isHidden(comp)) {
+                    console.log(`[calculateContainerHeight] Skipping hidden component at index ${index}`);
                     return total;
                 }
 
                 const def = DevExpressHelpers.getComponentDef(comp.type);
                 let componentHeight = def.defaultHeight;
 
-                // ? Calculate special component heights
-                if (comp.type === 'htmlelement' && comp.content)
-                {
+                // Calculate special component heights
+                if (comp.type === 'htmlelement' && comp.content) {
                     componentHeight = this.calculateHtmlHeight(comp.content, containerWidth);
-                }
-                else if (comp.type === 'content' && comp.html)
-                {
+                } else if (comp.type === 'content' && comp.html) {
                     componentHeight = this.calculateHtmlHeight(comp.html, containerWidth);
-                }
-                else if (comp.type === 'panel' || comp.type === 'fieldset')
-                {
-                    // ? For nested panels, recursively calculate height
+                } else if (comp.type === 'panel' || comp.type === 'fieldset') {
                     componentHeight = this.calculateContainerHeight(comp);
-                }
-                else if (comp.type === 'table' && comp.rows)
-                {
+                } else if (comp.type === 'table' && comp.rows) {
                     componentHeight = this.calculateTableHeight(comp);
-                }
-                else if (comp.type === 'columns' && comp.columns)
-                {
-                    // ? For columns components, use the columns height calculation
+                } else if (comp.type === 'columns' && comp.columns) {
                     componentHeight = this.calculateColumnsHeight(comp);
-                }
-                else if (comp.type === 'radio' && def.calculateHeight)
-                {
+                } else if (comp.type === 'radio' && def.calculateHeight) {
                     componentHeight = def.calculateHeight(comp);
-                }
-                else if (comp.type === 'tabs' && comp.components)
-                {
-                    // ? For tabs, we need to account for each tab's contents plus spacing
-                    componentHeight = comp.components.reduce((tabsHeight, tab) =>
-                    {
-                        // ? Calculate height of this tab (including its label if present)
+                } else if (comp.type === 'tabs' && comp.components) {
+                    componentHeight = comp.components.reduce((tabsHeight, tab) => {
                         const tabHeight = this.calculateContainerHeight(tab);
-                        // ? Add spacing between tabs
                         return tabsHeight + tabHeight + DevExpressDefinitions.commonAttributes.spacing.sectionSpacing;
                     }, 0);
                 }
 
-                // ? Add component height plus label height if needed
-                return total + componentHeight + (def.requiresLabel ? LAYOUT.LABEL_HEIGHT : 0) +
-                    DevExpressDefinitions.commonAttributes.spacing.componentSpacing;
+                console.log(`[calculateContainerHeight] Component at index ${index}, type: ${comp.type}, calculated height: ${componentHeight}`);
+
+                // Avoid adding spacing after the last component
+                const isLastComponent = index === components.length - 1;
+                const spacing = isLastComponent ? 0 : DevExpressDefinitions.commonAttributes.spacing.componentSpacing;
+
+                // Add label height if the component requires a label
+                const hasLabel = def.requiresLabel && comp.label !== false && comp.hideLabel !== true;
+                const labelPosition = comp.labelPosition || 'top';
+                const labelHeight = hasLabel && (labelPosition === 'top' || labelPosition === 'bottom') ? LAYOUT.LABEL_HEIGHT : 0;
+
+                // Debugging log for refined label handling
+                console.log(`[calculateContainerHeight] Component at index ${index}, type: ${comp.type}, hasLabel: ${hasLabel}, labelPosition: ${labelPosition}, labelHeight: ${labelHeight}`);
+
+                componentHeight += labelHeight;
+
+                return total + componentHeight + spacing;
             }, 0);
         }
 
-        // ? Add padding at top and bottom of container
-        return height + (DevExpressDefinitions.commonAttributes.spacing.sectionSpacing * 2);
+        // Avoid adding redundant padding for nested containers
+        const isNestedContainer = container.parentType === 'panel' || container.parentType === 'fieldset' || container.parentType === 'tabs' || container.parentType === 'well' || container.parentType === 'columns' || container.parentType === 'table';
+        const padding = isNestedContainer ? 0 : DevExpressDefinitions.commonAttributes.spacing.sectionSpacing * 2;
+
+        // Debugging log for nested container padding
+        console.log(`[calculateContainerHeight] Is nested container: ${isNestedContainer}, padding added: ${padding}`);
+
+        const totalHeight = height + padding;
+
+        // Debugging logs for padding and final height calculations
+        console.log(`[calculateContainerHeight] Padding added: ${DevExpressDefinitions.commonAttributes.spacing.sectionSpacing * 2}`);
+        console.log(`[calculateContainerHeight] Final height before return: ${totalHeight}`);
+        console.log(`[calculateContainerHeight] Total calculated height for ${container.key} container: ${totalHeight}`);
+        return totalHeight;
     }
 
-    // ! Placeholder SubReport Creation
     // ? Create subreport node
-    createSubReportNode(component, width, xOffset)
-    {
-        // ! Temporarily disable nested subforms due to issues. Create the subreport label like normal,
-        // ! then skip creating the actual subreport node; instead create a label with placeholder text "REPLACE ME"
-
-        const placeholderNode = this.xmlProcessor.createItemNode(undefined, 'XRLabel',
-        {
-            Name: `placeholder_${component.key || Date.now()}`,
-            Text: 'REPLACE ME WITH SUBREPORT',
-            SizeF: `${width},${LAYOUT.LABEL_HEIGHT}`,
-            LocationFloat: `${xOffset},${this.currentY}`
-        });
-
-        // ? Early return 
-        return placeholderNode;
-    }
-
-    // ! REAL SubReport Creation (Disabled due to issues)
-    // ? Create subreport node
-    /*
     createSubReportNode(component, width, xOffset)
     {
         const def = DevExpressHelpers.getComponentDef('nestedsubform');
@@ -877,10 +897,10 @@ export class ComponentProcessor
         // ? Create the subreport node
         const node = this.xmlProcessor.createItemNode(undefined, def.controlType,
         {
-            Name: `subreport_${component.key || Date.now()}`,
+            Name: `subreport_${component.key || component.Name || Date.now()}`,
             ...def.attributes,
             SizeF: `${width},${def.defaultHeight}`,
-            LocationFloat: `${xOffset},${this.currentY}`,
+            LocationFloat: `0,0`, // Ensure the subreport is at the top-left corner of it's band
         });
 
         // ? Create ReportSource node with required structure
@@ -894,7 +914,8 @@ export class ComponentProcessor
             Font: 'Arial, 9pt'
         });
 
-        // ? Add bands structure without a Ref attribute
+        console.log('[componentProcessor] Before increment, currentRef:', this.xmlProcessor.currentRef);
+        // ? Add bands structure
         const bandsNode = this.xmlProcessor.buildNode('Bands', null, [
             this.xmlProcessor.buildNode('Item1',
             {
@@ -912,13 +933,13 @@ export class ComponentProcessor
                 ControlType: 'BottomMarginBand'
             }, null, true)
         ]);
+        console.log('[componentProcessor] After increment, currentRef:', this.xmlProcessor.currentRef);
 
         reportSource.addChild(bandsNode);
         node.addChild(reportSource);
 
         return node;
     }
-    */
 
     // ? Create radio buttons container with individual radio buttons
     createRadioButtonsNode(component, width, xOffset, def)
@@ -1160,10 +1181,15 @@ export class ComponentProcessor
         });
 
         nodes.push(dataTableNode);
-        this.currentY += LAYOUT.LABEL_HEIGHT + DevExpressDefinitions.commonAttributes.spacing.sectionSpacing;
+        this.currentY += LAYOUT.LABEL_HEIGHT + LAYOUT.VERTICAL_SPACING;
 
         // ? Restore original item number
         this.xmlProcessor.currentItemNum = savedItemNum;
+
+        console.log('[createLabelNode] createItemNode', {
+            currentRef: this.xmlProcessor.currentRef,
+            Name: `label_${component.key || `field${Date.now()}`}`
+        });
 
         return nodes;
     }
@@ -1259,7 +1285,12 @@ export class ComponentProcessor
 
         // ? Update vertical position
         this.currentY += this.calculateTableHeight(component) +
-            DevExpressDefinitions.commonAttributes.spacing.sectionSpacing;
+            LAYOUT.VERTICAL_SPACING;
+
+        // console.log('[processTable] createItemNode', {
+        //     currentRef: this.xmlProcessor.currentRef,
+        //     Name: component.key || `table${Date.now()}`
+        // });
 
         nodes.push(tableNode);
         return nodes;
@@ -1330,7 +1361,7 @@ export class ComponentProcessor
 
             // ? Update current Y position for next tab
             this.currentY = savedY + this.calculateContainerHeight(tab) +
-                DevExpressDefinitions.commonAttributes.spacing.sectionSpacing;
+                LAYOUT.VERTICAL_SPACING;
 
             nodes.push(panelNode);
         });
@@ -1368,7 +1399,7 @@ export class ComponentProcessor
                     }
 
                     return total + componentHeight + (def.requiresLabel ? LAYOUT.LABEL_HEIGHT : 0) +
-                        DevExpressDefinitions.commonAttributes.spacing.componentSpacing;
+                        LAYOUT.VERTICAL_SPACING;
                 }, 0);
 
                 rowHeight = Math.max(rowHeight, cellHeight);
@@ -1378,7 +1409,7 @@ export class ComponentProcessor
         });
 
         // ? Add padding for top and bottom, but only once since tables are always inside another container
-        return totalHeight + DevExpressDefinitions.commonAttributes.spacing.sectionSpacing;
+        return totalHeight + LAYOUT.VERTICAL_SPACING;
     }
 
     // ? Calculate height needed for columns component
@@ -1412,13 +1443,13 @@ export class ComponentProcessor
 
                     // ? Add component height plus label height if needed
                     return total + componentHeight + (def.requiresLabel ? LAYOUT.LABEL_HEIGHT : 0) +
-                        DevExpressDefinitions.commonAttributes.spacing.componentSpacing;
+                        LAYOUT.VERTICAL_SPACING;
                 }, 0);
             }
             maxHeight = Math.max(maxHeight, colHeight);
         });
 
         // ? Add padding at top and bottom, but only once since columns are always inside another container
-        return maxHeight + DevExpressDefinitions.commonAttributes.spacing.sectionSpacing;
+        return maxHeight + LAYOUT.VERTICAL_SPACING;
     }
 }
