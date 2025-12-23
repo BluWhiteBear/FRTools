@@ -41,6 +41,17 @@
 }
 
 /* === Global Styles === */
+a {
+  color: var(--accent-color);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: white;
+}
+
+
 body {
   background: #121212;
   font-family: 'Inter', system-ui, sans-serif;

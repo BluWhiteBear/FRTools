@@ -739,25 +739,25 @@
                             <h3 class="fw-bold text-light mb-3"><i class="bi bi-question-circle me-2"></i>How to Use This Tool</h3>
                             <p class="text-light">Welcome to the Printout From Form Tool! This tool lets you generate customizable printouts from your Form.io forms. Here’s how to get started:</p>
                             <ol class="text-light">
-                                <li><span class="fw-semibold">Upload Your Form:</span> Navigate to the <span class="text-info">Converter</span> tab and select your Form.io JSON file to load your form into the tool.</li>
-                                <li><span class="fw-semibold">Customize Your Printout:</span> Navigate to the <span class="text-info">Settings</span> tab and adjust the layout options to your preference. Finalize the changes by pressing "Apply Settings". Your settings will save for future printouts.</li>
-                                <li><span class="fw-semibold">Download Your Printout:</span> Scroll down to the <span class="text-info">DevExpress JSON</span> section to download your printout, or copy the JSON to your clipboard.</li>
-                                <li><span class="fw-semibold">Import Your Printout:</span> Navigate to the <span class="text-info">DevExpress Reports page</span> and press the "Import" button at the top of the page.</li>
-                                <li><span class="fw-semibold">Upload Your Printout:</span> Select your <span class="text-info">DevExpress report JSON</span> file, and verify that the report Name and Department have generated as expected.</li>
-                                <li><span class="fw-semibold">Verify Layout:</span> After importing your printout, <span class="text-info">review the report layout</span> to ensure that everything has generated as expected.</li>
-                                <li><span class="fw-semibold">Retrieve SQL:</span> Navigate back to the Printout Tool, and scroll down to the <span class="text-info">SQL Query</span> section, and copy/paste the generated SQL queries into SSMS.</li>
-                                <li><span class="fw-semibold">Verify SQL:</span> Carefully <span class="text-info">review the SQL</span> that was generated, and ensure that it meets your printout's needs. Once you have done so you can execute the SP Create/Alter statements.</li>
-                                <li><span class="fw-semibold">Add Your DataSource:</span> Add your <span class="text-info">Stored Procedures</span> into your printout's DataSource like normal.</li>
-                                <li><span class="fw-semibold">Test Your Printout:</span> Finally, <span class="text-info">run your printout</span> to ensure that everything is working as expected.</li>
+                                <li><span class="fw-semibold">Upload Your Form:</span> Navigate to the <span >Converter</span> tab and select your Form.io JSON file to load your form into the tool.</li>
+                                <li><span class="fw-semibold">Customize Your Printout:</span> Navigate to the <span >Settings</span> tab and adjust the layout options to your preference. Finalize the changes by pressing "Apply Settings". Your settings will save for future printouts.</li>
+                                <li><span class="fw-semibold">Download Your Printout:</span> Scroll down to the <span >DevExpress JSON</span> section to download your printout, or copy the JSON to your clipboard.</li>
+                                <li><span class="fw-semibold">Import Your Printout:</span> Navigate to the <span >DevExpress Reports page</span> and press the "Import" button at the top of the page.</li>
+                                <li><span class="fw-semibold">Upload Your Printout:</span> Select your <span >DevExpress report JSON</span> file, and verify that the report Name and Department have generated as expected.</li>
+                                <li><span class="fw-semibold">Verify Layout:</span> After importing your printout, <span >review the report layout</span> to ensure that everything has generated as expected.</li>
+                                <li><span class="fw-semibold">Retrieve SQL:</span> Navigate back to the Printout Tool, and scroll down to the <span >SQL Query</span> section, and copy/paste the generated SQL queries into SSMS.</li>
+                                <li><span class="fw-semibold">Verify SQL:</span> Carefully <span >review the SQL</span> that was generated, and ensure that it meets your printout's needs. Once you have done so you can execute the SP Create/Alter statements.</li>
+                                <li><span class="fw-semibold">Add Your DataSource:</span> Add your <span >Stored Procedures</span> into your printout's DataSource like normal.</li>
+                                <li><span class="fw-semibold">Test Your Printout:</span> Finally, <span >run your printout</span> to ensure that everything is working as expected.</li>
                             </ol>
-                            <p class="text-light">Need help? Reach out anytime! <span class="fw-bold text-info">- Blu Morse</span></p>
+                            <p class="text-light">Need help? Reach out anytime! <span class="fw-bold">- Blu Morse</span></p>
                             <hr class="my-4" style="border-color: rgba(255,255,255,0.2);">
                             <h3 class="fw-bold text-light mb-3"><i class="bi bi-exclamation-triangle me-2"></i>Known Issues</h3>
                             <ul class="text-light">
                                 <li>Nested Grids are not supported. Grids nested within other components will be moved outside of their parent containers. This may cause visual inconsistencies.</li>
-                                <li>Nested Nested Form components are not supported. Nested Forms within other components will be moved outside of their parent containers. This may cause visual inconsistencies.</li>
+                                <li>Nested Subform/Nested Form components are not supported. Nested Forms within other components will be moved outside of their parent containers. This may cause visual inconsistencies.</li>
                                 <li>Container component vertical scaling is overly generous in some edge cases, which may lead to excessive spacing in the printout.</li>
-                                <li>For more information on supported functionality, please review the <a href="patchNotes.html" class="text-info">Patch Notes.</a>.</li>
+                                <li>For more information on supported functionality, please review the <a href="patchNotes.html" >Patch Notes.</a>.</li>
                                 <li>If you encounter an undocumented issue, please reach out to me with details.</li>
                             </ul>
                         </div>
@@ -767,10 +767,12 @@
         </div>
     </div>
 
+    <!-- Footer -->
+    <div id="footer-placeholder"></div>
+
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
     <script src="scripts/Tools/FormViewer/renderFormio.js"></script>

@@ -156,14 +156,6 @@ UniTools is a browser-based toolkit designed to help developers work with Form.i
 - **License**: MIT
 - **Purpose**: Timezone support for Moment.js
 
-#### Signature Pad
-- **Library**: Signature Pad
-- **Version**: 4.0.0
-- **CDN**: `https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js`
-- **Source**: [https://github.com/szimek/signature_pad](https://github.com/szimek/signature_pad)
-- **License**: MIT
-- **Purpose**: HTML5 canvas-based signature pad for capturing signatures
-
 #### Prettier (Code Formatting)
 - **Library**: Prettier Standalone
 - **Version**: 2.8.8
@@ -212,14 +204,6 @@ UniTools is a browser-based toolkit designed to help developers work with Form.i
 - **License**: MIT
 - **Purpose**: XML and CSS beautification
 
-#### He (HTML Entities)
-- **Library**: He
-- **Version**: 1.2.0
-- **CDN**: `https://cdnjs.cloudflare.com/ajax/libs/he/1.2.0/he.min.js`
-- **Source**: [https://github.com/mathiasbynens/he](https://github.com/mathiasbynens/he)
-- **License**: MIT
-- **Purpose**: HTML entity encoding/decoding
-
 #### Lang Detector
 - **Library**: Lang Detector
 - **Version**: 1.0.6
@@ -241,12 +225,6 @@ All external dependencies are loaded from the following CDN providers:
 | unpkg | https://unpkg.com | Prettier |
 | Google Fonts | https://fonts.googleapis.com | Inter font family |
 | Form.io CDN | https://cdn.form.io | Form.io SDK |
-
----
-
-## License
-
-All tools developed in part or in full by Joshua "Blü" Morse.
 
 ---
 

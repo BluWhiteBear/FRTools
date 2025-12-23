@@ -1,348 +1,377 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Patch Notes</title>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Patch Notes</title>
 
-    <!-- Favicon -->
-    <link rel="icon" href="img/faviconLarge.png" type="image/png" sizes="1024x1024">
-    
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="styles/style.css">
-</head>
-<body>
-    <!-- Include Navigation Bar -->
-    <div id="navbar-container"></div>
+        <!-- Favicon -->
+        <link rel="icon" href="img/faviconLarge.png" type="image/png" sizes="1024x1024">
+        
+        <!-- Bootstrap CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+        <!-- Bootstrap Icons -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+        <!-- Custom CSS -->
+        <link rel="stylesheet" href="styles/style.css">
+    </head>
 
-    <div class="container mt-4">
-        <header class="text-center mb-5">
-            <h1 class="display-4 fw-bold mb-2 text-light">Change Log</h1>
-            <p class="text-light">Dated list of changes and improvements made to the site and it's tools</p>
+    <body>
+        <!-- Nav Bar -->
+        <div id="navbar-placeholder" class="fixed-top"></div>
 
-        </header>
+        <div class="container my-5" style="padding-top: 4rem;">
+            <header class="text-center mb-5">
+                <h1 class="display-4 fw-bold mb-2 text-light">Change Log</h1>
+                <p class="text-light">Dated list of changes and improvements made to the site and it's tools</p>
 
-        <!-- Latest Version -->
-        <div class="card mb-4 bg-dark">
-            <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                <h2 class="h5 mb-0 text-light"><a href="tool_printoutFromForm.html" class="text-info" style="color: var(--accent-color) !important;"><i class="bi bi-pencil-square"></i> Printout From Form</a> | Version 0.4.4</h2>
-                <small class="text-light">October 30, 2025</small>
+            </header>
+
+            <!-- Latest Version -->
+            <div class="card mb-4 bg-dark">
+                <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <h2 class="h5 mb-0 text-light"><a href="privacy.html" class="text-info" style="color: var(--accent-color) !important;"><i class="bi bi-file-earmark-text"></i> Website</a> | Version 0.1</h2>
+                    <small class="text-light">December 23, 2025</small>
+                </div>
+                <div class="card-body">
+                    <h3 class="h6 text-light">New Features</h3>
+                    <ul class="text-light">
+                        <li>Created a Privacy Policy page</li>
+                        <li>Created universal site footer</li>
+                        <li>Created GitHub README file documenting the technologies used</li>
+                    </ul>
+
+                    <h3 class="h6 mt-3 text-light">Improvements</h3>
+                    <ul class="text-light">
+                        <li>Updated Home page content and layout to better prioritize more commonly used tools</li>
+                    </ul>
+                </div>
             </div>
-            <div class="card-body">
-                <!-- <h3 class="h6 text-light">New Features</h3>
-                <ul class="text-light">
-                    <li>[PLACEHOLDER]</li>
-                </ul> -->
 
-                <h3 class="h6 mt-3 text-light">Improvements</h3>
-                <ul class="text-light">
-                    <li>Added pre-processing that moves grids and nested forms out of containers so our band splitting logic can account for them more easily</li>
-                </ul>
+            <div class="card mb-4 bg-dark">
+                <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <h2 class="h5 mb-0 text-light"><a href="tool_printoutFromForm.html" class="text-info" style="color: var(--accent-color) !important;"><i class="bi bi-pencil-square"></i> Printout From Form</a> | Version 0.4.5</h2>
+                    <small class="text-light">December 23, 2025</small>
+                </div>
+                <div class="card-body">
+                    <!-- <h3 class="h6 text-light">New Features</h3>
+                    <ul class="text-light">
+                        <li>[PLACEHOLDER]</li>
+                    </ul> -->
+
+                    <h3 class="h6 mt-3 text-light">Improvements</h3>
+                    <ul class="text-light">
+                        <li>Updated Help tab content with more accurate language</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Previous Versions -->
+            <div class="card mb-4 bg-dark">
+                <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <h2 class="h5 mb-0 text-light"><a href="tool_printoutFromForm.html" class="text-info" style="color: var(--accent-color) !important;"><i class="bi bi-pencil-square"></i> Printout From Form</a> | Version 0.4.4</h2>
+                    <small class="text-light">October 30, 2025</small>
+                </div>
+                <div class="card-body">
+                    <h3 class="h6 mt-3 text-light">Improvements</h3>
+                    <ul class="text-light">
+                        <li>Added pre-processing that moves grids and nested forms out of containers so our band splitting logic can account for them more easily</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4 bg-dark">
+                <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <h2 class="h5 mb-0 text-light"><a href="tool_printoutFromForm.html" class="text-info" style="color: var(--accent-color) !important;"><i class="bi bi-pencil-square"></i> Printout From Form</a> | Version 0.4.3</h2>
+                    <small class="text-light">October 28, 2025</small>
+                </div>
+                <div class="card-body">
+                    <h3 class="h6 mt-3 text-light">Improvements</h3>
+                    <ul class="text-light">
+                        <li>Improved Ref Count validation and repair method</li>
+                        <li>Nested Forms now generate inside their own DetailReport bands within the report layout</li>
+                        <li>Fixed an issue where container heights were not being calculated correctly due to double counting the spacing afforded to nested containers</li>
+                        <li>Fixed an issue where container heights were not being calculated correctly due to not accounting for the labelPosition property of multiple field types; it always assumed the label was on top, contributing to the height of the component</li>
+                        <li>Fixed an issue where container heights were not being calculated correctly due to not accounting for the hideLabel property of multiple field types; it always assumed the label was visible, contributing to the height of the component</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4 bg-dark">
+                <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <h2 class="h5 mb-0 text-light"><a href="tool_printoutFromForm.html" class="text-info" style="color: var(--accent-color) !important;"><i class="bi bi-pencil-square"></i> Printout From Form</a> | Version 0.4.2</h2>
+                    <small class="text-light">October 24, 2025</small>
+                </div>
+                <div class="card-body">
+                    <h3 class="h6 text-light">New Features</h3>
+                    <ul class="text-light">
+                        <li>Added "Help" tab that gives tool usage instructions and additional information</li>
+                    </ul>
+
+                    <h3 class="h6 mt-3 text-light">Improvements</h3>
+                    <ul class="text-light">
+                        <li>Improved code comments and documentation</li>
+                        <li>Fixed an issue where the "Reset to Defaults" button was throwing an error due to a setting being removed previously</li>
+                        <li>Fixed an issue where radio button panels were scaled as if they had an extra option inside them</li>
+                        <li>Added "Apply Settings" button to Settings tab so user doesn't have to reupload their form to apply new settings</li>
+                        <li>Label Height is now variable</li>
+                        <li>Field Height is now variable</li>
+                        <li>Added Snap Grid Size property to generated report</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4 bg-dark">
+                <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <h2 class="h5 mb-0 text-light"><a href="tool_printoutFromForm.html" class="text-info" style="color: var(--accent-color) !important;"><i class="bi bi-pencil-square"></i> Printout From Form</a> | Version 0.4.1</h2>
+                    <small class="text-light">October 23, 2025</small>
+                </div>
+                <div class="card-body">
+                    <h3 class="h6 text-light">New Features</h3>
+                    <ul class="text-light">
+                        <li>Added "Settings" tab that allows the user to define certain layout properties for the report</li>
+                        <li>Report Width is now variable</li>
+                        <li>Margin Sizes are now variable</li>
+                        <li>Vertical Component Spacing is now variable</li>
+                        <li>Font properties for Report Header are now variable</li>
+                        <li>Font properties for Report Section are now variable</li>
+                        <li>Font properties for Field Labels are now variable</li>
+                        <li>Font properties for Field Outputs are now variable</li>
+                    </ul>
+
+                    <h3 class="h6 mt-3 text-light">Improvements</h3>
+                    <ul class="text-light">
+                        <li>labelPosition values "right-left" and "right-right" now properly position their field label</li>
+                        <li>Form and Data Grid DetailReport Bands now generate within the report layout instead of being appended at the end of the layout</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4 bg-dark">
+                <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <h2 class="h5 mb-0 text-light"><a href="tool_printoutFromForm.html" class="text-info" style="color: var(--accent-color) !important;"><i class="bi bi-pencil-square"></i> Printout From Form</a> | Version 0.4.0</h2>
+                    <small class="text-light">October 17, 2025</small>
+                </div>
+                <div class="card-body">
+                    <h3 class="h6 mt-3 text-light">Improvements</h3>
+                    <ul class="text-light">
+                        <li>Improved code comments and documentation</li>
+                        <li>Column Element weights now respect their component width property</li>
+                        <li>Radio Button Elements now respects their "Inline" layout property, dynamically adjusting the option widths as well</li>
+                        <li>Text Field, Text Area, and Select Elements now respect their "labelPosition" property, dynamically adjusting their field label positions</li>
+                        <li>Fixed an issue that was causing some Markup tags to not close properly</li>
+                        <li>Fixed an issue that was causing the "Color" Markup tag to not render correctly</li>
+                        <li>Fixed an issue that was causing the labels of nested Panel elements to inaccurately size horizontally</li>
+                        <li>Panel Labels now have a unique style defined in devexpress-definitions.js</li>
+                        <li>Elements now have the full width of the report available for their layout instead of being capped at a width of 650px</li>
+                        <li>Form and Data Grids now generate inside their own DetailReport Bands</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4 bg-dark">
+                <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <h2 class="h5 mb-0 text-light"><a href="tool_printoutFromForm.html" class="text-info" style="color: var(--accent-color) !important;"><i class="bi bi-pencil-square"></i> Printout From Form</a> | Version 0.3.8</h2>
+                    <small class="text-light">October 8, 2025</small>
+                </div>
+                <div class="card-body">
+                    <h3 class="h6 mt-3 text-light">Improvements</h3>
+                    <ul class="text-light">
+                        <li>Improved code comments and documentation</li>
+                        <li>Printouts are now generated with hidden and private properties set to true</li>
+                        <li>Content components now properly calculate their height based on the rendered content</li>
+                        <li>HTML Element and Content components now map their HTML tag content to DevExpress MarkUp tags</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4 bg-dark">
+                <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <h2 class="h5 mb-0 text-light"><a href="tool_printoutFromForm.html" class="text-info" style="color: var(--accent-color) !important;"><i class="bi bi-pencil-square"></i> Printout From Form</a> | Version 0.3.7</h2>
+                    <small class="text-light">October 7, 2025</small>
+                </div>
+                <div class="card-body">
+                    <h3 class="h6 mt-3 text-light">Improvements</h3>
+                    <ul class="text-light">
+                        <li>Improved code comments and documentation</li>
+                        <li>Fixed an issue that caused Panel labels to generate with inaccurate/repeating ItemNums, causing other elements to fail DevExpress parsing</li>
+                        <li>XML Validation now does a repair pass, attempting to correct any structural issues regarding ItemNumbers</li>
+                        <li>Fixed an issue that caused container elements to not scale accurately when nested with empty containers</li>
+                    </ul>
+
+                    <h3 class="h6 mt-3 text-light">Notes</h3>
+                    <ul class="text-light">
+                        <li>NestedForms have been temporarily disabled as they are causing issues with XML generation</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4 bg-dark">
+                <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <h2 class="h5 mb-0 text-light"><a href="tool_formViewer.html" class="text-info" style="color: var(--accent-color) !important;"><i class="bi bi-ui-checks"></i> Form Viewer</a> | Version 0.1.1</h2>
+                    <small class="text-light">October 7, 2025</small>
+                </div>
+                <div class="card-body">
+                    <h3 class="h6 text-light">New Features</h3>
+                    <ul class="text-light">
+                        <li>Now parses out and displays the Form Template JSON in a separate tool tab</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4 bg-dark">
+                <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <h2 class="h5 mb-0 text-light"><a href="tool_printoutFromForm.html" class="text-info" style="color: var(--accent-color) !important;"><i class="bi bi-pencil-square"></i> Printout From Form</a> | Version 0.3.6</h2>
+                    <small class="text-light">October 6, 2025</small>
+                </div>
+                <div class="card-body">
+                    <h3 class="h6 mt-3 text-light">Improvements</h3>
+                    <ul class="text-light">
+                        <li>Improved XML Validation - Now validates ItemNums to ensure sequential numbering within nodes</li>
+                        <li>Improved XML Validation - Now validates RefNums to ensure sequential numbering across all nodes</li>
+                        <li>Fixed an issue that caused DataGrids to generate with inaccurate/repeating ItemNums, causing other elements to fail DevExpress parsing</li>
+                        <li>Fixed an issue that caused FormGrids to generate with inaccurate/repeating ItemNums, causing other elements to fail DevExpress parsing</li>
+                        <li>Fixed an issue that caused Tabs to generate with inaccurate/repeating ItemNums, causing other elements to fail DevExpress parsing</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4 bg-dark">
+                <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <h2 class="h5 mb-0 text-light"><a href="tool_printoutFromForm.html" class="text-info" style="color: var(--accent-color) !important;"><i class="bi bi-pencil-square"></i> Printout From Form</a> | Version 0.3.5</h2>
+                    <small class="text-light">October 3, 2025</small>
+                </div>
+                <div class="card-body">
+                    <h3 class="h6 mt-3 text-light">Improvements</h3>
+                    <ul class="text-light">
+                        <li>Improved code comments and documentation</li>
+                        <li>Now generates SQL Queries for FormGrid components</li>
+                        <li>Fixed an issue causing DataGrid SQL generation to fail on subsequent DataGrids when more than one was present on a form</li>
+                        <li>Form and Data Grid SQL generation now utilizes the API keys of the grids as table aliases instead of relying on indexing</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4 bg-dark">
+                <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <h2 class="h5 mb-0 text-light"><a href="tool_printoutFromForm.html" class="text-info" style="color: var(--accent-color) !important;"><i class="bi bi-pencil-square"></i> Printout From Form</a> | Version 0.3.4</h2>
+                    <small class="text-light">October 2, 2025</small>
+                </div>
+                <div class="card-body">
+                    <h3 class="h6 mt-3 text-light">Improvements</h3>
+                    <ul class="text-light">
+                        <li>Improved code comments and documentation</li>
+                        <li>Moved element XML definitions out of tool_printoutFromForm.js and into devexpress-definitions.js for improved maintainability</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4 bg-dark">
+                <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <h2 class="h5 mb-0 text-light"><a href="tool_printoutFromForm.html" class="text-info" style="color: var(--accent-color) !important;"><i class="bi bi-pencil-square"></i> Printout From Form</a> | Version 0.3.3</h2>
+                    <small class="text-light">October 1, 2025</small>
+                </div>
+                <div class="card-body">
+                    <h3 class="h6 mt-3 text-light">Improvements</h3>
+                    <ul class="text-light">
+                        <li>Now generates the SQL Queries for DataGrid components</li>
+                        <li>Now <b>partially</b> supports FormGrid components</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4 bg-dark">
+                <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <h2 class="h5 mb-0 text-light"><a href="tool_printoutFromForm.html" class="text-info" style="color: var(--accent-color) !important;"><i class="bi bi-pencil-square"></i> Printout From Form</a> | Version 0.3.2</h2>
+                    <small class="text-light">September 29, 2025</small>
+                </div>
+                <div class="card-body">
+                    <h3 class="h6 mt-3 text-light">Improvements</h3>
+                    <ul class="text-light">
+                        <li>Now properly handles Signature ImageSource bindings</li>
+                        <li>Added widthMultiplier property to element definitions, allowing for more flexible layout options</li>
+                        <li>Now supports Day components</li>
+                        <li>Now supports Time components</li>
+                        <li>Now supports Currency components</li>
+                        <li>Now <b>partially</b> supports DataGrid components</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4 bg-dark">
+                <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <h2 class="h5 mb-0 text-light"><a href="tool_printoutFromForm.html" class="text-info" style="color: var(--accent-color) !important;"><i class="bi bi-pencil-square"></i> Printout From Form</a> | Version 0.3.1</h2>
+                    <small class="text-light">September 26, 2025</small>
+                </div>
+                <div class="card-body">
+                    <h3 class="h6 mt-3 text-light">Improvements</h3>
+                    <ul class="text-light">
+                        <li>Improved Error Handling and rendering</li>
+                        <li>Improved Nested Element Scaling</li>
+                        <li>Improved navigation</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4 bg-dark">
+                <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <h2 class="h5 mb-0 text-light"><a href="tool_printoutFromForm.html" class="text-info" style="color: var(--accent-color) !important;"><i class="bi bi-pencil-square"></i> Printout From Form</a> | Version 0.3.0</h2>
+                    <small class="text-light">September 19, 2025</small>
+                </div>
+                <div class="card-body">
+                    <h3 class="h6 mt-3 text-light">Improvements</h3>
+                    <ul class="text-light">
+                        <li>Now supports Radio Button components</li>
+                        <li>Now supports Email Input components</li>
+                        <li>Now supports URL components</li>
+                        <li>Now supports Phone Number components</li>
+                        <li>Now supports Address components</li>
+                        <li>Now supports Date/Time components</li>
+                        <li>Now supports Signature components</li>
+                        <li>Now supports Content components</li>
+                        <li>Now supports Table components</li>
+                        <li>Now supports Tabs components</li>
+                        <li>Now supports Well components</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4 bg-dark">
+                <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <h2 class="h5 mb-0 text-light"><a href="tool_printoutFromForm.html" class="text-info" style="color: var(--accent-color) !important;"><i class="bi bi-pencil-square"></i> Printout From Form</a> | Version 0.2.1</h2>
+                    <small class="text-light">September 15, 2025</small>
+                </div>
+                <div class="card-body">
+                    <h3 class="h6 mt-3 text-light">Improvements</h3>
+                    <ul class="text-light">
+                        <li>Improved code comments and documentation</li>
+                        <li>Now supports HTML Element components</li>
+                        <li>Now supports Column components</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4 bg-dark">
+                <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <h2 class="h5 mb-0 text-light"><a href="tool_printoutFromForm.html" class="text-info" style="color: var(--accent-color) !important;"><i class="bi bi-pencil-square"></i> Printout From Form</a> | Version 0.2.0</h2>
+                    <small class="text-light">September 5, 2025</small>
+                </div>
+                <div class="card-body">
+                    <h3 class="h6 mt-3 text-light">Improvements</h3>
+                    <ul class="text-light">
+                        <li>Now supports properly nested components</li>
+                        <li>Now supports Panel components</li>
+                        <li>Now supports Fieldset components</li>
+                    </ul>
+                </div>
             </div>
         </div>
 
-        <!-- Previous Versions -->
-        <div class="card mb-4 bg-dark">
-            <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                <h2 class="h5 mb-0 text-light"><a href="tool_printoutFromForm.html" class="text-info" style="color: var(--accent-color) !important;"><i class="bi bi-pencil-square"></i> Printout From Form</a> | Version 0.4.3</h2>
-                <small class="text-light">October 28, 2025</small>
-            </div>
-            <div class="card-body">
-                <h3 class="h6 mt-3 text-light">Improvements</h3>
-                <ul class="text-light">
-                    <li>Improved Ref Count validation and repair method</li>
-                    <li>Nested Forms now generate inside their own DetailReport bands within the report layout</li>
-                    <li>Fixed an issue where container heights were not being calculated correctly due to double counting the spacing afforded to nested containers</li>
-                    <li>Fixed an issue where container heights were not being calculated correctly due to not accounting for the labelPosition property of multiple field types; it always assumed the label was on top, contributing to the height of the component</li>
-                    <li>Fixed an issue where container heights were not being calculated correctly due to not accounting for the hideLabel property of multiple field types; it always assumed the label was visible, contributing to the height of the component</li>
-                </ul>
-            </div>
-        </div>
+        <!-- Footer -->
+        <div id="footer-placeholder"></div>
 
-        <div class="card mb-4 bg-dark">
-            <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                <h2 class="h5 mb-0 text-light"><a href="tool_printoutFromForm.html" class="text-info" style="color: var(--accent-color) !important;"><i class="bi bi-pencil-square"></i> Printout From Form</a> | Version 0.4.2</h2>
-                <small class="text-light">October 24, 2025</small>
-            </div>
-            <div class="card-body">
-                <h3 class="h6 text-light">New Features</h3>
-                <ul class="text-light">
-                    <li>Added "Help" tab that gives tool usage instructions and additional information</li>
-                </ul>
-
-                <h3 class="h6 mt-3 text-light">Improvements</h3>
-                <ul class="text-light">
-                    <li>Improved code comments and documentation</li>
-                    <li>Fixed an issue where the "Reset to Defaults" button was throwing an error due to a setting being removed previously</li>
-                    <li>Fixed an issue where radio button panels were scaled as if they had an extra option inside them</li>
-                    <li>Added "Apply Settings" button to Settings tab so user doesn't have to reupload their form to apply new settings</li>
-                    <li>Label Height is now variable</li>
-                    <li>Field Height is now variable</li>
-                    <li>Added Snap Grid Size property to generated report</li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="card mb-4 bg-dark">
-            <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                <h2 class="h5 mb-0 text-light"><a href="tool_printoutFromForm.html" class="text-info" style="color: var(--accent-color) !important;"><i class="bi bi-pencil-square"></i> Printout From Form</a> | Version 0.4.1</h2>
-                <small class="text-light">October 23, 2025</small>
-            </div>
-            <div class="card-body">
-                <h3 class="h6 text-light">New Features</h3>
-                <ul class="text-light">
-                    <li>Added "Settings" tab that allows the user to define certain layout properties for the report</li>
-                    <li>Report Width is now variable</li>
-                    <li>Margin Sizes are now variable</li>
-                    <li>Vertical Component Spacing is now variable</li>
-                    <li>Font properties for Report Header are now variable</li>
-                    <li>Font properties for Report Section are now variable</li>
-                    <li>Font properties for Field Labels are now variable</li>
-                    <li>Font properties for Field Outputs are now variable</li>
-                </ul>
-
-                <h3 class="h6 mt-3 text-light">Improvements</h3>
-                <ul class="text-light">
-                    <li>labelPosition values "right-left" and "right-right" now properly position their field label</li>
-                    <li>Form and Data Grid DetailReport Bands now generate within the report layout instead of being appended at the end of the layout</li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="card mb-4 bg-dark">
-            <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                <h2 class="h5 mb-0 text-light"><a href="tool_printoutFromForm.html" class="text-info" style="color: var(--accent-color) !important;"><i class="bi bi-pencil-square"></i> Printout From Form</a> | Version 0.4.0</h2>
-                <small class="text-light">October 17, 2025</small>
-            </div>
-            <div class="card-body">
-                <h3 class="h6 mt-3 text-light">Improvements</h3>
-                <ul class="text-light">
-                    <li>Improved code comments and documentation</li>
-                    <li>Column Element weights now respect their component width property</li>
-                    <li>Radio Button Elements now respects their "Inline" layout property, dynamically adjusting the option widths as well</li>
-                    <li>Text Field, Text Area, and Select Elements now respect their "labelPosition" property, dynamically adjusting their field label positions</li>
-                    <li>Fixed an issue that was causing some Markup tags to not close properly</li>
-                    <li>Fixed an issue that was causing the "Color" Markup tag to not render correctly</li>
-                    <li>Fixed an issue that was causing the labels of nested Panel elements to inaccurately size horizontally</li>
-                    <li>Panel Labels now have a unique style defined in devexpress-definitions.js</li>
-                    <li>Elements now have the full width of the report available for their layout instead of being capped at a width of 650px</li>
-                    <li>Form and Data Grids now generate inside their own DetailReport Bands</li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="card mb-4 bg-dark">
-            <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                <h2 class="h5 mb-0 text-light"><a href="tool_printoutFromForm.html" class="text-info" style="color: var(--accent-color) !important;"><i class="bi bi-pencil-square"></i> Printout From Form</a> | Version 0.3.8</h2>
-                <small class="text-light">October 8, 2025</small>
-            </div>
-            <div class="card-body">
-                <h3 class="h6 mt-3 text-light">Improvements</h3>
-                <ul class="text-light">
-                    <li>Improved code comments and documentation</li>
-                    <li>Printouts are now generated with hidden and private properties set to true</li>
-                    <li>Content components now properly calculate their height based on the rendered content</li>
-                    <li>HTML Element and Content components now map their HTML tag content to DevExpress MarkUp tags</li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="card mb-4 bg-dark">
-            <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                <h2 class="h5 mb-0 text-light"><a href="tool_printoutFromForm.html" class="text-info" style="color: var(--accent-color) !important;"><i class="bi bi-pencil-square"></i> Printout From Form</a> | Version 0.3.7</h2>
-                <small class="text-light">October 7, 2025</small>
-            </div>
-            <div class="card-body">
-                <h3 class="h6 mt-3 text-light">Improvements</h3>
-                <ul class="text-light">
-                    <li>Improved code comments and documentation</li>
-                    <li>Fixed an issue that caused Panel labels to generate with inaccurate/repeating ItemNums, causing other elements to fail DevExpress parsing</li>
-                    <li>XML Validation now does a repair pass, attempting to correct any structural issues regarding ItemNumbers</li>
-                    <li>Fixed an issue that caused container elements to not scale accurately when nested with empty containers</li>
-                </ul>
-
-                <h3 class="h6 mt-3 text-light">Notes</h3>
-                <ul class="text-light">
-                    <li>NestedForms have been temporarily disabled as they are causing issues with XML generation</li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="card mb-4 bg-dark">
-            <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                <h2 class="h5 mb-0 text-light"><a href="tool_formViewer.html" class="text-info" style="color: var(--accent-color) !important;"><i class="bi bi-ui-checks"></i> Form Viewer</a> | Version 0.1.1</h2>
-                <small class="text-light">October 7, 2025</small>
-            </div>
-            <div class="card-body">
-                <h3 class="h6 text-light">New Features</h3>
-                <ul class="text-light">
-                    <li>Now parses out and displays the Form Template JSON in a separate tool tab</li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="card mb-4 bg-dark">
-            <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                <h2 class="h5 mb-0 text-light"><a href="tool_printoutFromForm.html" class="text-info" style="color: var(--accent-color) !important;"><i class="bi bi-pencil-square"></i> Printout From Form</a> | Version 0.3.6</h2>
-                <small class="text-light">October 6, 2025</small>
-            </div>
-            <div class="card-body">
-                <h3 class="h6 mt-3 text-light">Improvements</h3>
-                <ul class="text-light">
-                    <li>Improved XML Validation - Now validates ItemNums to ensure sequential numbering within nodes</li>
-                    <li>Improved XML Validation - Now validates RefNums to ensure sequential numbering across all nodes</li>
-                    <li>Fixed an issue that caused DataGrids to generate with inaccurate/repeating ItemNums, causing other elements to fail DevExpress parsing</li>
-                    <li>Fixed an issue that caused FormGrids to generate with inaccurate/repeating ItemNums, causing other elements to fail DevExpress parsing</li>
-                    <li>Fixed an issue that caused Tabs to generate with inaccurate/repeating ItemNums, causing other elements to fail DevExpress parsing</li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="card mb-4 bg-dark">
-            <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                <h2 class="h5 mb-0 text-light"><a href="tool_printoutFromForm.html" class="text-info" style="color: var(--accent-color) !important;"><i class="bi bi-pencil-square"></i> Printout From Form</a> | Version 0.3.5</h2>
-                <small class="text-light">October 3, 2025</small>
-            </div>
-            <div class="card-body">
-                <h3 class="h6 mt-3 text-light">Improvements</h3>
-                <ul class="text-light">
-                    <li>Improved code comments and documentation</li>
-                    <li>Now generates SQL Queries for FormGrid components</li>
-                    <li>Fixed an issue causing DataGrid SQL generation to fail on subsequent DataGrids when more than one was present on a form</li>
-                    <li>Form and Data Grid SQL generation now utilizes the API keys of the grids as table aliases instead of relying on indexing</li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="card mb-4 bg-dark">
-            <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                <h2 class="h5 mb-0 text-light"><a href="tool_printoutFromForm.html" class="text-info" style="color: var(--accent-color) !important;"><i class="bi bi-pencil-square"></i> Printout From Form</a> | Version 0.3.4</h2>
-                <small class="text-light">October 2, 2025</small>
-            </div>
-            <div class="card-body">
-                <h3 class="h6 mt-3 text-light">Improvements</h3>
-                <ul class="text-light">
-                    <li>Improved code comments and documentation</li>
-                    <li>Moved element XML definitions out of tool_printoutFromForm.js and into devexpress-definitions.js for improved maintainability</li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="card mb-4 bg-dark">
-            <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                <h2 class="h5 mb-0 text-light"><a href="tool_printoutFromForm.html" class="text-info" style="color: var(--accent-color) !important;"><i class="bi bi-pencil-square"></i> Printout From Form</a> | Version 0.3.3</h2>
-                <small class="text-light">October 1, 2025</small>
-            </div>
-            <div class="card-body">
-                <h3 class="h6 mt-3 text-light">Improvements</h3>
-                <ul class="text-light">
-                    <li>Now generates the SQL Queries for DataGrid components</li>
-                    <li>Now <b>partially</b> supports FormGrid components</li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="card mb-4 bg-dark">
-            <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                <h2 class="h5 mb-0 text-light"><a href="tool_printoutFromForm.html" class="text-info" style="color: var(--accent-color) !important;"><i class="bi bi-pencil-square"></i> Printout From Form</a> | Version 0.3.2</h2>
-                <small class="text-light">September 29, 2025</small>
-            </div>
-            <div class="card-body">
-                <h3 class="h6 mt-3 text-light">Improvements</h3>
-                <ul class="text-light">
-                    <li>Now properly handles Signature ImageSource bindings</li>
-                    <li>Added widthMultiplier property to element definitions, allowing for more flexible layout options</li>
-                    <li>Now supports Day components</li>
-                    <li>Now supports Time components</li>
-                    <li>Now supports Currency components</li>
-                    <li>Now <b>partially</b> supports DataGrid components</li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="card mb-4 bg-dark">
-            <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                <h2 class="h5 mb-0 text-light"><a href="tool_printoutFromForm.html" class="text-info" style="color: var(--accent-color) !important;"><i class="bi bi-pencil-square"></i> Printout From Form</a> | Version 0.3.1</h2>
-                <small class="text-light">September 26, 2025</small>
-            </div>
-            <div class="card-body">
-                <h3 class="h6 mt-3 text-light">Improvements</h3>
-                <ul class="text-light">
-                    <li>Improved Error Handling and rendering</li>
-                    <li>Improved Nested Element Scaling</li>
-                    <li>Improved navigation</li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="card mb-4 bg-dark">
-            <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                <h2 class="h5 mb-0 text-light"><a href="tool_printoutFromForm.html" class="text-info" style="color: var(--accent-color) !important;"><i class="bi bi-pencil-square"></i> Printout From Form</a> | Version 0.3.0</h2>
-                <small class="text-light">September 19, 2025</small>
-            </div>
-            <div class="card-body">
-                <h3 class="h6 mt-3 text-light">Improvements</h3>
-                <ul class="text-light">
-                    <li>Now supports Radio Button components</li>
-                    <li>Now supports Email Input components</li>
-                    <li>Now supports URL components</li>
-                    <li>Now supports Phone Number components</li>
-                    <li>Now supports Address components</li>
-                    <li>Now supports Date/Time components</li>
-                    <li>Now supports Signature components</li>
-                    <li>Now supports Content components</li>
-                    <li>Now supports Table components</li>
-                    <li>Now supports Tabs components</li>
-                    <li>Now supports Well components</li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="card mb-4 bg-dark">
-            <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                <h2 class="h5 mb-0 text-light"><a href="tool_printoutFromForm.html" class="text-info" style="color: var(--accent-color) !important;"><i class="bi bi-pencil-square"></i> Printout From Form</a> | Version 0.2.1</h2>
-                <small class="text-light">September 15, 2025</small>
-            </div>
-            <div class="card-body">
-                <h3 class="h6 mt-3 text-light">Improvements</h3>
-                <ul class="text-light">
-                    <li>Improved code comments and documentation</li>
-                    <li>Now supports HTML Element components</li>
-                    <li>Now supports Column components</li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="card mb-4 bg-dark">
-            <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                <h2 class="h5 mb-0 text-light"><a href="tool_printoutFromForm.html" class="text-info" style="color: var(--accent-color) !important;"><i class="bi bi-pencil-square"></i> Printout From Form</a> | Version 0.2.0</h2>
-                <small class="text-light">September 5, 2025</small>
-            </div>
-            <div class="card-body">
-                <h3 class="h6 mt-3 text-light">Improvements</h3>
-                <ul class="text-light">
-                    <li>Now supports properly nested components</li>
-                    <li>Now supports Panel components</li>
-                    <li>Now supports Fieldset components</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-
-    <!-- Load navigation bar -->
-    <script>
-        fetch('components/comp_navbar.html')
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('navbar-container').innerHTML = data;
-            });
-    </script>
-
-    <!-- Bootstrap JS Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+        <!-- Bootstrap JS Bundle with Popper -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="scripts/scripts.js"></script>
+    </body>
 </html>
