@@ -1,3 +1,69 @@
+// Render Form.io form inside an isolated iframe (only Bootstrap CSS applies)
+function renderFormInIframe(formDefinition) {
+    const iframe = document.getElementById('formio-frame');
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+    
+    // Create isolated HTML document with only Bootstrap CSS
+    const iframeContent = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.form.io/formiojs/formio.full.min.css">
+    <style>
+        body {
+            padding: 1rem;
+            background: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div id="formio-container"></div>
+    <script src="https://cdn.form.io/formiojs/formio.full.min.js"><\/script>
+    <script>
+        const formDefinition = ${JSON.stringify(formDefinition)};
+        const options = {
+            sanitize: true,
+            noAlerts: false,
+            readOnly: false
+        };
+        
+        Formio.createForm(document.getElementById('formio-container'), formDefinition, options)
+            .then(form => {
+                console.log('Form created successfully in iframe');
+                // Auto-resize iframe to fit content
+                const resizeObserver = new ResizeObserver(() => {
+                    const height = document.body.scrollHeight;
+                    window.parent.postMessage({ type: 'resize', height: height }, '*');
+                });
+                resizeObserver.observe(document.body);
+            })
+            .catch(err => {
+                console.error('Error creating form:', err);
+                document.getElementById('formio-container').innerHTML = 
+                    '<div class="alert alert-danger">Error creating form: ' + err.message + '</div>';
+            });
+    <\/script>
+</body>
+</html>`;
+
+    iframeDoc.open();
+    iframeDoc.write(iframeContent);
+    iframeDoc.close();
+}
+
+// Listen for iframe resize messages
+window.addEventListener('message', function(event) {
+    if (event.data && event.data.type === 'resize') {
+        const iframe = document.getElementById('formio-frame');
+        if (iframe) {
+            iframe.style.height = (event.data.height + 20) + 'px';
+        }
+    }
+});
+
 // Handle file upload and tab population
 document.getElementById('fileUpload').addEventListener('change', function(event) {
     const file = event.target.files[0];
@@ -8,9 +74,7 @@ document.getElementById('fileUpload').addEventListener('change', function(event)
     reader.onload = function(e) {
         try {
             const formioData = JSON.parse(e.target.result);
-            const formContainer = document.getElementById('formio-rendered');
-            formContainer.innerHTML = '';
-
+            
             // Load client and server scripts
             const clientScript = formioData.ClientSideScript || '';
             const serverScript = formioData.ServerSideScript || '';
@@ -59,36 +123,8 @@ document.getElementById('fileUpload').addEventListener('change', function(event)
             const previewContainer = document.querySelector('.preview-container');
             previewContainer.style.display = 'block';
 
-            // Create Form.io form with options
-            const options = {
-                sanitize: true,
-                noAlerts: false,
-                readOnly: false,
-                hooks: {
-                    beforeSubmit: (submission, next) => {
-                        console.log('Form submission:', submission);
-                        next();
-                    }
-                }
-            };
-
-            Formio.createForm(formContainer, formDefinition, options)
-                .then(form => {
-                    console.log('Form created successfully');
-                    form.on('change', () => {
-                        console.log('Form data:', form.data);
-                    });
-                    form.on('error', (errors) => {
-                        console.error('Form errors:', errors);
-                    });
-                })
-                .catch(err => {
-                    console.error('Error creating form:', err);
-                    formContainer.innerHTML = `
-                        <div class="alert alert-danger">
-                            Error creating form: ${err.message}
-                        </div>`;
-                });
+            // Render Form.io in isolated iframe
+            renderFormInIframe(formDefinition);
 
             // Set up copy buttons
             setupCopyButtons();

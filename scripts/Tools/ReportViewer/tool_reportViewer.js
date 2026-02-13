@@ -1076,6 +1076,35 @@ class ReportViewer {
     }
 }
 
+/**
+ * Creates a DevExpress preview from JSON data and decoded template
+ * @param {Object} devExpressData - The DevExpress JSON data
+ * @param {Object} decodedTemplate - The decoded template containing XML content
+ */
+export function createDevExpressPreview(devExpressData, decodedTemplate) {
+    console.log('createDevExpressPreview called with:', {
+        hasDevExpressData: Boolean(devExpressData),
+        hasDecodedTemplate: Boolean(decodedTemplate),
+        templateType: decodedTemplate?.type
+    });
+
+    const container = document.getElementById('reportContainer');
+    if (!container) {
+        console.error('Report container not found for preview');
+        return;
+    }
+
+    // Create or reuse viewer instance
+    if (!window.viewer) {
+        window.viewer = new ReportViewer(container);
+    }
+
+    // If we have XML content, render it
+    if (decodedTemplate?.content) {
+        window.viewer.renderReport(decodedTemplate.content);
+    }
+}
+
 // Initialize viewer when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded, initializing ReportViewer');

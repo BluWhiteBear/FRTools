@@ -1,53 +1,11 @@
-/* === Form.io Container Override === */
-#formio-rendered {
-  /* Reset form container */
-  background: var(--component-bg) !important;
-  color: var(--text-color) !important;
-  padding: 1rem !important;
-  border-radius: 0.25rem !important;
-  border: 1px solid var(--border-color) !important;
-}
-
-/* Target only Form.io specific elements */
-.formio-component,
-.formio-component-textfield,
-.formio-component-textarea,
-.formio-component-select,
-.formio-component-checkbox,
-.formio-component-radio,
-.formio-component-button {
-  /* Reset Form.io component styles */
-  font-family: inherit !important;
-  color: var(--text-color) !important;
-  background-color: var(--component-bg) !important;
-}
-
-/* Keep global form styling light */
-#formio-rendered .form-control {
-  background-color: #fff !important;
-  color: #212529 !important;
-  border: 1px solid #ced4da !important;
-}
-
-/* Override dark theme for form elements */
-#formio-rendered .form-label,
-#formio-rendered .form-check-label {
-  color: #212529 !important;
-}
-
-/* Keep Bootstrap's native form styling */
-#formio-rendered .form-group {
-  margin-bottom: 1rem !important;
-}
-
 /* === Global Styles === */
-a {
+a:not(#formio-rendered a) {
   color: var(--accent-color);
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
-a:hover {
+a:not(#formio-rendered a):hover {
   color: white;
 }
 
@@ -59,7 +17,7 @@ body {
 }
 
 .container {
-  max-width: 1200px;
+  max-width: 1700px;
   margin: 0 auto;
 }
 
@@ -233,14 +191,14 @@ body {
   font-weight: 500;
 }
 
-.btn-primary {
+.btn-primary:not(#formio-rendered .btn-primary) {
   background: var(--accent-color) !important;
   border: none !important;
   color: #121212 !important;
   transition: all 0.3s ease;
 }
 
-.btn-primary:hover:not(:disabled) {
+.btn-primary:not(#formio-rendered .btn-primary):hover:not(:disabled) {
   background: var(--accent-color-dark) !important;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(200, 223, 143, 0.2);
@@ -252,14 +210,14 @@ body {
 }
 
 /* === Form Controls === */
-.form-control {
+.form-control:not(#formio-rendered .form-control) {
   margin-top: 5px;
   background: rgba(255,255,255,0.1);
   border: 1px solid rgba(255,255,255,0.2);
   color: rgba(204, 204, 204, 0.9) !important;
 }
 
-.form-control:focus {
+.form-control:not(#formio-rendered .form-control):focus {
   background: rgba(255,255,255,0.15);
   border-color: var(--accent-color);
   color: rgba(204, 204, 204, 0.9);
@@ -274,57 +232,6 @@ body {
     width: 100%;
     max-width: none;
   }
-}
-
-/* === FormIO Rendering === */
-.formio-form-wrapper {
-  min-height: 400px;
-  height: auto;
-  overflow: auto;
-}
-
-#formio-rendered {
-  font-family: inherit;
-}
-
-#formio-rendered .form-group {
-  margin-bottom: 1rem;
-}
-
-#formio-rendered label {
-  color: #212529;
-  font-weight: 500;
-  margin-bottom: 0.5rem;
-}
-
-#formio-rendered .form-control {
-  background-color: #fff;
-  border: 1px solid #ced4da;
-  color: #212529;
-  padding: 0.375rem 0.75rem;
-}
-
-#formio-rendered .formio-component {
-  margin-bottom: 1rem;
-}
-
-#formio-rendered .formio-component-panel {
-  border: 1px solid #dee2e6;
-  border-radius: 0.25rem;
-  padding: 1rem;
-  margin-bottom: 1rem;
-}
-
-#formio-rendered .formio-component-columns {
-  margin: 0 -0.5rem;
-}
-
-#formio-rendered .formio-component-columns > .row {
-  margin: 0;
-}
-
-#formio-rendered .formio-component-columns > .row > [class*="col"] {
-  padding: 0 0.5rem;
 }
 
 /* === DevExpress Rendering === */

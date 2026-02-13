@@ -126,6 +126,7 @@ function createComponent(component, formData) {
       
     case 'radio':
       radioGroup = document.createElement('div');
+
       if (component.values) {
         component.values.forEach(option => {
           const wrapper = document.createElement('div');
@@ -146,6 +147,7 @@ function createComponent(component, formData) {
           radioGroup.appendChild(wrapper);
         });
       }
+      
       input = radioGroup;
       break;
   
