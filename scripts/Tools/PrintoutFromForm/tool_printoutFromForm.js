@@ -10,8 +10,8 @@ import { ComponentProcessor } from './componentProcessor.js';
 
 // ? Version info is used for generating both XML and SQL
 const VERSION_INFO = {
-    version: '0.4.4',
-    updated: '10/30/2025',
+    version: '0.4.5',
+    updated: '4/1/2026',
     devexpressVersion: '23.2.5.0'
 };
 
@@ -2094,7 +2094,9 @@ const ComponentCleaner = {
         //console.warn('[hoistGridsAndSubforms] Original JSON:', JSON.stringify(formJson, null, 2));
 
         // ? Containers to handle
-        const containerTypes = ['panel', 'fieldset', 'well', 'columns', 'tabs'];
+        // ! Do not flatten tabs here. Their child entries are tab panes, not normal components,
+        // ! and flattening them causes the pane keys to render as ordinary data-bound labels.
+        const containerTypes = ['panel', 'fieldset', 'well', 'columns'];
         // ? Element types to hoist
         const hoistTypes = ['datagrid', 'nestedsubform'];
 
