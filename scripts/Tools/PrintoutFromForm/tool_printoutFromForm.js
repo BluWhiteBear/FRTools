@@ -2100,6 +2100,25 @@ const ComponentCleaner = {
         // ? Element types to hoist
         const hoistTypes = ['datagrid', 'nestedsubform'];
 
+        function containsHoistableDescendant(comp) {
+            if (!comp || typeof comp !== 'object') return false;
+
+            if (hoistTypes.includes((comp.type || '').toLowerCase())) {
+                return true;
+            }
+
+            if (Array.isArray(comp.components) && comp.components.some(child => containsHoistableDescendant(child))) {
+                return true;
+            }
+
+            if (Array.isArray(comp.columns) && comp.columns.some(column =>
+                Array.isArray(column.components) && column.components.some(child => containsHoistableDescendant(child)))) {
+                return true;
+            }
+
+            return false;
+        }
+
 
         // Helper: recursively flatten containers, hoisting grids/subforms to root and preserving order
         function flattenComponents(arr, rootArr) {
@@ -2109,8 +2128,9 @@ const ComponentCleaner = {
                 if (hoistTypes.includes((comp.type || '').toLowerCase())) {
                     // Hoist to root
                     result.push({ hoist: true, comp });
-                } else if (containerTypes.includes((comp.type || '').toLowerCase()) && Array.isArray(comp.components)) {
-                    // Flatten container: replace with its children (recursively)
+                } else if (containerTypes.includes((comp.type || '').toLowerCase()) && Array.isArray(comp.components) && containsHoistableDescendant(comp)) {
+                    // Only flatten containers that actually contain hoistable descendants.
+                    // Preserving unrelated containers keeps panel/fieldset headers intact.
                     const flattened = flattenComponents(comp.components, rootArr);
                     result = result.concat(flattened);
                 } else {
@@ -2499,7 +2519,10 @@ function generateMinimalXmlTemplate()
                 const nestedFormControls = processor.buildNode('Controls', {});
 
                 // Add the subreport element to the nested form band
+                const savedBandItemNum = processor.currentItemNum;
+                processor.currentItemNum = 0;
                 const subreportNode = componentProcessor.createSubReportNode(nestedForm, (LAYOUT.PAGE_WIDTH - LAYOUT.MARGIN_LEFT - LAYOUT.MARGIN_RIGHT), 0);
+                processor.currentItemNum = savedBandItemNum;
                 nestedFormControls.addChild(subreportNode);
                 nestedFormBands.children[0].addChild(nestedFormControls);
                 nestedFormReport.addChild(nestedFormBands);

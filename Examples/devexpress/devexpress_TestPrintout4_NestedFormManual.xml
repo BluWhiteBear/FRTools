@@ -279,7 +279,7 @@
             <Item21 ControlType="XRLabel" Name="content" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="750,30" LocationFloat="0,880" Font="Times New Roman, 9pt" Text="Content Component" Ref="107" />
             <Item22 ControlType="XRTable" Name="columns" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="750,160" LocationFloat="0,920" KeepTogether="true" AdjustToContainerWidth="true" Ref="108">
               <Rows>
-                <Item1 ControlType="XRTableRow" Name="columnsRow_1775066247669" Weight="1" Ref="109">
+                <Item1 ControlType="XRTableRow" Name="columnsRow_1775068557944" Weight="1" Ref="109">
                   <Cells>
                     <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.333333" WidthF="250.0" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="110">
                       <Controls>
@@ -400,20 +400,22 @@ Blue Text" Ref="123">
                 </Item3>
               </Rows>
             </Item32>
-            <Item33 ControlType="XRLabel" Name="label_tab2" Text="Tab 1" SizeF="750,30" LocationFloat="0,1590" Font="Times New Roman, 9pt, style=Bold" TextAlignment="MiddleLeft" Padding="2,0,0,0,100" Borders="None" Ref="152" />
-            <Item34 ControlType="XRLabel" Name="tab2" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="562,30" LocationFloat="0,1630" Font="Times New Roman, 9pt" Ref="153">
-              <ExpressionBindings>
-                <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[tab2]" Ref="154">
+            <Item33 ControlType="XRPanel" Name="tab_tab2" CanShrink="true" Borders="None" Padding="2,2,0,0,100" SizeF="750,100" LocationFloat="0,1590" Ref="152">
+              <Controls>
+                <Item1 ControlType="XRLabel" Name="label_tab2_label" Text="Tab 1" SizeF="740,30" LocationFloat="5,0" Font="Times New Roman, 9pt, style=Bold" TextAlignment="MiddleLeft" Padding="2,0,0,0,100" Borders="None" Ref="153">
                 </Item1>
-              </ExpressionBindings>
+                <Item2 ControlType="XRLabel" Name="html1" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="730,30" LocationFloat="10,30" Font="Times New Roman, 9pt" Text="TAB 1 CONTENT" Ref="154">
+                </Item2>
+              </Controls>
+            </Item33>
+            <Item34 ControlType="XRPanel" Name="tab_tab3" CanShrink="true" Borders="None" Padding="2,2,0,0,100" SizeF="750,100" LocationFloat="0,1700" Ref="155">
+              <Controls>
+                <Item1 ControlType="XRLabel" Name="label_tab3_label" Text="Tab 2" SizeF="740,30" LocationFloat="5,0" Font="Times New Roman, 9pt, style=Bold" TextAlignment="MiddleLeft" Padding="2,0,0,0,100" Borders="None" Ref="156">
+                </Item1>
+                <Item2 ControlType="XRLabel" Name="html2" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="730,30" LocationFloat="10,30" Font="Times New Roman, 9pt" Text="TAB 2 CONTENT" Ref="157">
+                </Item2>
+              </Controls>
             </Item34>
-            <Item35 ControlType="XRLabel" Name="label_tab3" Text="Tab 2" SizeF="750,30" LocationFloat="0,1670" Font="Times New Roman, 9pt, style=Bold" TextAlignment="MiddleLeft" Padding="2,0,0,0,100" Borders="None" Ref="155" />
-            <Item36 ControlType="XRLabel" Name="tab3" TextAlignment="MiddleLeft" Borders="Bottom" Padding="2,2,0,0,100" SizeF="562,30" LocationFloat="0,1710" Font="Times New Roman, 9pt" Ref="156">
-              <ExpressionBindings>
-                <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[tab3]" Ref="157">
-                </Item1>
-              </ExpressionBindings>
-            </Item36>
           </Controls>
         </Item1>
       </Bands>
@@ -552,7 +554,7 @@ Blue Text" Ref="123">
             <Item6 ControlType="XRLabel" Name="html8" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="750,30" LocationFloat="0,210" Font="Times New Roman, 9pt" Text="Layer 3 HMTL" Ref="201" />
             <Item7 ControlType="XRTable" Name="columns1" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="750,50" LocationFloat="0,250" KeepTogether="true" AdjustToContainerWidth="true" Ref="202">
               <Rows>
-                <Item1 ControlType="XRTableRow" Name="columnsRow_1775066247677" Weight="1" Ref="203">
+                <Item1 ControlType="XRTableRow" Name="columnsRow_1775068557960" Weight="1" Ref="203">
                   <Cells>
                     <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.250000" WidthF="187.5" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="204">
                       <Controls>
