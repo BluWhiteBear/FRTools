@@ -810,7 +810,9 @@ export class ComponentProcessor
     }
 
     // ? Calculate height of a container based on its components
-    calculateContainerHeight(container)
+    // isNested: true when called recursively to measure a child container's contribution
+    // to its parent's height — suppresses the outer padding that would otherwise double-count.
+    calculateContainerHeight(container, isNested = false)
     {
         let height = 0;
 
@@ -838,8 +840,9 @@ export class ComponentProcessor
                     componentHeight = this.calculateHtmlHeight(comp.content, containerWidth);
                 } else if (comp.type === 'content' && comp.html) {
                     componentHeight = this.calculateHtmlHeight(comp.html, containerWidth);
-                } else if (comp.type === 'panel' || comp.type === 'fieldset') {
-                    componentHeight = this.calculateContainerHeight(comp);
+                } else if (comp.type === 'panel' || comp.type === 'fieldset' || comp.type === 'well') {
+                    // Pass isNested = true so child containers don't add their own outer padding
+                    componentHeight = this.calculateContainerHeight(comp, true);
                 } else if (comp.type === 'table' && comp.rows) {
                     componentHeight = this.calculateTableHeight(comp);
                 } else if (comp.type === 'columns' && comp.columns) {
@@ -847,9 +850,10 @@ export class ComponentProcessor
                 } else if (comp.type === 'radio' && def.calculateHeight) {
                     componentHeight = def.calculateHeight(comp);
                 } else if (comp.type === 'tabs' && comp.components) {
+                    // Use LAYOUT.VERTICAL_SPACING to match the spacing processTabs actually applies
                     componentHeight = comp.components.reduce((tabsHeight, tab) => {
-                        const tabHeight = this.calculateContainerHeight(tab);
-                        return tabsHeight + tabHeight + DevExpressDefinitions.commonAttributes.spacing.sectionSpacing;
+                        const tabHeight = this.calculateContainerHeight(tab, true);
+                        return tabsHeight + tabHeight + LAYOUT.VERTICAL_SPACING;
                     }, 0);
                 }
 
@@ -873,17 +877,15 @@ export class ComponentProcessor
             }, 0);
         }
 
-        // Avoid adding redundant padding for nested containers
-        const isNestedContainer = container.parentType === 'panel' || container.parentType === 'fieldset' || container.parentType === 'tabs' || container.parentType === 'well' || container.parentType === 'columns' || container.parentType === 'table';
-        const padding = isNestedContainer ? 0 : DevExpressDefinitions.commonAttributes.spacing.sectionSpacing * 2;
+        // Only add outer padding for the container being sized as an XML element.
+        // Recursive calls (isNested = true) skip this to avoid double-counting padding
+        // across parent and child containers.
+        const padding = isNested ? 0 : DevExpressDefinitions.commonAttributes.spacing.sectionSpacing * 2;
 
-        // Debugging log for nested container padding
-        console.log(`[calculateContainerHeight] Is nested container: ${isNestedContainer}, padding added: ${padding}`);
+        console.log(`[calculateContainerHeight] isNested: ${isNested}, padding added: ${padding}`);
 
         const totalHeight = height + padding;
 
-        // Debugging logs for padding and final height calculations
-        console.log(`[calculateContainerHeight] Padding added: ${DevExpressDefinitions.commonAttributes.spacing.sectionSpacing * 2}`);
         console.log(`[calculateContainerHeight] Final height before return: ${totalHeight}`);
         console.log(`[calculateContainerHeight] Total calculated height for ${container.key} container: ${totalHeight}`);
         return totalHeight;
