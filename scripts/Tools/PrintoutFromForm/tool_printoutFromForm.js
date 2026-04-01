@@ -1511,14 +1511,12 @@ as
   select
     ownCon.first
     ,ownCon.last
-    ,main.*
     ,${safeKey}.*
 
-  from ${fullTableName} main
-  join Contact ownCon with(NOLOCK) on ownCon.ContactGUID = main.__ownerobjectguid
-  left join ${grid.DBName} ${safeKey} with(NOLOCK) on ${safeKey}.__forminstanceguid = main.__forminstanceguid
-  where main.__forminstanceguid = @FormDataGUID
-  and main.__ownerobjectguid = @OwnerObjectGUID
+  from ${grid.DBName} ${safeKey}
+  join Contact ownCon with(NOLOCK) on ownCon.ContactGUID = ${safeKey}.__ownerobjectguid
+  where ${safeKey}.__forminstanceguid = @FormDataGUID
+  and ${safeKey}.__ownerobjectguid = @OwnerObjectGUID
 GO`);
             });
         }
@@ -1542,12 +1540,11 @@ as
   set nocount on;
   select
     ${grid.dialogFormTable ? 'dialog.*' : ''}
-  from ${fullTableName} main
-  join Contact ownCon with(NOLOCK) on ownCon.ContactGUID = main.__ownerobjectguid
-  left join ${grid.DBName} ${safeKey} with(NOLOCK) on ${safeKey}.__forminstanceguid = main.__forminstanceguid
+  from ${grid.DBName} ${safeKey}
+  join Contact ownCon with(NOLOCK) on ownCon.ContactGUID = ${safeKey}.__ownerobjectguid
   ${grid.dialogFormTable ? `left join ${grid.dialogFormTable} dialog with(NOLOCK) on dialog.__forminstanceguid = ${safeKey}.[view]` : ''}
-  where main.__forminstanceguid = @FormDataGUID
-  and main.__ownerobjectguid = @OwnerObjectGUID
+  where ${safeKey}.__forminstanceguid = @FormDataGUID
+  and ${safeKey}.__ownerobjectguid = @OwnerObjectGUID
 GO`);
             });
         }
