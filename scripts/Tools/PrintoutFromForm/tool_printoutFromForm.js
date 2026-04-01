@@ -1509,12 +1509,8 @@ as
 
   set nocount on;
   select
-    ownCon.first
-    ,ownCon.last
-    ,${safeKey}.*
-
+    ${safeKey}.*
   from ${grid.DBName} ${safeKey}
-  join Contact ownCon with(NOLOCK) on ownCon.ContactGUID = ${safeKey}.__ownerobjectguid
   where ${safeKey}.__forminstanceguid = @FormDataGUID
   and ${safeKey}.__ownerobjectguid = @OwnerObjectGUID
 GO`);
@@ -1541,7 +1537,6 @@ as
   select
     ${grid.dialogFormTable ? 'dialog.*' : ''}
   from ${grid.DBName} ${safeKey}
-  join Contact ownCon with(NOLOCK) on ownCon.ContactGUID = ${safeKey}.__ownerobjectguid
   ${grid.dialogFormTable ? `left join ${grid.dialogFormTable} dialog with(NOLOCK) on dialog.__forminstanceguid = ${safeKey}.[view]` : ''}
   where ${safeKey}.__forminstanceguid = @FormDataGUID
   and ${safeKey}.__ownerobjectguid = @OwnerObjectGUID
