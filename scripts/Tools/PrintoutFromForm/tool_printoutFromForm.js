@@ -36,6 +36,279 @@ function debugWarn(level, ...args)
     }
 }
 
+//#region ComponentStorage Helpers
+
+/**
+ * Encodes a string to Base64 using UTF-8 encoding
+ * @param {string} str - The string to encode
+ * @returns {string} Base64-encoded string
+ */
+function utf8ToBase64(str) {
+    const bytes = new TextEncoder().encode(str);
+    const binString = Array.from(bytes, b => String.fromCodePoint(b)).join('');
+    return btoa(binString);
+}
+
+/**
+ * Maps Form.io component types to DevExpress SQL types
+ * @param {object} component - The Form.io component
+ * @returns {string} DevExpress SQL type
+ */
+function formioTypeToDevExpressType(component) {
+    switch (component.type) {
+        case 'checkbox': return 'Boolean';
+        case 'datetime': 
+        case 'day': return 'DateTime';
+        case 'number': 
+        case 'currency': return 'Decimal';
+        default: return 'String';
+    }
+}
+
+/**
+ * Recursively collects leaf input fields from form components
+ * @param {array} components - The Form.io components array
+ * @param {boolean} excludeGrids - Skip datagrid subtrees (for main datasource)
+ * @returns {array} Array of field objects with name and type
+ */
+function collectLeafInputFields(components, excludeGrids = true) {
+    const fields = [];
+    
+    function traverse(comps) {
+        if (!Array.isArray(comps)) return;
+        
+        comps.forEach(comp => {
+            // Skip grids if excludeGrids is true
+            if (excludeGrids && comp.type === 'grid') {
+                return;
+            }
+            
+            // Skip containers, nested forms, and buttons
+            if (['fieldset', 'panel', 'tabs', 'form', 'nestedform', 'button', 'submit', 'checkbox'].includes(comp.type)) {
+                // For nested forms, include their components
+                if (comp.type === 'nestedform' && comp.components) {
+                    traverse(comp.components);
+                }
+                // For containers, include their children
+                else if (comp.components) {
+                    traverse(comp.components);
+                }
+                return;
+            }
+            
+            // Skip non-input controls
+            if (comp.type === 'button' || comp.type === 'submit' || comp.type === 'content' || !comp.key) {
+                return;
+            }
+            
+            // Add leaf field
+            fields.push({
+                name: comp.key,
+                type: formioTypeToDevExpressType(comp)
+            });
+        });
+    }
+    
+    traverse(components);
+    return fields;
+}
+
+/**
+ * Builds the inner SqlDataSource XML string (to be Base64-encoded)
+ * @param {string} dsName - The datasource name (e.g., "sqlDataSource1")
+ * @param {string} procName - The stored procedure name
+ * @param {array} fields - Array of field objects with name and type
+ * @returns {string} XML string for SqlDataSource
+ */
+function buildSqlDataSourceXml(dsName, procName, fields) {
+    let xml = `<SqlDataSource Name="${dsName}">`;
+    xml += `<Connection Name="UniData" ConnectionString="" />`;
+    xml += `<Query Type="StoredProcQuery" Name="${procName}">`;
+    xml += `<Parameter Name="@FormDataGUID" Type="Guid" ValueInfo="00000000-0000-0000-0000-000000000000" />`;
+    xml += `<Parameter Name="@OwnerObjectGUID" Type="Guid" ValueInfo="00000000-0000-0000-0000-000000000000" />`;
+    xml += `<ProcName>${procName}</ProcName>`;
+    xml += `</Query>`;
+    xml += `<ResultSchema>`;
+    xml += `<DataSet Name="${dsName}">`;
+    xml += `<View Name="${procName}">`;
+    
+    // System fields (always present)
+    const systemFields = [
+        { name: '__ID', type: 'Int32' },
+        { name: '__OwnerObjectGuid', type: 'Guid' },
+        { name: '__FormInstanceGUID', type: 'Guid' },
+        { name: '__FormGUID', type: 'Guid' },
+        { name: '__FormGroupName', type: 'String' },
+        { name: '__FormGroupFolder', type: 'Guid' },
+        { name: '__InstanceName', type: 'String' },
+        { name: '__Created', type: 'DateTime' },
+        { name: '__Modified', type: 'DateTime' },
+        { name: '__Locked', type: 'Boolean' },
+        { name: '__LockLevel', type: 'Int32' },
+        { name: '__LockedBy', type: 'Guid' },
+        { name: '__LockedTime', type: 'DateTime' },
+        { name: '__Referrer', type: 'Guid' },
+        { name: '__FormVersion', type: 'Int32' },
+        { name: '__CreatedBy', type: 'Guid' },
+        { name: '__ModifiedBy', type: 'Guid' }
+    ];
+    
+    // Add system fields
+    systemFields.forEach(field => {
+        xml += `<Field Name="${field.name}" Type="${field.type}" />`;
+    });
+    
+    // Add form fields
+    fields.forEach(field => {
+        xml += `<Field Name="${field.name}" Type="${field.type}" />`;
+    });
+    
+    xml += `</View>`;
+    xml += `</DataSet>`;
+    xml += `</ResultSchema>`;
+    xml += `<ConnectionOptions CloseConnection="true" />`;
+    xml += `</SqlDataSource>`;
+    
+    return xml;
+}
+
+/**
+ * Builds the full ComponentStorage XMLNode tree
+ * @param {object} formioData - The Form.io form data
+ * @param {XMLProcessor} processor - The XML processor instance
+ * @returns {XMLNode} The ComponentStorage node
+ */
+function buildComponentStorage(formioData, processor) {
+    const deptName = formioData?.DepartmentName || 'Unknown';
+    const formName = formioData?.FormName || 'Unknown';
+    
+    // Collect fields from main form (excluding grids)
+    const mainFields = collectLeafInputFields(formioData?.FormioTemplate?.components || [], true);
+    
+    // Build main datasource (Item1)
+    const mainProcName = `cstm_${deptName}_${formName}_Printout`;
+    const mainSqlXml = buildSqlDataSourceXml('sqlDataSource1', mainProcName, mainFields);
+    const mainBase64 = utf8ToBase64(mainSqlXml);
+    
+    const items = [
+        processor.createItemNode(1, undefined, {
+            Ref: "0",
+            ObjectType: "DevExpress.DataAccess.Sql.SqlDataSource,DevExpress.DataAccess.v23.2",
+            Name: "sqlDataSource1",
+            Base64: mainBase64
+        })
+    ];
+    
+    // Find and process grid components for Item2+
+    const grids = DevExpressConverter.findDataGridComponents(formioData);
+    
+    grids.forEach((grid, idx) => {
+        const gridKey = grid.key || `grid${idx}`;
+        const gridProcName = `cstm_${deptName}_${formName}_${gridKey}`;
+        
+        // Add grid-specific extra system fields
+        const gridExtraSystemFields = [
+            { name: 'FormInstanceGUID', type: 'Guid' },
+            { name: 'GridEntryUID', type: 'Guid' },
+            { name: 'ParentEntryUID', type: 'Guid' },
+            { name: 'RowGUID', type: 'Guid' },
+            { name: 'Active', type: 'String' }
+        ];
+        
+        // Add grid component fields
+        const gridComponents = grid.components || [];
+        const gridSpecificFields = collectLeafInputFields(gridComponents, false);
+        
+        const gridSqlXml = buildSqlDataSourceXmlForGrid('sqlDataSource' + (idx + 2), gridProcName, mainFields, gridExtraSystemFields, gridSpecificFields);
+        const gridBase64 = utf8ToBase64(gridSqlXml);
+        
+        items.push(processor.createItemNode(idx + 2, undefined, {
+            Ref: `${idx + 325}`, // Ref values: Item2 has Ref="325", Item3 has Ref="?", etc.
+            ObjectType: "DevExpress.DataAccess.Sql.SqlDataSource,DevExpress.DataAccess.v23.2",
+            Name: `sqlDataSource${idx + 2}`,
+            Base64: gridBase64
+        }));
+    });
+    
+    // Build the ComponentStorage node
+    const componentStorage = processor.buildNode('ComponentStorage', {}, items);
+    
+    return componentStorage;
+}
+
+/**
+ * Builds SQL datasource XML for grid datasources (includes system fields in correct order)
+ * @param {string} dsName - Datasource name
+ * @param {string} procName - Stored procedure name
+ * @param {array} mainFields - Main form fields
+ * @param {array} gridSystemFields - Grid extra system fields
+ * @param {array} gridFields - Grid-specific fields
+ * @returns {string} XML string for SqlDataSource
+ */
+function buildSqlDataSourceXmlForGrid(dsName, procName, mainFields, gridSystemFields, gridFields) {
+    let xml = `<SqlDataSource Name="${dsName}">`;
+    xml += `<Connection Name="UniData" ConnectionString="" />`;
+    xml += `<Query Type="StoredProcQuery" Name="${procName}">`;
+    xml += `<Parameter Name="@FormDataGUID" Type="Guid" ValueInfo="00000000-0000-0000-0000-000000000000" />`;
+    xml += `<Parameter Name="@OwnerObjectGUID" Type="Guid" ValueInfo="00000000-0000-0000-0000-000000000000" />`;
+    xml += `<ProcName>${procName}</ProcName>`;
+    xml += `</Query>`;
+    xml += `<ResultSchema>`;
+    xml += `<DataSet Name="${dsName}">`;
+    xml += `<View Name="${procName}">`;
+    
+    // System fields (always present)
+    const systemFields = [
+        { name: '__ID', type: 'Int32' },
+        { name: '__OwnerObjectGuid', type: 'Guid' },
+        { name: '__FormInstanceGUID', type: 'Guid' },
+        { name: '__FormGUID', type: 'Guid' },
+        { name: '__FormGroupName', type: 'String' },
+        { name: '__FormGroupFolder', type: 'Guid' },
+        { name: '__InstanceName', type: 'String' },
+        { name: '__Created', type: 'DateTime' },
+        { name: '__Modified', type: 'DateTime' },
+        { name: '__Locked', type: 'Boolean' },
+        { name: '__LockLevel', type: 'Int32' },
+        { name: '__LockedBy', type: 'Guid' },
+        { name: '__LockedTime', type: 'DateTime' },
+        { name: '__Referrer', type: 'Guid' },
+        { name: '__FormVersion', type: 'Int32' },
+        { name: '__CreatedBy', type: 'Guid' },
+        { name: '__ModifiedBy', type: 'Guid' }
+    ];
+    
+    // Add system fields
+    systemFields.forEach(field => {
+        xml += `<Field Name="${field.name}" Type="${field.type}" />`;
+    });
+    
+    // Add main form fields
+    mainFields.forEach(field => {
+        xml += `<Field Name="${field.name}" Type="${field.type}" />`;
+    });
+    
+    // Add grid extra system fields
+    gridSystemFields.forEach(field => {
+        xml += `<Field Name="${field.name}" Type="${field.type}" />`;
+    });
+    
+    // Add grid-specific fields
+    gridFields.forEach(field => {
+        xml += `<Field Name="${field.name}" Type="${field.type}" />`;
+    });
+    
+    xml += `</View>`;
+    xml += `</DataSet>`;
+    xml += `</ResultSchema>`;
+    xml += `<ConnectionOptions CloseConnection="true" />`;
+    xml += `</SqlDataSource>`;
+    
+    return xml;
+}
+
+//#endregion
+
 const ConversionSettings = {
     alignToGrid: false,
     snapGridSize: 10
@@ -2472,6 +2745,7 @@ function generateMinimalXmlTemplate()
 
         // ? Report metadata
         const name = formioData?.FormName || 'Simple Report';
+        const deptName = formioData?.DepartmentName || 'Unknown';
         const reportGuid = formioData?.ReportGuid || '00000000-0000-0000-0000-000000000000';
         const departmentGuid = formioData?.DepartmentGuid || '00000000-0000-0000-0000-000000000000';
         const displayName = Utils.escapeXml(`${name};${name};false;false;${departmentGuid};${reportGuid}`);
@@ -2489,7 +2763,8 @@ function generateMinimalXmlTemplate()
             PageWidth: `${LAYOUT.PAGE_WIDTH}`,
             PageHeight: `${LAYOUT.PAGE_HEIGHT}`,
             Version: "23.2",
-            DataMember: "Root"
+            DataMember: `cstm_${deptName}_${name}_Printout`,
+            DataSource: "#Ref-0"
         });
 
         // ? Build basic structure
@@ -2897,6 +3172,10 @@ function generateMinimalXmlTemplate()
             })
         ]);
         root.addChild(parameterPanel);
+
+        // ? Add ComponentStorage for datasource definitions
+        const componentStorage = buildComponentStorage(formioData, processor);
+        root.addChild(componentStorage);
 
         if (ConversionSettings.alignToGrid)
         {

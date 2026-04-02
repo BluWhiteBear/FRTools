@@ -1,0 +1,41 @@
+<SqlDataSource Name="sqlDataSource1"
+    ><Connection Name="UniData" ConnectionString="" /><Query
+        Type="StoredProcQuery"
+        Name="cstm_FormIO_FormIO2DevExpressTestForm1_Printout"
+        ><Parameter Name="@FormDataGUID" Type="DevExpress.DataAccess.Expression"
+            >(System.Guid)(?FormDataGUID )</Parameter
+        ><Parameter Name="@OwnerObjectGUID" Type="DevExpress.DataAccess.Expression"
+            >(System.Guid)(?ObjectGUID )</Parameter
+        ><ProcName>cstm_FormIO_FormIO2DevExpressTestForm1_Printout</ProcName></Query
+    ><ResultSchema
+        ><DataSet Name="sqlDataSource1"
+            ><View Name="cstm_FormIO_FormIO2DevExpressTestForm1_Printout"
+                ><Field Name="first" Type="String" /><Field Name="last" Type="String" /><Field
+                    Name="__ID"
+                    Type="Int32" /><Field Name="__OwnerObjectGuid" Type="Guid" /><Field
+                    Name="__FormInstanceGUID"
+                    Type="Guid" /><Field Name="__FormGUID" Type="Guid" /><Field
+                    Name="__FormGroupName"
+                    Type="String" /><Field Name="__FormGroupFolder" Type="Guid" /><Field
+                    Name="__InstanceName"
+                    Type="String" /><Field Name="__Created" Type="DateTime" /><Field
+                    Name="__Modified"
+                    Type="DateTime" /><Field Name="__Locked" Type="Boolean" /><Field
+                    Name="__LockLevel"
+                    Type="Int32" /><Field Name="__LockedBy" Type="Guid" /><Field
+                    Name="__LockedTime"
+                    Type="DateTime" /><Field Name="__Referrer" Type="Guid" /><Field
+                    Name="__FormVersion"
+                    Type="Int32" /><Field Name="__CreatedBy" Type="Guid" /><Field
+                    Name="__ModifiedBy"
+                    Type="Guid" /><Field Name="txtUnnestedField1" Type="String" /><Field
+                    Name="txtUnnestedField2"
+                    Type="String" /><Field Name="txtaUnnestedField3" Type="String" /><Field
+                    Name="txtFieldsetField1"
+                    Type="String" /><Field Name="txtaFieldsetField2" Type="String" /><Field
+                    Name="chkFieldsetField3"
+                    Type="Boolean" /><Field Name="txtPanelField1" Type="String" /><Field
+                    Name="cmbPanelField2"
+                    Type="String" /></View></DataSet></ResultSchema
+    ><ConnectionOptions CloseConnection="true"
+/></SqlDataSource>
