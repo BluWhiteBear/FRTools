@@ -427,7 +427,7 @@ export class ComponentProcessor
         {
             Name: component.key || `${component.type}${Date.now()}`,
             ...containerDef.attributes,
-            SizeF: `${containerWidth},${this.calculateContainerHeight(component)}`,
+            SizeF: `${containerWidth},${this.calculateContainerHeight(component, false, containerWidth)}`,
             LocationFloat: `${xOffset},${this.currentY}`
         });
 
@@ -476,7 +476,7 @@ export class ComponentProcessor
         }
 
         // ? Restore original Y position and item number state
-        this.currentY = originalY + this.calculateContainerHeight(component) + LAYOUT.VERTICAL_SPACING;
+        this.currentY = originalY + this.calculateContainerHeight(component, false, containerWidth) + LAYOUT.VERTICAL_SPACING;
         this.xmlProcessor.currentItemNum = savedItemNum;
 
         // console.log('[processContainer] createItemNode', {
@@ -530,7 +530,7 @@ export class ComponentProcessor
         {
             Name: component.key || `columns${Date.now()}`,
             ...columnDef.attributes,
-            SizeF: `${containerWidth},${this.calculateColumnsHeight(component)}`,
+            SizeF: `${containerWidth},${this.calculateColumnsHeight(component, containerWidth)}`,
             LocationFloat: `${xOffset},${this.currentY}`,
             KeepTogether: true,
             AdjustToContainerWidth: true
@@ -617,7 +617,7 @@ export class ComponentProcessor
         // ? Restore original item number state
         this.xmlProcessor.currentItemNum = savedItemNum;
 
-        this.currentY += this.calculateColumnsHeight(component) +
+        this.currentY += this.calculateColumnsHeight(component, containerWidth) +
             LAYOUT.VERTICAL_SPACING;
 
         // console.log('[processColumns] createItemNode', {
@@ -812,7 +812,7 @@ export class ComponentProcessor
     // ? Calculate height of a container based on its components
     // isNested: true when called recursively to measure a child container's contribution
     // to its parent's height — suppresses the outer padding that would otherwise double-count.
-    calculateContainerHeight(container, isNested = false)
+    calculateContainerHeight(container, isNested = false, containerWidth = (LAYOUT.PAGE_WIDTH - LAYOUT.MARGIN_LEFT - LAYOUT.MARGIN_RIGHT))
     {
         let height = 0;
 
@@ -825,7 +825,7 @@ export class ComponentProcessor
 
         // Calculate height of visible components only
         if (container.components) {
-            const containerWidth = (LAYOUT.PAGE_WIDTH - LAYOUT.MARGIN_LEFT - LAYOUT.MARGIN_RIGHT) - 20; // Standard width minus padding
+            const childContainerWidth = Math.max(0, containerWidth - 20); // Match processContainer nested width inset
             height += container.components.reduce((total, comp, index, components) => {
                 if (this.isHidden(comp)) {
                     console.log(`[calculateContainerHeight] Skipping hidden component at index ${index}`);
@@ -837,22 +837,22 @@ export class ComponentProcessor
 
                 // Calculate special component heights
                 if (comp.type === 'htmlelement' && comp.content) {
-                    componentHeight = this.calculateHtmlHeight(comp.content, containerWidth);
+                    componentHeight = this.calculateHtmlHeight(comp.content, childContainerWidth);
                 } else if (comp.type === 'content' && comp.html) {
-                    componentHeight = this.calculateHtmlHeight(comp.html, containerWidth);
+                    componentHeight = this.calculateHtmlHeight(comp.html, childContainerWidth);
                 } else if (comp.type === 'panel' || comp.type === 'fieldset' || comp.type === 'well') {
                     // Pass isNested = true so child containers don't add their own outer padding
-                    componentHeight = this.calculateContainerHeight(comp, true);
+                    componentHeight = this.calculateContainerHeight(comp, true, childContainerWidth);
                 } else if (comp.type === 'table' && comp.rows) {
-                    componentHeight = this.calculateTableHeight(comp);
+                    componentHeight = this.calculateTableHeight(comp, childContainerWidth);
                 } else if (comp.type === 'columns' && comp.columns) {
-                    componentHeight = this.calculateColumnsHeight(comp);
+                    componentHeight = this.calculateColumnsHeight(comp, childContainerWidth);
                 } else if (comp.type === 'radio' && def.calculateHeight) {
                     componentHeight = def.calculateHeight(comp);
                 } else if (comp.type === 'tabs' && comp.components) {
                     // Use LAYOUT.VERTICAL_SPACING to match the spacing processTabs actually applies
                     componentHeight = comp.components.reduce((tabsHeight, tab) => {
-                        const tabHeight = this.calculateContainerHeight(tab, true);
+                        const tabHeight = this.calculateContainerHeight(tab, true, childContainerWidth);
                         return tabsHeight + tabHeight + LAYOUT.VERTICAL_SPACING;
                     }, 0);
                 }
@@ -1082,7 +1082,7 @@ export class ComponentProcessor
         {
             Name: `${component.key}_headers` || `formgrid_headers_${Date.now()}`,
             ...def.headerTable.attributes,
-            SizeF: `${containerWidth},${LAYOUT.HEADER_HEIGHT}`,
+            SizeF: `${containerWidth},${LAYOUT.LABEL_HEIGHT}`,
             LocationFloat: `${xOffset},${this.currentY}`
         });
 
@@ -1214,7 +1214,7 @@ export class ComponentProcessor
         {
             Name: component.key || `table${Date.now()}`,
             ...tableDef.attributes,
-            SizeF: `${containerWidth},${this.calculateTableHeight(component)}`,
+            SizeF: `${containerWidth},${this.calculateTableHeight(component, containerWidth)}`,
             LocationFloat: `${xOffset},${this.currentY}`
         });
 
@@ -1286,7 +1286,7 @@ export class ComponentProcessor
         this.xmlProcessor.currentItemNum = savedItemNum;
 
         // ? Update vertical position
-        this.currentY += this.calculateTableHeight(component) +
+        this.currentY += this.calculateTableHeight(component, containerWidth) +
             LAYOUT.VERTICAL_SPACING;
 
         // console.log('[processTable] createItemNode', {
@@ -1322,7 +1322,7 @@ export class ComponentProcessor
             {
                 Name: `tab_${tab.key || index + 1}`,
                 ...tabsDef.attributes,
-                SizeF: `${containerWidth},${this.calculateContainerHeight(tab)}`,
+                SizeF: `${containerWidth},${this.calculateContainerHeight(tab, false, containerWidth)}`,
                 LocationFloat: `${xOffset},${this.currentY}`
             });
 
@@ -1362,7 +1362,7 @@ export class ComponentProcessor
             this.xmlProcessor.currentItemNum = savedPanelItemNum;
 
             // ? Update current Y position for next tab
-            this.currentY = savedY + this.calculateContainerHeight(tab) +
+            this.currentY = savedY + this.calculateContainerHeight(tab, false, containerWidth) +
                 LAYOUT.VERTICAL_SPACING;
 
             nodes.push(panelNode);
@@ -1372,7 +1372,7 @@ export class ComponentProcessor
     }
 
     // ? Calculate height needed for table component
-    calculateTableHeight(tableComponent)
+    calculateTableHeight(tableComponent, tableWidth = (LAYOUT.PAGE_WIDTH - LAYOUT.MARGIN_LEFT - LAYOUT.MARGIN_RIGHT))
     {
         // ? For tables, we need to calculate the maximum height needed for each row
         let totalHeight = 0;
@@ -1393,15 +1393,45 @@ export class ComponentProcessor
 
                     const def = DevExpressHelpers.getComponentDef(comp.type);
                     let componentHeight = def.defaultHeight;
+                    const cellWidth = (tableWidth / (row.length || 1)) - 16;
 
                     if (comp.type === 'htmlelement' && comp.content)
                     {
-                        // ? Approximate cell width for HTML height calculation
-                        componentHeight = this.calculateHtmlHeight(comp.content, (LAYOUT.PAGE_WIDTH - LAYOUT.MARGIN_LEFT - LAYOUT.MARGIN_RIGHT) / row.length);
+                        componentHeight = this.calculateHtmlHeight(comp.content, cellWidth);
+                    }
+                    else if (comp.type === 'content' && comp.html)
+                    {
+                        componentHeight = this.calculateHtmlHeight(comp.html, cellWidth);
+                    }
+                    else if (comp.type === 'panel' || comp.type === 'fieldset' || comp.type === 'well')
+                    {
+                        componentHeight = this.calculateContainerHeight(comp, true, cellWidth);
+                    }
+                    else if (comp.type === 'table' && comp.rows)
+                    {
+                        componentHeight = this.calculateTableHeight(comp, cellWidth);
+                    }
+                    else if (comp.type === 'columns' && comp.columns)
+                    {
+                        componentHeight = this.calculateColumnsHeight(comp, cellWidth);
+                    }
+                    else if (comp.type === 'radio' && def.calculateHeight)
+                    {
+                        componentHeight = def.calculateHeight(comp);
+                    }
+                    else if (comp.type === 'tabs' && comp.components)
+                    {
+                        componentHeight = comp.components.reduce((tabsHeight, tab) => {
+                            const tabHeight = this.calculateContainerHeight(tab, true, cellWidth);
+                            return tabsHeight + tabHeight + LAYOUT.VERTICAL_SPACING;
+                        }, 0);
                     }
 
-                    return total + componentHeight + (def.requiresLabel ? LAYOUT.LABEL_HEIGHT : 0) +
-                        LAYOUT.VERTICAL_SPACING;
+                    const labelPosition = comp.labelPosition || 'top';
+                    const hasLabel = def.requiresLabel && comp.label !== false && comp.hideLabel !== true;
+                    const labelHeight = hasLabel && (labelPosition === 'top' || labelPosition === 'bottom') ? LAYOUT.LABEL_HEIGHT : 0;
+
+                    return total + componentHeight + labelHeight + LAYOUT.VERTICAL_SPACING;
                 }, 0);
 
                 rowHeight = Math.max(rowHeight, cellHeight);
@@ -1415,17 +1445,30 @@ export class ComponentProcessor
     }
 
     // ? Calculate height needed for columns component
-    calculateColumnsHeight(columnsComponent)
+    calculateColumnsHeight(columnsComponent, containerWidth = (LAYOUT.PAGE_WIDTH - LAYOUT.MARGIN_LEFT - LAYOUT.MARGIN_RIGHT))
     {
         let maxHeight = 0;
         const visibleColumns = columnsComponent.columns.filter(col => !this.isHidden(col));
-        const columnWidth = ((LAYOUT.PAGE_WIDTH - LAYOUT.MARGIN_LEFT - LAYOUT.MARGIN_RIGHT) - 16) / (visibleColumns.length || 1); // ? Standard width minus padding, divided by visible column count
+
+        const totalUnits = visibleColumns.reduce((sum, col) => {
+            const width = col.width || 0;
+            return sum + width;
+        }, 0) || 12;
+
+        const calculateColumnPixelWidth = (columnUnits) => {
+            if (!columnUnits)
+            {
+                return containerWidth / (visibleColumns.length || 1);
+            }
+            return (columnUnits / totalUnits) * containerWidth;
+        };
 
         visibleColumns.forEach(col =>
         {
             let colHeight = 0;
             if (col.components)
             {
+                const columnWidth = calculateColumnPixelWidth(col.width) - 16;
                 colHeight = col.components.reduce((total, comp) =>
                 {
                     // ? Skip hidden components in height calculation
@@ -1440,11 +1483,42 @@ export class ComponentProcessor
                     // ? Calculate actual height for HTML elements
                     if (comp.type === 'htmlelement' && comp.content)
                     {
-                        componentHeight = this.calculateHtmlHeight(comp.content, columnWidth - 16);
+                        componentHeight = this.calculateHtmlHeight(comp.content, columnWidth);
+                    }
+                    else if (comp.type === 'content' && comp.html)
+                    {
+                        componentHeight = this.calculateHtmlHeight(comp.html, columnWidth);
+                    }
+                    else if (comp.type === 'panel' || comp.type === 'fieldset' || comp.type === 'well')
+                    {
+                        componentHeight = this.calculateContainerHeight(comp, true, columnWidth);
+                    }
+                    else if (comp.type === 'table' && comp.rows)
+                    {
+                        componentHeight = this.calculateTableHeight(comp, columnWidth);
+                    }
+                    else if (comp.type === 'columns' && comp.columns)
+                    {
+                        componentHeight = this.calculateColumnsHeight(comp, columnWidth);
+                    }
+                    else if (comp.type === 'radio' && def.calculateHeight)
+                    {
+                        componentHeight = def.calculateHeight(comp);
+                    }
+                    else if (comp.type === 'tabs' && comp.components)
+                    {
+                        componentHeight = comp.components.reduce((tabsHeight, tab) => {
+                            const tabHeight = this.calculateContainerHeight(tab, true, columnWidth);
+                            return tabsHeight + tabHeight + LAYOUT.VERTICAL_SPACING;
+                        }, 0);
                     }
 
+                    const labelPosition = comp.labelPosition || 'top';
+                    const hasLabel = def.requiresLabel && comp.label !== false && comp.hideLabel !== true;
+                    const labelHeight = hasLabel && (labelPosition === 'top' || labelPosition === 'bottom') ? LAYOUT.LABEL_HEIGHT : 0;
+
                     // ? Add component height plus label height if needed
-                    return total + componentHeight + (def.requiresLabel ? LAYOUT.LABEL_HEIGHT : 0) +
+                    return total + componentHeight + labelHeight +
                         LAYOUT.VERTICAL_SPACING;
                 }, 0);
             }
