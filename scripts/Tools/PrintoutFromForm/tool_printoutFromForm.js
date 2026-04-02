@@ -1,4 +1,4 @@
-//#region Imports
+﻿//#region Imports
 import { LAYOUT } from './layoutConfig.js';
 
 import { XMLProcessor } from './xmlProcessor.js';
@@ -19,6 +19,22 @@ const VERSION_INFO = {
 const debugLevel = 0;       // ? 0: No Logging, 
                             // ? 1: Basic Event Logging, 
                             // ? 2: Detailed Component Processing Logging
+
+function debugLog(level, ...args)
+{
+    if (debugLevel >= level)
+    {
+        console.log(...args);
+    }
+}
+
+function debugWarn(level, ...args)
+{
+    if (debugLevel >= level)
+    {
+        console.warn(...args);
+    }
+}
 
 const ConversionSettings = {
     alignToGrid: false,
@@ -73,17 +89,17 @@ const SettingsManager = {
         };
 
         localStorage.setItem(this.SETTINGS_KEY, JSON.stringify(settings));
-        //console.log('[SettingsManager] Settings saved:', settings);
+        //debugLog(1, '[SettingsManager] Settings saved:', settings);
     },
 
     loadSettings() {
         const settingsStr = localStorage.getItem(this.SETTINGS_KEY);
         if (!settingsStr) {
-            console.warn('[SettingsManager] No saved settings found.');
+            debugWarn(1, '[SettingsManager] No saved settings found.');
             return;
         }
         const settings = JSON.parse(settingsStr);
-        //console.log('[SettingsManager] Settings loaded:', settings);
+        //debugLog(1, '[SettingsManager] Settings loaded:', settings);
         document.getElementById('settings_pageWidth').value = settings.pageWidth || 850;
         document.getElementById('settings_marginsLeft').value = settings.marginsLeft || 50;
         document.getElementById('settings_marginsRight').value = settings.marginsRight || 50;
@@ -143,7 +159,7 @@ const SettingsManager = {
             'font_fieldOutput_underline', 'font_fieldOutput_strikethrough'
         ];
 
-        //console.log('[DEBUG] Setting up auto-save for fields:', fields);
+        //debugLog(1, '[DEBUG] Setting up auto-save for fields:', fields);
 
         fields.forEach(id => {
             const el = document.getElementById(id);
@@ -209,7 +225,7 @@ window.addEventListener('DOMContentLoaded', () => {
             document.getElementById('font_fieldOutput_strikethrough').checked = false;
 
             SettingsManager.saveSettings();
-            console.log('[SettingsManager] Settings reset to defaults.');
+            debugLog(1, '[SettingsManager] Settings reset to defaults.');
         });
     }
 
@@ -413,7 +429,7 @@ function applyLayoutSettingsFromUI() {
     LAYOUT.FONT_FIELDOUTPUT = `${fontFieldOutputFamilyInput.value}, ${fontFieldOutputSizeInput.value}pt`
         + (fieldOutputStyles.length ? `, style=${fieldOutputStyles.join(',')}` : '');
 
-    //console.log('[Settings] Applied:', LAYOUT);
+    //debugLog(1, '[Settings] Applied:', LAYOUT);
 }
 
 //#endregion
@@ -497,7 +513,7 @@ class DevExpressConverter
 
                 // ? Debug Logging - DataGrid Found
                 if (debugLevel >= 2) {
-                    console.log('FOUND DataGrid Component:',
+                    debugLog(1, 'FOUND DataGrid Component:',
                     {
                         key,
                         dbName: component.DBName
@@ -512,7 +528,7 @@ class DevExpressConverter
 
                 // ? Debug Logging - FormGrid Found
                 if (debugLevel >= 2) {
-                    console.log('FOUND FormGrid Component:',
+                    debugLog(1, 'FOUND FormGrid Component:',
                     {
                         key,
                         dbName: component.DBName
@@ -527,7 +543,7 @@ class DevExpressConverter
 
                 // ? Debug Logging - Nested Form Found
                 if (debugLevel >= 2) {
-                    console.log('FOUND Nested Form Component:',
+                    debugLog(1, 'FOUND Nested Form Component:',
                     {
                         key,
                         dbName: component.DBName
@@ -562,7 +578,7 @@ class DevExpressConverter
 
         // ? Debug log all found data sources
         if (debugLevel >= 1) {
-            console.log('All Data Sources:', dataSources);
+            debugLog(1, 'All Data Sources:', dataSources);
         }
 
         return dataSources.length;
@@ -751,11 +767,11 @@ class DevExpressConverter
             const isVisible = DevExpressConverter.isComponentVisible(component, context.parentVisible);
             if (!isVisible)
             {
-                console.log(`Skipping hidden panel/fieldset: ${component.key}`);
+                debugLog(1, `Skipping hidden panel/fieldset: ${component.key}`);
                 return '';
             }
 
-            console.log(`Processing panel/fieldset: ${component.key}`,
+            debugLog(1, `Processing panel/fieldset: ${component.key}`,
             {
                 type: component.type,
                 hasComponents: Boolean(component.components),
@@ -1146,7 +1162,7 @@ class DevExpressConverter
             // ? Log input summary
             if (debugLevel >= 1)
             {
-                console.log("transformToDevExpress() called with formData:",
+                debugLog(1, "transformToDevExpress() called with formData:",
                 {
                     formName: formioData.FormName,
                     hasTemplate: Boolean(formioData.FormioTemplate),
@@ -1161,8 +1177,8 @@ class DevExpressConverter
             // ? Log initial XML template size and preview
             if (debugLevel >= 2)
             {
-                console.log("XML template generated, length:", xmlTemplate.length);
-                console.log("XML preview:", xmlTemplate.substring(0, 200) + "...");
+                debugLog(1, "XML template generated, length:", xmlTemplate.length);
+                debugLog(1, "XML preview:", xmlTemplate.substring(0, 200) + "...");
             }
 
             // ? Clean XML - remove unnecessary whitespace but preserve structure
@@ -1178,7 +1194,7 @@ class DevExpressConverter
             // ? Log initial validation results
             if (debugLevel >= 1)
             {
-                console.log("Initial XML validation results:", initialValidation);
+                debugLog(1, "Initial XML validation results:", initialValidation);
             }
 
             // ? Check for critical errors in initial validation
@@ -1217,7 +1233,7 @@ class DevExpressConverter
                 // ? Log compression results
                 if (debugLevel >= 2)
                 {
-                    console.log('XML compressed successfully, base64 length:', base64Template.length);
+                    debugLog(1, 'XML compressed successfully, base64 length:', base64Template.length);
                 }
 
                 // ? Attempt to decode the template as a final validation
@@ -1227,14 +1243,14 @@ class DevExpressConverter
 
                     if (!decodedTemplate || !decodedTemplate.content)
                     {
-                        console.warn('Warning: Template decoded to empty content - this may cause issues');
+                        debugWarn(1, 'Warning: Template decoded to empty content - this may cause issues');
                     }
                     else
                     {
                         // ? Log decoded content length
                         if (debugLevel >= 2)
                         {
-                            console.log('Template validation successful - decoded content length:', decodedTemplate.content.length);
+                            debugLog(1, 'Template validation successful - decoded content length:', decodedTemplate.content.length);
                         }
 
                         // ? Look for specific field bindings in the decoded XML to verify fields are present
@@ -1242,14 +1258,14 @@ class DevExpressConverter
 
                         if (fieldBindings.length === 0)
                         {
-                            console.warn('Warning: No field bindings found in the decoded template');
+                            debugWarn(1, 'Warning: No field bindings found in the decoded template');
                         }
                         else
                         {
                             // ? Log number of field bindings found
                             if (debugLevel >= 2)
                             {
-                                console.log(`Found ${fieldBindings.length} field bindings in the decoded template`);
+                                debugLog(1, `Found ${fieldBindings.length} field bindings in the decoded template`);
                             }
                         }
                     }
@@ -1272,7 +1288,7 @@ class DevExpressConverter
             // ? Log validation results
             if (debugLevel >= 1)
             {
-                console.log("XML validation results:", validationResults);
+                debugLog(1, "XML validation results:", validationResults);
             }
 
             // ? Check for critical errors (not just warnings)
@@ -1451,8 +1467,8 @@ const Utils = {
             // ? Debug base64 input
             if (debugLevel >= 2)
             {
-                console.log('Base64 template length:', base64Template.length);
-                console.log('Base64 template start:', base64Template.substring(0, 50));
+                debugLog(1, 'Base64 template length:', base64Template.length);
+                debugLog(1, 'Base64 template start:', base64Template.substring(0, 50));
             }
 
             // ? Convert base64 to binary array
@@ -1466,8 +1482,8 @@ const Utils = {
             // ? Debug compressed bytes
             if (debugLevel >= 2)
             {
-                console.log('Compressed bytes length:', bytes.length);
-                console.log('First few bytes:', Array.from(bytes.slice(0, 10)));
+                debugLog(1, 'Compressed bytes length:', bytes.length);
+                debugLog(1, 'First few bytes:', Array.from(bytes.slice(0, 10)));
             }
 
             // ? Decompress with error handling
@@ -1488,8 +1504,8 @@ const Utils = {
             // ? Debug decompressed content
             if (debugLevel >= 2)
             {
-                console.log('Decompressed length:', decompressed?.length);
-                console.log('Decompressed start:', decompressed?.substring(0, 100));
+                debugLog(1, 'Decompressed length:', decompressed?.length);
+                debugLog(1, 'Decompressed start:', decompressed?.substring(0, 100));
             }
 
             // ? Validate XML structure 
@@ -1533,7 +1549,7 @@ const Utils = {
 
                 if (debugLevel >= 2)
                 {
-                    console.log('Parsed FormioTemplate:', formioTemplate);
+                    debugLog(1, 'Parsed FormioTemplate:', formioTemplate);
                 }
             }
             catch (error)
@@ -1716,7 +1732,7 @@ const UIHandlers = {
 
                 if (debugLevel >= 1)
                 {
-                    console.log("File loaded, raw data:",
+                    debugLog(1, "File loaded, raw data:",
                     {
                         hasFormioTemplate: Boolean(jsonData.FormioTemplate),
                         templateType: typeof jsonData.FormioTemplate
@@ -1743,7 +1759,7 @@ const UIHandlers = {
                             // ? Debug logging
                             if (debugLevel >= 1)
                             {
-                                console.log("Successfully parsed FormioTemplate:",
+                                debugLog(1, "Successfully parsed FormioTemplate:",
                                 {
                                     hasComponents: Boolean(formioTemplate.components),
                                     componentCount: formioTemplate.components?.length || 0
@@ -1797,7 +1813,7 @@ const UIHandlers = {
                             // ? Debug logging
                             if (debugLevel >= 1)
                             {
-                                console.log('Form.io form instance created:', form);
+                                debugLog(1, 'Form.io form instance created:', form);
                             }
                         }).catch(err =>
                         {
@@ -1832,7 +1848,7 @@ const UIHandlers = {
                         // ? Debug logging
                         if (debugLevel >= 1)
                         {
-                            console.log('Decoded template result:',
+                            debugLog(1, 'Decoded template result:',
                             {
                                 success: Boolean(decodedTemplate),
                                 type: decodedTemplate?.type,
@@ -2179,8 +2195,8 @@ const ComponentCleaner = {
         // ? Validate input
         if (!formJson || !Array.isArray(formJson.components)) return formJson;
 
-        //console.warn('[hoistGridsAndSubforms] Starting hoisting process');
-        //console.warn('[hoistGridsAndSubforms] Original JSON:', JSON.stringify(formJson, null, 2));
+        //debugWarn(1, '[hoistGridsAndSubforms] Starting hoisting process');
+        //debugWarn(1, '[hoistGridsAndSubforms] Original JSON:', JSON.stringify(formJson, null, 2));
 
         // ? Containers to handle
         // ! Do not flatten tabs here. Their child entries are tab panes, not normal components,
@@ -2236,7 +2252,7 @@ const ComponentCleaner = {
         const newRoot = [];
         flattened.forEach(item => {
             if (item.hoist) {
-                //console.warn(`[hoistGridsAndSubforms] Hoisting '${getLabelOrKey(item.comp)}' (type: ${item.comp.type}) to root level.`);
+                //debugWarn(1, `[hoistGridsAndSubforms] Hoisting '${getLabelOrKey(item.comp)}' (type: ${item.comp.type}) to root level.`);
                 newRoot.push(item.comp);
             } else {
                 newRoot.push(item.comp);
@@ -2244,7 +2260,7 @@ const ComponentCleaner = {
         });
         formJson.components = newRoot;
 
-        //console.warn('[hoistGridsAndSubforms] Hoisting complete. Hoisted JSON:', JSON.stringify(formJson, null, 2));
+        //debugWarn(1, '[hoistGridsAndSubforms] Hoisting complete. Hoisted JSON:', JSON.stringify(formJson, null, 2));
         return formJson;
     }
 };
@@ -2523,10 +2539,10 @@ function generateMinimalXmlTemplate()
             );
 
             if (debugLevel >= 2) {
-                console.log('Processed components:', processedNodes);
-                console.log('Grid markers:', componentProcessor.gridComponents);
-                console.log('Nested form markers:', componentProcessor.nestedFormComponents);
-                console.log('Starting to process nodes into groups...');
+                debugLog(1, 'Processed components:', processedNodes);
+                debugLog(1, 'Grid markers:', componentProcessor.gridComponents);
+                debugLog(1, 'Nested form markers:', componentProcessor.nestedFormComponents);
+                debugLog(1, 'Starting to process nodes into groups...');
             }
             
             // Improved grouping: split processedNodes into groups at grid markers
@@ -2536,7 +2552,7 @@ function generateMinimalXmlTemplate()
             processedNodes.forEach((node) => {
                 if (node.type === 'grid')
                 {
-                    console.warn("GRID DETECTED");
+                    debugWarn(1, "GRID DETECTED");
 
                     // If there are components collected, push them as a group
                     if (currentComponents.length > 0) {
@@ -2549,7 +2565,7 @@ function generateMinimalXmlTemplate()
                 } 
                 else if (node.type === 'nestedsubform')
                 {
-                    console.warn("NESTEDSUBFORM DETECTED");
+                    debugWarn(1, "NESTEDSUBFORM DETECTED");
 
                     // If there are components collected, push them as a group
                     if (currentComponents.length > 0) {
@@ -2561,7 +2577,7 @@ function generateMinimalXmlTemplate()
                 } 
                 else 
                 {
-                    console.warn("REGULAR COMPONENT DETECTED. TYPE:", node.type, "NAME:", node.name, "KEY:", node.key);
+                    debugWarn(1, "REGULAR COMPONENT DETECTED. TYPE:", node.type, "NAME:", node.name, "KEY:", node.key);
                     currentComponents.push(node);
                 }
             });
@@ -2576,7 +2592,7 @@ function generateMinimalXmlTemplate()
 
             // Debug output
             if (debugLevel >= 2) {
-                console.log('Final component groups (split at grids):', {
+                debugLog(1, 'Final component groups (split at grids):', {
                     totalGroups: componentGroups.length,
                     groups: componentGroups.map(g => ({
                         type: g.type,
@@ -2604,7 +2620,7 @@ function generateMinimalXmlTemplate()
                 });
                 controls.push(...componentGroups[0].components);
             } else {
-                console.log('No initial components for main detail band');
+                debugLog(1, 'No initial components for main detail band');
             }
         }
 
@@ -2784,14 +2800,14 @@ function generateMinimalXmlTemplate()
                 const nestedForm = group.component;
                 const nestedFormBaseName = nestedForm.key || `NestedForm${i + 1}`;
 
-                console.log(`Processing Nested Form: ${nestedFormBaseName}`);
+                debugLog(1, `Processing Nested Form: ${nestedFormBaseName}`);
 
                 // Create nested form band
                 const nestedFormReport = processor.createItemNode(undefined, "DetailReportBand", {
                     Name: `DetailReport_${nestedFormBaseName}`,
                     HeightF: (nestedForm.height || LAYOUT.INPUT_HEIGHT).toString() // Fallback to INPUT_HEIGHT if height is undefined
                 });
-                console.log(`Creating nested form band for: ${nestedFormBaseName}`, nestedForm); // Log nestedForm for debugging
+                debugLog(1, `Creating nested form band for: ${nestedFormBaseName}`, nestedForm); // Log nestedForm for debugging
 
                 const nestedFormBands = processor.buildNode('Bands', {}, [
                     processor.createItemNode(1, "DetailBand", {
@@ -2816,7 +2832,7 @@ function generateMinimalXmlTemplate()
                     Name: `DetailReport_${nestedFormBaseName}_postContent`,
                     HeightF: LAYOUT.LABEL_HEIGHT.toString()
                 });
-                console.log(`Creating post-nested form band for: ${nestedFormBaseName}`);
+                debugLog(1, `Creating post-nested form band for: ${nestedFormBaseName}`);
 
                 // Add post-content components if available
                 if (i + 1 < componentGroups.length && componentGroups[i + 1].type === 'components') {
@@ -2930,11 +2946,11 @@ const Init = {
         {
             uploadAnotherBtn.addEventListener('click', () =>
             {
-            console.log('Upload another clicked, reloading page');
+            debugLog(1, 'Upload another clicked, reloading page');
 
             window.location.reload();
             });
-        } else { console.warn('Upload another button not found'); }
+        } else { debugWarn(1, 'Upload another button not found'); }
     },
 
     // ? Attach event listeners to UI elements
@@ -2954,27 +2970,27 @@ const Init = {
         if (fileUpload)
         {
             fileUpload.addEventListener('change', event => UIHandlers.handleFileUpload(event, createDevExpressPreview));
-        } else { console.warn('File upload element not found'); }
+        } else { debugWarn(1, 'File upload element not found'); }
 
         if (copyJsonBtn)
         {
             copyJsonBtn.addEventListener('click', UIHandlers.copyJson);
-        } else { console.warn('Copy JSON button not found'); }
+        } else { debugWarn(1, 'Copy JSON button not found'); }
 
         if (downloadJsonBtn)
         {
             downloadJsonBtn.addEventListener('click', UIHandlers.downloadJson);
-        } else { console.warn('Download JSON button not found'); }
+        } else { debugWarn(1, 'Download JSON button not found'); }
 
         if (copyXmlBtn)
         {
             copyXmlBtn.addEventListener('click', UIHandlers.copyXML);
-        } else { console.warn('Copy XML button not found'); }
+        } else { debugWarn(1, 'Copy XML button not found'); }
 
         if (copySqlBtn)
         {
             copySqlBtn.addEventListener('click', UIHandlers.copySQL);
-        } else { console.warn('Copy SQL button not found'); }
+        } else { debugWarn(1, 'Copy SQL button not found'); }
     }
 };
 
