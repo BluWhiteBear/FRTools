@@ -2268,29 +2268,44 @@ function snapPairAttribute(value, gridSize)
 
 function alignNodeTreeToGrid(node, gridSize)
 {
-    if (!node || !node.attributes)
+    if (!node)
     {
         return;
     }
 
-    if (node.attributes.LocationFloat !== undefined)
+    if (Array.isArray(node))
     {
-        node.attributes.LocationFloat = snapPairAttribute(node.attributes.LocationFloat, gridSize);
+        node.forEach(child => alignNodeTreeToGrid(child, gridSize));
+        return;
     }
 
-    if (node.attributes.SizeF !== undefined)
+    if (typeof node !== 'object')
     {
-        node.attributes.SizeF = snapPairAttribute(node.attributes.SizeF, gridSize);
+        return;
     }
 
-    if (node.attributes.WidthF !== undefined)
+    const attrs = node.attributes;
+    if (attrs && typeof attrs === 'object')
     {
-        node.attributes.WidthF = snapToGrid(node.attributes.WidthF, gridSize);
-    }
+        if (attrs.LocationFloat !== undefined)
+        {
+            attrs.LocationFloat = snapPairAttribute(attrs.LocationFloat, gridSize);
+        }
 
-    if (node.attributes.HeightF !== undefined)
-    {
-        node.attributes.HeightF = snapToGrid(node.attributes.HeightF, gridSize);
+        if (attrs.SizeF !== undefined)
+        {
+            attrs.SizeF = snapPairAttribute(attrs.SizeF, gridSize);
+        }
+
+        if (attrs.WidthF !== undefined)
+        {
+            attrs.WidthF = snapToGrid(attrs.WidthF, gridSize);
+        }
+
+        if (attrs.HeightF !== undefined)
+        {
+            attrs.HeightF = snapToGrid(attrs.HeightF, gridSize);
+        }
     }
 
     if (Array.isArray(node.children))
