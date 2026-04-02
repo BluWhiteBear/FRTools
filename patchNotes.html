@@ -31,15 +31,16 @@
             <div class="card mb-4 bg-dark">
                 <div class="card-header" style="background: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
                     <h2 class="h5 mb-0 text-light"><a href="tool_printoutFromForm.html" class="text-info" style="color: var(--accent-color) !important;"><i class="bi bi-ui-checks"></i> Printout From Form</a> | Version 0.4.5</h2>
-                    <small class="text-light">April 1, 2026</small>
+                    <small class="text-light">April 2, 2026</small>
                 </div>
                 <div class="card-body">
                     <h3 class="h6 mt-3 text-light">Improvements</h3>
                     <ul class="text-light">
                         <li>Optimized automatically generated SQL statements to minimize redundant joins</li>
                         <li>Fixed an issue where tab components do not properly render their child components</li>
-                        <li>Fixed an issue where root-moved subreports were causing the following component to render incorrectly</li>
-                        <li>Improved container height calculations when processing nested containers</li>
+                        <li>Fixed an issue where pre-processed nested subforms were causing the following component in the printout to render incorrectly</li>
+                        <li>Fixed an issue where less common container components (such as wells) were not considered when calculating parent container height</li>
+                        <li>Fixed an issue where parent container height calculations were including labels for containers that did not have them, causing additional whitespace to be created</li>
                     </ul>
                 </div>
             </div>

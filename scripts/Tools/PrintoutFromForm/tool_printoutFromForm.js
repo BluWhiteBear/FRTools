@@ -20,6 +20,11 @@ const debugLevel = 0;       // ? 0: No Logging,
                             // ? 1: Basic Event Logging, 
                             // ? 2: Detailed Component Processing Logging
 
+const ConversionSettings = {
+    alignToGrid: false,
+    snapGridSize: 10
+};
+
 // Settings persistence utility
 const SettingsManager = {
     SETTINGS_KEY: 'printoutFormSettings',
@@ -35,6 +40,8 @@ const SettingsManager = {
             labelHeight: document.getElementById('settings_labelHeight')?.value,
             outputHeight: document.getElementById('settings_outputHeight')?.value,
             verticalSpacing: document.getElementById('settings_verticalSpacing')?.value,
+            alignToGrid: document.getElementById('settings_alignToGrid')?.checked,
+            snapGridSize: document.getElementById('settings_snapGridSize')?.value,
 
             fontHeaderFamily: document.getElementById('font_header_family')?.value,
             fontHeaderSize: document.getElementById('font_header_size')?.value,
@@ -85,6 +92,8 @@ const SettingsManager = {
         document.getElementById('settings_labelHeight').value = settings.labelHeight || 30;
         document.getElementById('settings_outputHeight').value = settings.outputHeight || 30;
         document.getElementById('settings_verticalSpacing').value = settings.verticalSpacing || 10;
+        document.getElementById('settings_alignToGrid').checked = !!settings.alignToGrid;
+        document.getElementById('settings_snapGridSize').value = settings.snapGridSize || 10;
 
         document.getElementById('font_header_family').value = settings.fontHeaderFamily || 'Times New Roman';
         document.getElementById('font_header_size').value = settings.fontHeaderSize || 14;
@@ -119,7 +128,7 @@ const SettingsManager = {
         // Save settings on change for all relevant fields
         const fields = [
             'settings_orientation', 'settings_pageWidth', 'settings_marginsLeft', 'settings_marginsRight',
-            'settings_marginsTop', 'settings_marginsBottom', 'settings_labelHeight', 'settings_outputHeight', 'settings_verticalSpacing',
+            'settings_marginsTop', 'settings_marginsBottom', 'settings_labelHeight', 'settings_outputHeight', 'settings_verticalSpacing', 'settings_alignToGrid', 'settings_snapGridSize',
 
             'font_header_family', 'font_header_size', 'font_header_bold', 'font_header_italics',
             'font_header_underline', 'font_header_strikethrough',
@@ -168,6 +177,8 @@ window.addEventListener('DOMContentLoaded', () => {
             document.getElementById('settings_labelHeight').value = 30;
             document.getElementById('settings_outputHeight').value = 30;
             document.getElementById('settings_verticalSpacing').value = 10;
+            document.getElementById('settings_alignToGrid').checked = false;
+            document.getElementById('settings_snapGridSize').value = 10;
 
             document.getElementById('font_header_family').value = 'Times New Roman';
             document.getElementById('font_header_size').value = 14;
@@ -251,6 +262,8 @@ function applyLayoutSettingsFromUI() {
     const labelHeightInput = document.getElementById('settings_labelHeight');
     const outputHeightInput = document.getElementById('settings_outputHeight');
     const verticalSpacingInput = document.getElementById('settings_verticalSpacing');
+    const alignToGridInput = document.getElementById('settings_alignToGrid');
+    const snapGridSizeInput = document.getElementById('settings_snapGridSize');
 
     const fontHeaderFamilyInput = document.getElementById('font_header_family');
     const fontHeaderSizeInput = document.getElementById('font_header_size');
@@ -289,6 +302,8 @@ function applyLayoutSettingsFromUI() {
     LAYOUT.LABEL_HEIGHT = parseFloat(labelHeightInput.value);
     window.LAYOUT.INPUT_HEIGHT = parseFloat(outputHeightInput.value);
     LAYOUT.VERTICAL_SPACING = parseFloat(verticalSpacingInput.value);
+    ConversionSettings.alignToGrid = !!alignToGridInput?.checked;
+    ConversionSettings.snapGridSize = parseFloat(snapGridSizeInput?.value) || 10;
 
     // Build style string for header font
     let headerStyles = [];
@@ -2164,6 +2179,74 @@ const ComponentCleaner = {
 
 //#region Generation
 
+function snapToGrid(value, gridSize)
+{
+    const parsed = parseFloat(value);
+    if (!Number.isFinite(parsed) || !Number.isFinite(gridSize) || gridSize <= 0)
+    {
+        return value;
+    }
+
+    const snapped = Math.round(parsed / gridSize) * gridSize;
+    if (parsed > 0 && snapped === 0)
+    {
+        return gridSize.toString();
+    }
+
+    return Number.isInteger(snapped) ? String(snapped) : String(parseFloat(snapped.toFixed(3)));
+}
+
+function snapPairAttribute(value, gridSize)
+{
+    if (typeof value !== 'string' || !value.includes(','))
+    {
+        return value;
+    }
+
+    const parts = value.split(',');
+    if (parts.length < 2)
+    {
+        return value;
+    }
+
+    const snappedX = snapToGrid(parts[0].trim(), gridSize);
+    const snappedY = snapToGrid(parts[1].trim(), gridSize);
+    return `${snappedX},${snappedY}`;
+}
+
+function alignNodeTreeToGrid(node, gridSize)
+{
+    if (!node || !node.attributes)
+    {
+        return;
+    }
+
+    if (node.attributes.LocationFloat !== undefined)
+    {
+        node.attributes.LocationFloat = snapPairAttribute(node.attributes.LocationFloat, gridSize);
+    }
+
+    if (node.attributes.SizeF !== undefined)
+    {
+        node.attributes.SizeF = snapPairAttribute(node.attributes.SizeF, gridSize);
+    }
+
+    if (node.attributes.WidthF !== undefined)
+    {
+        node.attributes.WidthF = snapToGrid(node.attributes.WidthF, gridSize);
+    }
+
+    if (node.attributes.HeightF !== undefined)
+    {
+        node.attributes.HeightF = snapToGrid(node.attributes.HeightF, gridSize);
+    }
+
+    if (Array.isArray(node.children))
+    {
+        node.children.forEach(child => alignNodeTreeToGrid(child, gridSize));
+    }
+}
+
 // ? Generates a minimal XML template for DevExpress reports that we can then populate with element nodes
 function generateMinimalXmlTemplate()
 {
@@ -2184,7 +2267,7 @@ function generateMinimalXmlTemplate()
             ControlType: "DevExpress.XtraReports.UI.XtraReport, DevExpress.XtraReports.v23.2, Version=23.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a",
             Name: "Report",
             DisplayName: displayName,
-            SnapGridSize: "10.0",
+            SnapGridSize: `${ConversionSettings.snapGridSize.toFixed(1)}`,
             Margins: `${LAYOUT.MARGIN_LEFT}, ${LAYOUT.MARGIN_RIGHT}, ${LAYOUT.MARGIN_TOP}, ${LAYOUT.MARGIN_BOTTOM}`,
             PaperKind: "Custom",
             PageWidth: `${LAYOUT.PAGE_WIDTH}`,
@@ -2598,6 +2681,11 @@ function generateMinimalXmlTemplate()
             })
         ]);
         root.addChild(parameterPanel);
+
+        if (ConversionSettings.alignToGrid)
+        {
+            alignNodeTreeToGrid(root, ConversionSettings.snapGridSize);
+        }
 
         // ? Second pass: Assign all references
         processor.assignReferences(root);
