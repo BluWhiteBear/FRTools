@@ -264,19 +264,7 @@ function doApplySettings() {
         }
 
         Utils.generateSqlQuery(formData);
-
-        // ? Check for overlaps detected during generation and surface them
-        const overlaps = DevExpressConverter.state.overlapWarnings || [];
-        if (overlaps.length > 0)
-        {
-            const list = document.getElementById('overlapWarningList');
-            if (list)
-            {
-                list.innerHTML = overlaps.map(o => `<li>${o}</li>`).join('');
-                const modalEl = document.getElementById('overlapWarningModal');
-                bootstrap.Modal.getOrCreateInstance(modalEl).show();
-            }
-        }
+        showOverlapWarnings();
 
         if (window.showToast) {
             window.showToast('Settings applied and printout regenerated.', 'success');
@@ -286,6 +274,25 @@ function doApplySettings() {
             window.showToast('No form uploaded. Cannot regenerate printout.', 'warning');
         }
     }
+}
+
+function showOverlapWarnings()
+{
+    const overlaps = DevExpressConverter.state.overlapWarnings || [];
+    if (overlaps.length === 0)
+    {
+        return;
+    }
+
+    const list = document.getElementById('overlapWarningList');
+    const modalEl = document.getElementById('overlapWarningModal');
+    if (!list || !modalEl)
+    {
+        return;
+    }
+
+    list.innerHTML = overlaps.map(overlap => `<li>${overlap}</li>`).join('');
+    bootstrap.Modal.getOrCreateInstance(modalEl).show();
 }
 
 function validateSettingsConflicts() {
@@ -1804,6 +1811,7 @@ const UIHandlers = {
 
                     // ? Generate DevExpress report
                     DevExpressConverter.state.devExpressJson = DevExpressConverter.transformToDevExpress(jsonData);
+                    showOverlapWarnings();
 
                     if (DevExpressConverter.state.devExpressJson)
                     {
