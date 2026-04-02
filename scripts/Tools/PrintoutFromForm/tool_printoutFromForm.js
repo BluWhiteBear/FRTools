@@ -265,6 +265,19 @@ function doApplySettings() {
 
         Utils.generateSqlQuery(formData);
 
+        // ? Check for overlaps detected during generation and surface them
+        const overlaps = DevExpressConverter.state.overlapWarnings || [];
+        if (overlaps.length > 0)
+        {
+            const list = document.getElementById('overlapWarningList');
+            if (list)
+            {
+                list.innerHTML = overlaps.map(o => `<li>${o}</li>`).join('');
+                const modalEl = document.getElementById('overlapWarningModal');
+                bootstrap.Modal.getOrCreateInstance(modalEl).show();
+            }
+        }
+
         if (window.showToast) {
             window.showToast('Settings applied and printout regenerated.', 'success');
         }
@@ -417,6 +430,7 @@ class DevExpressConverter
     {
         this.state.devExpressJson = null;   // ? Reset generated JSON
         this.state.warnings = [];           // ? Reset warnings
+        this.state.overlapWarnings = [];    // ? Reset overlap warnings
         //FieldGenerator.initRefs();          // ? Reset ref and item counters at start
     }
 
@@ -2266,6 +2280,72 @@ function snapPairAttribute(value, gridSize)
     return `${snappedX},${snappedY}`;
 }
 
+function detectOverlaps(rootNode)
+{
+    const overlaps = [];
+
+    function parseRect(node)
+    {
+        const loc = node.attributes?.LocationFloat;
+        const size = node.attributes?.SizeF;
+        if (!loc || !size) return null;
+
+        const [x, y] = loc.split(',').map(s => parseFloat(s.trim()));
+        const [w, h] = size.split(',').map(s => parseFloat(s.trim()));
+        if ([x, y, w, h].some(v => !Number.isFinite(v) || v < 0)) return null;
+
+        return { x, y, w, h };
+    }
+
+    function nodeName(node)
+    {
+        return node.attributes?.Name || node.type || 'unknown';
+    }
+
+    function walk(node)
+    {
+        if (!node || typeof node !== 'object') return;
+
+        const children = Array.isArray(node.children) ? node.children : [];
+
+        // Collect children that have a parseable rect
+        const rects = [];
+        for (const child of children)
+        {
+            const rect = parseRect(child);
+            if (rect) rects.push({ node: child, rect });
+        }
+
+        // Check every pair of siblings for overlap
+        for (let i = 0; i < rects.length; i++)
+        {
+            for (let j = i + 1; j < rects.length; j++)
+            {
+                const a = rects[i].rect;
+                const b = rects[j].rect;
+                const overlapsX = a.x < b.x + b.w && a.x + a.w > b.x;
+                const overlapsY = a.y < b.y + b.h && a.y + a.h > b.y;
+                if (overlapsX && overlapsY)
+                {
+                    overlaps.push(
+                        `"${nodeName(rects[i].node)}" overlaps with "${nodeName(rects[j].node)}"` +
+                        ` (parent: "${nodeName(node)}")`
+                    );
+                }
+            }
+        }
+
+        // Recurse into all children regardless
+        for (const child of children)
+        {
+            walk(child);
+        }
+    }
+
+    walk(rootNode);
+    return overlaps;
+}
+
 function alignNodeTreeToGrid(node, gridSize)
 {
     if (!node)
@@ -2753,6 +2833,9 @@ function generateMinimalXmlTemplate()
         {
             alignNodeTreeToGrid(root, ConversionSettings.snapGridSize);
         }
+
+        // ? Overlap detection pass: check for explicitly overlapping siblings at every container depth
+        DevExpressConverter.state.overlapWarnings = detectOverlaps(root);
 
         // ? Second pass: Assign all references
         processor.assignReferences(root);
