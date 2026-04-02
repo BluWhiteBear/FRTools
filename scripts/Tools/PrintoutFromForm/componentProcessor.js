@@ -863,8 +863,11 @@ export class ComponentProcessor
                 const isLastComponent = index === components.length - 1;
                 const spacing = isLastComponent ? 0 : DevExpressDefinitions.commonAttributes.spacing.componentSpacing;
 
-                // Add label height if the component requires a label
-                const hasLabel = def.requiresLabel && comp.label !== false && comp.hideLabel !== true;
+                // Only regular field components get a separate label row.
+                // Layout/container components render their own structure and should not get
+                // extra label height from fallback component definitions.
+                const isLayoutComponent = ['panel', 'fieldset', 'well', 'columns', 'table', 'tabs', 'datagrid', 'formgrid'].includes(comp.type);
+                const hasLabel = !isLayoutComponent && def.requiresLabel && comp.label !== false && comp.hideLabel !== true;
                 const labelPosition = comp.labelPosition || 'top';
                 const labelHeight = hasLabel && (labelPosition === 'top' || labelPosition === 'bottom') ? LAYOUT.LABEL_HEIGHT : 0;
 
@@ -1427,8 +1430,9 @@ export class ComponentProcessor
                         }, 0);
                     }
 
+                    const isLayoutComponent = ['panel', 'fieldset', 'well', 'columns', 'table', 'tabs', 'datagrid', 'formgrid'].includes(comp.type);
                     const labelPosition = comp.labelPosition || 'top';
-                    const hasLabel = def.requiresLabel && comp.label !== false && comp.hideLabel !== true;
+                    const hasLabel = !isLayoutComponent && def.requiresLabel && comp.label !== false && comp.hideLabel !== true;
                     const labelHeight = hasLabel && (labelPosition === 'top' || labelPosition === 'bottom') ? LAYOUT.LABEL_HEIGHT : 0;
 
                     return total + componentHeight + labelHeight + LAYOUT.VERTICAL_SPACING;
@@ -1513,8 +1517,9 @@ export class ComponentProcessor
                         }, 0);
                     }
 
+                    const isLayoutComponent = ['panel', 'fieldset', 'well', 'columns', 'table', 'tabs', 'datagrid', 'formgrid'].includes(comp.type);
                     const labelPosition = comp.labelPosition || 'top';
-                    const hasLabel = def.requiresLabel && comp.label !== false && comp.hideLabel !== true;
+                    const hasLabel = !isLayoutComponent && def.requiresLabel && comp.label !== false && comp.hideLabel !== true;
                     const labelHeight = hasLabel && (labelPosition === 'top' || labelPosition === 'bottom') ? LAYOUT.LABEL_HEIGHT : 0;
 
                     // ? Add component height plus label height if needed
