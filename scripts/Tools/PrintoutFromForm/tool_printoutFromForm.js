@@ -2310,6 +2310,28 @@ function detectOverlaps(rootNode)
         return node.attributes?.Name || node.type || 'unknown';
     }
 
+    function controlTypeLabel(node)
+    {
+        const rawType = node?.attributes?.ControlType || node?.type || 'Unknown';
+        const shortType = rawType.includes('.') ? rawType.split('.').pop() : rawType;
+
+        const typeMap = {
+            XRCheckBox: 'Check Box',
+            XRPanel: 'Panel',
+            XRLabel: 'Label',
+            XRTable: 'Table',
+            XRTableCell: 'Table Cell',
+            XRTableRow: 'Table Row'
+        };
+
+        if (typeMap[shortType])
+        {
+            return typeMap[shortType];
+        }
+
+        return shortType.replace(/^XR/, '').replace(/([a-z])([A-Z])/g, '$1 $2');
+    }
+
     function walk(node)
     {
         if (!node || typeof node !== 'object') return;
@@ -2324,6 +2346,28 @@ function detectOverlaps(rootNode)
             if (rect) rects.push({ node: child, rect });
         }
 
+        // Check if children overflow the parent's own bounds
+        const parentRect = parseRect(node);
+        if (parentRect)
+        {
+            for (const entry of rects)
+            {
+                const childRect = entry.rect;
+                const outsideBounds =
+                    childRect.x < 0 ||
+                    childRect.y < 0 ||
+                    (childRect.x + childRect.w) > parentRect.w ||
+                    (childRect.y + childRect.h) > parentRect.h;
+
+                if (outsideBounds)
+                {
+                    overlaps.push(
+                        `${nodeName(entry.node)} (${controlTypeLabel(entry.node)}) is overlapping with ${nodeName(node)} (${controlTypeLabel(node)})`
+                    );
+                }
+            }
+        }
+
         // Check every pair of siblings for overlap
         for (let i = 0; i < rects.length; i++)
         {
@@ -2336,8 +2380,9 @@ function detectOverlaps(rootNode)
                 if (overlapsX && overlapsY)
                 {
                     overlaps.push(
-                        `"${nodeName(rects[i].node)}" overlaps with "${nodeName(rects[j].node)}"` +
-                        ` (parent: "${nodeName(node)}")`
+                        `${nodeName(rects[i].node)} (${controlTypeLabel(rects[i].node)}) overlaps with ` +
+                        `${nodeName(rects[j].node)} (${controlTypeLabel(rects[j].node)})` +
+                        ` (parent: ${nodeName(node)})`
                     );
                 }
             }

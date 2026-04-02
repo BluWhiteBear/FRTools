@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<XtraReportsLayoutSerializer SerializerVersion="23.2.5.0" ControlType="DevExpress.XtraReports.UI.XtraReport, DevExpress.XtraReports.v23.2, Version=23.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" Name="Report" DisplayName="Mental Status Exam;Mental Status Exam;false;false;00000000-0000-0000-0000-000000000000;00000000-0000-0000-0000-000000000000" SnapGridSize="10.0" Margins="50, 50, 50, 50" PaperKind="Custom" PageWidth="850" PageHeight="1120" Version="23.2" DataMember="Root" Ref="0">
+<XtraReportsLayoutSerializer SerializerVersion="23.2.5.0" ControlType="DevExpress.XtraReports.UI.XtraReport, DevExpress.XtraReports.v23.2, Version=23.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" Name="Report" DisplayName="Mental Status Exam;Mental Status Exam;false;false;00000000-0000-0000-0000-000000000000;00000000-0000-0000-0000-000000000000" SnapGridSize="10.0" Margins="50, 50, 50, 50" PaperKind="Custom" PageWidth="1000" PageHeight="1120" Version="23.2" DataMember="Root" Ref="0">
   <Extensions Ref="1">
     <Item1 Key="DataSerializationExtension" Value="DevExpress.XtraReports.Web.ReportDesigner.DefaultDataSerializer" Ref="2">
     </Item1>
@@ -15,23 +15,23 @@
     </Item1>
     <Item2 ControlType="ReportHeaderBand" Name="ReportHeader" HeightF="50" Ref="7">
       <Controls>
-        <Item1 ControlType="XRLabel" Name="headerLabel" Text="Mental Status Exam" TextAlignment="MiddleCenter" SizeF="750,50" LocationFloat="0,0" Font="Times New Roman, 14pt, style=Bold" Padding="2,2,0,0,100" Ref="8">
+        <Item1 ControlType="XRLabel" Name="headerLabel" Text="Mental Status Exam" TextAlignment="MiddleCenter" SizeF="900,50" LocationFloat="0,0" Font="Times New Roman, 14pt, style=Bold" Padding="2,2,0,0,100" Ref="8">
         </Item1>
       </Controls>
     </Item2>
-    <Item3 ControlType="DetailBand" Name="Detail" HeightF="4080" Ref="9">
+    <Item3 ControlType="DetailBand" Name="Detail" HeightF="3130" Ref="9">
       <Controls>
-        <Item1 ControlType="XRPanel" Name="panel20" CanShrink="true" Borders="None" Padding="2,2,0,0,100" SizeF="750,2710" LocationFloat="0,10" Ref="10">
+        <Item1 ControlType="XRPanel" Name="panel20" CanShrink="true" Borders="None" Padding="2,2,0,0,100" SizeF="900,2070" LocationFloat="0,10" Ref="10">
           <Controls>
-            <Item1 ControlType="XRLabel" Name="html42" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="730,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="&lt;b&gt;Appearance&lt;/b&gt;" Ref="11">
+            <Item1 ControlType="XRLabel" Name="html42" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="880,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="&lt;b&gt;Appearance&lt;/b&gt;" Ref="11">
             </Item1>
-            <Item2 ControlType="XRTable" Name="columns4" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="730,50" LocationFloat="10,40" KeepTogether="true" AdjustToContainerWidth="true" Ref="12">
+            <Item2 ControlType="XRTable" Name="columns4" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="880,40" LocationFloat="10,30" KeepTogether="true" AdjustToContainerWidth="true" Ref="12">
               <Rows>
-                <Item1 ControlType="XRTableRow" Name="columnsRow_1775148917931" Weight="1" Ref="13">
+                <Item1 ControlType="XRTableRow" Name="columnsRow_1775152539988" Weight="1" Ref="13">
                   <Cells>
-                    <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="14">
+                    <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="14">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkAppearAppropriateDress" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Appropriate dress" Ref="15">
+                        <Item1 ControlType="XRCheckBox" Name="chkAppearAppropriateDress" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Appropriate dress" Ref="15">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkAppearAppropriateDress] == &apos;true&apos;, True, False)" Ref="16">
                             </Item1>
@@ -39,9 +39,9 @@
                         </Item1>
                       </Controls>
                     </Item1>
-                    <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="17">
+                    <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="17">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkAppearAdequateGrooming" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Adequate grooming and hygiene" Ref="18">
+                        <Item1 ControlType="XRCheckBox" Name="chkAppearAdequateGrooming" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Adequate grooming and hygiene" Ref="18">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkAppearAdequateGrooming] == &apos;true&apos;, True, False)" Ref="19">
                             </Item1>
@@ -49,9 +49,9 @@
                         </Item1>
                       </Controls>
                     </Item2>
-                    <Item3 ControlType="XRTableCell" Name="column_3" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="20">
+                    <Item3 ControlType="XRTableCell" Name="column_3" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="20">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkAppearDisheveled" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Disheveled" Ref="21">
+                        <Item1 ControlType="XRCheckBox" Name="chkAppearDisheveled" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Disheveled" Ref="21">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkAppearDisheveled] == &apos;true&apos;, True, False)" Ref="22">
                             </Item1>
@@ -59,9 +59,9 @@
                         </Item1>
                       </Controls>
                     </Item3>
-                    <Item4 ControlType="XRTableCell" Name="column_4" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="23">
+                    <Item4 ControlType="XRTableCell" Name="column_4" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="23">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkAppearOther" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Other (Please specify)" Ref="24">
+                        <Item1 ControlType="XRCheckBox" Name="chkAppearOther" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Other (Please specify)" Ref="24">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkAppearOther] == &apos;true&apos;, True, False)" Ref="25">
                             </Item1>
@@ -73,33 +73,33 @@
                 </Item1>
               </Rows>
             </Item2>
-            <Item3 ControlType="XRLabel" Name="txtaAppearOther" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="550,60" LocationFloat="10,100" Font="Times New Roman, 9pt" Ref="26">
+            <Item3 ControlType="XRLabel" Name="txtaAppearOther" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="660,40" LocationFloat="10,80" Font="Times New Roman, 9pt" Ref="26">
               <ExpressionBindings>
                 <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtaAppearOther]" Ref="27">
                 </Item1>
               </ExpressionBindings>
             </Item3>
-            <Item4 ControlType="XRLabel" Name="html43" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="730,30" LocationFloat="10,170" Font="Times New Roman, 9pt" Text="&lt;b&gt;Behavior&lt;/b&gt;" Ref="28">
+            <Item4 ControlType="XRLabel" Name="html43" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="880,20" LocationFloat="10,130" Font="Times New Roman, 9pt" Text="&lt;b&gt;Behavior&lt;/b&gt;" Ref="28">
             </Item4>
-            <Item5 ControlType="XRTable" Name="columns23" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="730,130" LocationFloat="10,210" KeepTogether="true" AdjustToContainerWidth="true" Ref="29">
+            <Item5 ControlType="XRTable" Name="columns23" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="880,100" LocationFloat="10,160" KeepTogether="true" AdjustToContainerWidth="true" Ref="29">
               <Rows>
-                <Item1 ControlType="XRTableRow" Name="columnsRow_1775148917934" Weight="1" Ref="30">
+                <Item1 ControlType="XRTableRow" Name="columnsRow_1775152539991" Weight="1" Ref="30">
                   <Cells>
-                    <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="31">
+                    <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="31">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkBehaviorCooperative" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Cooperative" Ref="32">
+                        <Item1 ControlType="XRCheckBox" Name="chkBehaviorCooperative" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Cooperative" Ref="32">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkBehaviorCooperative] == &apos;true&apos;, True, False)" Ref="33">
                             </Item1>
                           </ExpressionBindings>
                         </Item1>
-                        <Item2 ControlType="XRCheckBox" Name="chkBehaviorNormalPsychomotor" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,40" Font="Times New Roman, 9pt" Text="Normal psychomotor activity" Ref="34">
+                        <Item2 ControlType="XRCheckBox" Name="chkBehaviorNormalPsychomotor" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,30" Font="Times New Roman, 9pt" Text="Normal psychomotor activity" Ref="34">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkBehaviorNormalPsychomotor] == &apos;true&apos;, True, False)" Ref="35">
                             </Item1>
                           </ExpressionBindings>
                         </Item2>
-                        <Item3 ControlType="XRCheckBox" Name="chkBehaviorWithdrawn" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,80" Font="Times New Roman, 9pt" Text="Withdrawn" Ref="36">
+                        <Item3 ControlType="XRCheckBox" Name="chkBehaviorWithdrawn" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,60" Font="Times New Roman, 9pt" Text="Withdrawn" Ref="36">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkBehaviorWithdrawn] == &apos;true&apos;, True, False)" Ref="37">
                             </Item1>
@@ -107,21 +107,21 @@
                         </Item3>
                       </Controls>
                     </Item1>
-                    <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="38">
+                    <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="38">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkBehaviorIntermittentEyeContact" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Intermittent eye Contact" Ref="39">
+                        <Item1 ControlType="XRCheckBox" Name="chkBehaviorIntermittentEyeContact" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Intermittent eye Contact" Ref="39">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkBehaviorIntermittentEyeContact] == &apos;true&apos;, True, False)" Ref="40">
                             </Item1>
                           </ExpressionBindings>
                         </Item1>
-                        <Item2 ControlType="XRCheckBox" Name="chkBehaviorInvoluntaryMovement" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,40" Font="Times New Roman, 9pt" Text="Involuntary movements" Ref="41">
+                        <Item2 ControlType="XRCheckBox" Name="chkBehaviorInvoluntaryMovement" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,30" Font="Times New Roman, 9pt" Text="Involuntary movements" Ref="41">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkBehaviorInvoluntaryMovement] == &apos;true&apos;, True, False)" Ref="42">
                             </Item1>
                           </ExpressionBindings>
                         </Item2>
-                        <Item3 ControlType="XRCheckBox" Name="chkBehaviorGoodEyeContact" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,80" Font="Times New Roman, 9pt" Text="Good eye contact" Ref="43">
+                        <Item3 ControlType="XRCheckBox" Name="chkBehaviorGoodEyeContact" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,60" Font="Times New Roman, 9pt" Text="Good eye contact" Ref="43">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkBehaviorGoodEyeContact] == &apos;true&apos;, True, False)" Ref="44">
                             </Item1>
@@ -129,21 +129,21 @@
                         </Item3>
                       </Controls>
                     </Item2>
-                    <Item3 ControlType="XRTableCell" Name="column_3" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="45">
+                    <Item3 ControlType="XRTableCell" Name="column_3" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="45">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkBehaviorUncooperative" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Uncooperative" Ref="46">
+                        <Item1 ControlType="XRCheckBox" Name="chkBehaviorUncooperative" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Uncooperative" Ref="46">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkBehaviorUncooperative] == &apos;true&apos;, True, False)" Ref="47">
                             </Item1>
                           </ExpressionBindings>
                         </Item1>
-                        <Item2 ControlType="XRCheckBox" Name="chkBehaviorPoorEyeContact" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,40" Font="Times New Roman, 9pt" Text="Poor eye contact" Ref="48">
+                        <Item2 ControlType="XRCheckBox" Name="chkBehaviorPoorEyeContact" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,30" Font="Times New Roman, 9pt" Text="Poor eye contact" Ref="48">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkBehaviorPoorEyeContact] == &apos;true&apos;, True, False)" Ref="49">
                             </Item1>
                           </ExpressionBindings>
                         </Item2>
-                        <Item3 ControlType="XRCheckBox" Name="chkBehaviorElevatedPsychomotor" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,80" Font="Times New Roman, 9pt" Text="Elevated psychomotor activity" Ref="50">
+                        <Item3 ControlType="XRCheckBox" Name="chkBehaviorElevatedPsychomotor" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,60" Font="Times New Roman, 9pt" Text="Elevated psychomotor activity" Ref="50">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkBehaviorElevatedPsychomotor] == &apos;true&apos;, True, False)" Ref="51">
                             </Item1>
@@ -151,7 +151,7 @@
                         </Item3>
                       </Controls>
                     </Item3>
-                    <Item4 ControlType="XRTableCell" Name="column_4" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="52">
+                    <Item4 ControlType="XRTableCell" Name="column_4" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="52">
                       <Controls>
                       </Controls>
                     </Item4>
@@ -159,32 +159,32 @@
                 </Item1>
               </Rows>
             </Item5>
-            <Item6 ControlType="XRCheckBox" Name="chkBehaviorOther" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="730,30" LocationFloat="10,350" Font="Times New Roman, 9pt" Text="Other (Please specify)" Ref="53">
+            <Item6 ControlType="XRCheckBox" Name="chkBehaviorOther" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="880,20" LocationFloat="10,270" Font="Times New Roman, 9pt" Text="Other (Please specify)" Ref="53">
               <ExpressionBindings>
                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkBehaviorOther] == &apos;true&apos;, True, False)" Ref="54">
                 </Item1>
               </ExpressionBindings>
             </Item6>
-            <Item7 ControlType="XRLabel" Name="txtaBehaviorOther" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="550,60" LocationFloat="10,390" Font="Times New Roman, 9pt" Ref="55">
+            <Item7 ControlType="XRLabel" Name="txtaBehaviorOther" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="660,40" LocationFloat="10,300" Font="Times New Roman, 9pt" Ref="55">
               <ExpressionBindings>
                 <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtaBehaviorOther]" Ref="56">
                 </Item1>
               </ExpressionBindings>
             </Item7>
-            <Item8 ControlType="XRLabel" Name="html44" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="730,30" LocationFloat="10,460" Font="Times New Roman, 9pt" Text="&lt;b&gt;Speech&lt;/b&gt;" Ref="57" />
-            <Item9 ControlType="XRTable" Name="columns24" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="730,90" LocationFloat="10,500" KeepTogether="true" AdjustToContainerWidth="true" Ref="58">
+            <Item8 ControlType="XRLabel" Name="html44" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="880,20" LocationFloat="10,350" Font="Times New Roman, 9pt" Text="&lt;b&gt;Speech&lt;/b&gt;" Ref="57" />
+            <Item9 ControlType="XRTable" Name="columns24" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="880,70" LocationFloat="10,380" KeepTogether="true" AdjustToContainerWidth="true" Ref="58">
               <Rows>
-                <Item1 ControlType="XRTableRow" Name="columnsRow_1775148917937" Weight="1" Ref="59">
+                <Item1 ControlType="XRTableRow" Name="columnsRow_1775152539996" Weight="1" Ref="59">
                   <Cells>
-                    <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="60">
+                    <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="60">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkSpeechNormal" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Normal rate, amplitude, and prosody" Ref="61">
+                        <Item1 ControlType="XRCheckBox" Name="chkSpeechNormal" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Normal rate, amplitude, and prosody" Ref="61">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkSpeechNormal] == &apos;true&apos;, True, False)" Ref="62">
                             </Item1>
                           </ExpressionBindings>
                         </Item1>
-                        <Item2 ControlType="XRCheckBox" Name="chkSpeechSlow" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,40" Font="Times New Roman, 9pt" Text="Slow" Ref="63">
+                        <Item2 ControlType="XRCheckBox" Name="chkSpeechSlow" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,30" Font="Times New Roman, 9pt" Text="Slow" Ref="63">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkSpeechSlow] == &apos;true&apos;, True, False)" Ref="64">
                             </Item1>
@@ -192,15 +192,15 @@
                         </Item2>
                       </Controls>
                     </Item1>
-                    <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="65">
+                    <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="65">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkSpeechSoft" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Soft" Ref="66">
+                        <Item1 ControlType="XRCheckBox" Name="chkSpeechSoft" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Soft" Ref="66">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkSpeechSoft] == &apos;true&apos;, True, False)" Ref="67">
                             </Item1>
                           </ExpressionBindings>
                         </Item1>
-                        <Item2 ControlType="XRCheckBox" Name="chkSpeechAbnormalProsody" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,40" Font="Times New Roman, 9pt" Text="Abnormal prosody" Ref="68">
+                        <Item2 ControlType="XRCheckBox" Name="chkSpeechAbnormalProsody" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,30" Font="Times New Roman, 9pt" Text="Abnormal prosody" Ref="68">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkSpeechAbnormalProsody] == &apos;true&apos;, True, False)" Ref="69">
                             </Item1>
@@ -208,15 +208,15 @@
                         </Item2>
                       </Controls>
                     </Item2>
-                    <Item3 ControlType="XRTableCell" Name="column_3" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="70">
+                    <Item3 ControlType="XRTableCell" Name="column_3" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="70">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkSpeechRapid" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Rapid/pressured" Ref="71">
+                        <Item1 ControlType="XRCheckBox" Name="chkSpeechRapid" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Rapid/pressured" Ref="71">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkSpeechRapid] == &apos;true&apos;, True, False)" Ref="72">
                             </Item1>
                           </ExpressionBindings>
                         </Item1>
-                        <Item2 ControlType="XRCheckBox" Name="chkSpeechLoud" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,40" Font="Times New Roman, 9pt" Text="Loud" Ref="73">
+                        <Item2 ControlType="XRCheckBox" Name="chkSpeechLoud" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,30" Font="Times New Roman, 9pt" Text="Loud" Ref="73">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkSpeechLoud] == &apos;true&apos;, True, False)" Ref="74">
                             </Item1>
@@ -224,15 +224,15 @@
                         </Item2>
                       </Controls>
                     </Item3>
-                    <Item4 ControlType="XRTableCell" Name="column_4" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="75">
+                    <Item4 ControlType="XRTableCell" Name="column_4" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="75">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkSpeechSlurred" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Slurred" Ref="76">
+                        <Item1 ControlType="XRCheckBox" Name="chkSpeechSlurred" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Slurred" Ref="76">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkSpeechSlurred] == &apos;true&apos;, True, False)" Ref="77">
                             </Item1>
                           </ExpressionBindings>
                         </Item1>
-                        <Item2 ControlType="XRCheckBox" Name="chkSpeechSpeechOther" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,40" Font="Times New Roman, 9pt" Text="Other (Please specify)" Ref="78">
+                        <Item2 ControlType="XRCheckBox" Name="chkSpeechSpeechOther" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,30" Font="Times New Roman, 9pt" Text="Other (Please specify)" Ref="78">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkSpeechSpeechOther] == &apos;true&apos;, True, False)" Ref="79">
                             </Item1>
@@ -244,26 +244,26 @@
                 </Item1>
               </Rows>
             </Item9>
-            <Item10 ControlType="XRLabel" Name="txtaSpeechspeechOther" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="550,60" LocationFloat="10,600" Font="Times New Roman, 9pt" Ref="80">
+            <Item10 ControlType="XRLabel" Name="txtaSpeechspeechOther" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="660,40" LocationFloat="10,460" Font="Times New Roman, 9pt" Ref="80">
               <ExpressionBindings>
                 <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtaSpeechspeechOther]" Ref="81">
                 </Item1>
               </ExpressionBindings>
             </Item10>
-            <Item11 ControlType="XRLabel" Name="html45" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="730,30" LocationFloat="10,670" Font="Times New Roman, 9pt" Text="&lt;b&gt;Mood&lt;/b&gt;" Ref="82" />
-            <Item12 ControlType="XRTable" Name="columns25" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="730,90" LocationFloat="10,710" KeepTogether="true" AdjustToContainerWidth="true" Ref="83">
+            <Item11 ControlType="XRLabel" Name="html45" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="880,20" LocationFloat="10,510" Font="Times New Roman, 9pt" Text="&lt;b&gt;Mood&lt;/b&gt;" Ref="82" />
+            <Item12 ControlType="XRTable" Name="columns25" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="880,70" LocationFloat="10,540" KeepTogether="true" AdjustToContainerWidth="true" Ref="83">
               <Rows>
-                <Item1 ControlType="XRTableRow" Name="columnsRow_1775148917939" Weight="1" Ref="84">
+                <Item1 ControlType="XRTableRow" Name="columnsRow_1775152539999" Weight="1" Ref="84">
                   <Cells>
-                    <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="85">
+                    <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="85">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkMoodEuthymic" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Euthymic" Ref="86">
+                        <Item1 ControlType="XRCheckBox" Name="chkMoodEuthymic" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Euthymic" Ref="86">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkMoodEuthymic] == &apos;true&apos;, True, False)" Ref="87">
                             </Item1>
                           </ExpressionBindings>
                         </Item1>
-                        <Item2 ControlType="XRCheckBox" Name="chkMoodElatedEuphoric" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,40" Font="Times New Roman, 9pt" Text="Elated/euphoric" Ref="88">
+                        <Item2 ControlType="XRCheckBox" Name="chkMoodElatedEuphoric" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,30" Font="Times New Roman, 9pt" Text="Elated/euphoric" Ref="88">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkMoodElatedEuphoric] == &apos;true&apos;, True, False)" Ref="89">
                             </Item1>
@@ -271,15 +271,15 @@
                         </Item2>
                       </Controls>
                     </Item1>
-                    <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="90">
+                    <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="90">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkMoodIrritable" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Irritable" Ref="91">
+                        <Item1 ControlType="XRCheckBox" Name="chkMoodIrritable" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Irritable" Ref="91">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkMoodIrritable] == &apos;true&apos;, True, False)" Ref="92">
                             </Item1>
                           </ExpressionBindings>
                         </Item1>
-                        <Item2 ControlType="XRCheckBox" Name="chkMoodApathetic" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,40" Font="Times New Roman, 9pt" Text="Apathetic" Ref="93">
+                        <Item2 ControlType="XRCheckBox" Name="chkMoodApathetic" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,30" Font="Times New Roman, 9pt" Text="Apathetic" Ref="93">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkMoodApathetic] == &apos;true&apos;, True, False)" Ref="94">
                             </Item1>
@@ -287,15 +287,15 @@
                         </Item2>
                       </Controls>
                     </Item2>
-                    <Item3 ControlType="XRTableCell" Name="column_3" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="95">
+                    <Item3 ControlType="XRTableCell" Name="column_3" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="95">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkMoodSadDepressed" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Sad/depressed" Ref="96">
+                        <Item1 ControlType="XRCheckBox" Name="chkMoodSadDepressed" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Sad/depressed" Ref="96">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkMoodSadDepressed] == &apos;true&apos;, True, False)" Ref="97">
                             </Item1>
                           </ExpressionBindings>
                         </Item1>
-                        <Item2 ControlType="XRCheckBox" Name="chkMoodAnxious" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,40" Font="Times New Roman, 9pt" Text="Anxious" Ref="98">
+                        <Item2 ControlType="XRCheckBox" Name="chkMoodAnxious" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,30" Font="Times New Roman, 9pt" Text="Anxious" Ref="98">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkMoodAnxious] == &apos;true&apos;, True, False)" Ref="99">
                             </Item1>
@@ -303,15 +303,15 @@
                         </Item2>
                       </Controls>
                     </Item3>
-                    <Item4 ControlType="XRTableCell" Name="column_4" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="100">
+                    <Item4 ControlType="XRTableCell" Name="column_4" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="100">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkMoodLabile" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Labile" Ref="101">
+                        <Item1 ControlType="XRCheckBox" Name="chkMoodLabile" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Labile" Ref="101">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkMoodLabile] == &apos;true&apos;, True, False)" Ref="102">
                             </Item1>
                           </ExpressionBindings>
                         </Item1>
-                        <Item2 ControlType="XRCheckBox" Name="chkMoodOther" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,40" Font="Times New Roman, 9pt" Text="Other (Please specify)" Ref="103">
+                        <Item2 ControlType="XRCheckBox" Name="chkMoodOther" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,30" Font="Times New Roman, 9pt" Text="Other (Please specify)" Ref="103">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkMoodOther] == &apos;true&apos;, True, False)" Ref="104">
                             </Item1>
@@ -323,26 +323,26 @@
                 </Item1>
               </Rows>
             </Item12>
-            <Item13 ControlType="XRLabel" Name="txtaMoodOther" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="550,60" LocationFloat="10,810" Font="Times New Roman, 9pt" Ref="105">
+            <Item13 ControlType="XRLabel" Name="txtaMoodOther" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="660,40" LocationFloat="10,620" Font="Times New Roman, 9pt" Ref="105">
               <ExpressionBindings>
                 <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtaMoodOther]" Ref="106">
                 </Item1>
               </ExpressionBindings>
             </Item13>
-            <Item14 ControlType="XRLabel" Name="html46" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="730,30" LocationFloat="10,880" Font="Times New Roman, 9pt" Text="&lt;b&gt;Affect&lt;/b&gt;" Ref="107" />
-            <Item15 ControlType="XRTable" Name="columns26" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="730,90" LocationFloat="10,920" KeepTogether="true" AdjustToContainerWidth="true" Ref="108">
+            <Item14 ControlType="XRLabel" Name="html46" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="880,20" LocationFloat="10,670" Font="Times New Roman, 9pt" Text="&lt;b&gt;Affect&lt;/b&gt;" Ref="107" />
+            <Item15 ControlType="XRTable" Name="columns26" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="880,70" LocationFloat="10,700" KeepTogether="true" AdjustToContainerWidth="true" Ref="108">
               <Rows>
-                <Item1 ControlType="XRTableRow" Name="columnsRow_1775148917941" Weight="1" Ref="109">
+                <Item1 ControlType="XRTableRow" Name="columnsRow_1775152540003" Weight="1" Ref="109">
                   <Cells>
-                    <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="110">
+                    <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="110">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkAffectMoodCongruent" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Mood congruent" Ref="111">
+                        <Item1 ControlType="XRCheckBox" Name="chkAffectMoodCongruent" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Mood congruent" Ref="111">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkAffectMoodCongruent] == &apos;true&apos;, True, False)" Ref="112">
                             </Item1>
                           </ExpressionBindings>
                         </Item1>
-                        <Item2 ControlType="XRCheckBox" Name="chkAffectFlatBlunted" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,40" Font="Times New Roman, 9pt" Text="Flat/blunted" Ref="113">
+                        <Item2 ControlType="XRCheckBox" Name="chkAffectFlatBlunted" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,30" Font="Times New Roman, 9pt" Text="Flat/blunted" Ref="113">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkAffectFlatBlunted] == &apos;true&apos;, True, False)" Ref="114">
                             </Item1>
@@ -350,15 +350,15 @@
                         </Item2>
                       </Controls>
                     </Item1>
-                    <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="115">
+                    <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="115">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkAffectFearfulAnxious" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Fearful/anxious" Ref="116">
+                        <Item1 ControlType="XRCheckBox" Name="chkAffectFearfulAnxious" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Fearful/anxious" Ref="116">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkAffectFearfulAnxious] == &apos;true&apos;, True, False)" Ref="117">
                             </Item1>
                           </ExpressionBindings>
                         </Item1>
-                        <Item2 ControlType="XRCheckBox" Name="chkAffectHostileAggressive" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,40" Font="Times New Roman, 9pt" Text="Hostile/aggressive" Ref="118">
+                        <Item2 ControlType="XRCheckBox" Name="chkAffectHostileAggressive" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,30" Font="Times New Roman, 9pt" Text="Hostile/aggressive" Ref="118">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkAffectHostileAggressive] == &apos;true&apos;, True, False)" Ref="119">
                             </Item1>
@@ -366,15 +366,15 @@
                         </Item2>
                       </Controls>
                     </Item2>
-                    <Item3 ControlType="XRTableCell" Name="column_3" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="120">
+                    <Item3 ControlType="XRTableCell" Name="column_3" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="120">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkAffectNormalRange" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Normal range and modulation" Ref="121">
+                        <Item1 ControlType="XRCheckBox" Name="chkAffectNormalRange" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Normal range and modulation" Ref="121">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkAffectNormalRange] == &apos;true&apos;, True, False)" Ref="122">
                             </Item1>
                           </ExpressionBindings>
                         </Item1>
-                        <Item2 ControlType="XRCheckBox" Name="chkAffectRestrictedRange" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,40" Font="Times New Roman, 9pt" Text="Restricted range" Ref="123">
+                        <Item2 ControlType="XRCheckBox" Name="chkAffectRestrictedRange" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,30" Font="Times New Roman, 9pt" Text="Restricted range" Ref="123">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkAffectRestrictedRange] == &apos;true&apos;, True, False)" Ref="124">
                             </Item1>
@@ -382,15 +382,15 @@
                         </Item2>
                       </Controls>
                     </Item3>
-                    <Item4 ControlType="XRTableCell" Name="column_4" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="125">
+                    <Item4 ControlType="XRTableCell" Name="column_4" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="125">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkAffectSadDepressed" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Sad/depressed" Ref="126">
+                        <Item1 ControlType="XRCheckBox" Name="chkAffectSadDepressed" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Sad/depressed" Ref="126">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkAffectSadDepressed] == &apos;true&apos;, True, False)" Ref="127">
                             </Item1>
                           </ExpressionBindings>
                         </Item1>
-                        <Item2 ControlType="XRCheckBox" Name="chkAffectOther" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,40" Font="Times New Roman, 9pt" Text="Other (Please specify)" Ref="128">
+                        <Item2 ControlType="XRCheckBox" Name="chkAffectOther" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,30" Font="Times New Roman, 9pt" Text="Other (Please specify)" Ref="128">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkAffectOther] == &apos;true&apos;, True, False)" Ref="129">
                             </Item1>
@@ -402,26 +402,26 @@
                 </Item1>
               </Rows>
             </Item15>
-            <Item16 ControlType="XRLabel" Name="txtaAffectOther" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="550,60" LocationFloat="10,1020" Font="Times New Roman, 9pt" Ref="130">
+            <Item16 ControlType="XRLabel" Name="txtaAffectOther" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="660,40" LocationFloat="10,780" Font="Times New Roman, 9pt" Ref="130">
               <ExpressionBindings>
                 <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtaAffectOther]" Ref="131">
                 </Item1>
               </ExpressionBindings>
             </Item16>
-            <Item17 ControlType="XRLabel" Name="html47" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="730,30" LocationFloat="10,1090" Font="Times New Roman, 9pt" Text="&lt;b&gt;Thought Process&lt;/b&gt;" Ref="132" />
-            <Item18 ControlType="XRTable" Name="columns27" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="730,90" LocationFloat="10,1130" KeepTogether="true" AdjustToContainerWidth="true" Ref="133">
+            <Item17 ControlType="XRLabel" Name="html47" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="880,20" LocationFloat="10,830" Font="Times New Roman, 9pt" Text="&lt;b&gt;Thought Process&lt;/b&gt;" Ref="132" />
+            <Item18 ControlType="XRTable" Name="columns27" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="880,70" LocationFloat="10,860" KeepTogether="true" AdjustToContainerWidth="true" Ref="133">
               <Rows>
-                <Item1 ControlType="XRTableRow" Name="columnsRow_1775148917943" Weight="1" Ref="134">
+                <Item1 ControlType="XRTableRow" Name="columnsRow_1775152540007" Weight="1" Ref="134">
                   <Cells>
-                    <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="135">
+                    <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="135">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkThoughtProcGoalDirected" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Goal directed" Ref="136">
+                        <Item1 ControlType="XRCheckBox" Name="chkThoughtProcGoalDirected" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Goal directed" Ref="136">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkThoughtProcGoalDirected] == &apos;true&apos;, True, False)" Ref="137">
                             </Item1>
                           </ExpressionBindings>
                         </Item1>
-                        <Item2 ControlType="XRCheckBox" Name="chkThoughtProcLogical" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,40" Font="Times New Roman, 9pt" Text="Logical" Ref="138">
+                        <Item2 ControlType="XRCheckBox" Name="chkThoughtProcLogical" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,30" Font="Times New Roman, 9pt" Text="Logical" Ref="138">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkThoughtProcLogical] == &apos;true&apos;, True, False)" Ref="139">
                             </Item1>
@@ -429,15 +429,15 @@
                         </Item2>
                       </Controls>
                     </Item1>
-                    <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="140">
+                    <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="140">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkThoughtProcTangential" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Tangential" Ref="141">
+                        <Item1 ControlType="XRCheckBox" Name="chkThoughtProcTangential" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Tangential" Ref="141">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkThoughtProcTangential] == &apos;true&apos;, True, False)" Ref="142">
                             </Item1>
                           </ExpressionBindings>
                         </Item1>
-                        <Item2 ControlType="XRCheckBox" Name="chkThoughtProcDisorganized" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,40" Font="Times New Roman, 9pt" Text="Disorganized" Ref="143">
+                        <Item2 ControlType="XRCheckBox" Name="chkThoughtProcDisorganized" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,30" Font="Times New Roman, 9pt" Text="Disorganized" Ref="143">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkThoughtProcDisorganized] == &apos;true&apos;, True, False)" Ref="144">
                             </Item1>
@@ -445,15 +445,15 @@
                         </Item2>
                       </Controls>
                     </Item2>
-                    <Item3 ControlType="XRTableCell" Name="column_3" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="145">
+                    <Item3 ControlType="XRTableCell" Name="column_3" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="145">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkThoughtProcOrganized" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Organized" Ref="146">
+                        <Item1 ControlType="XRCheckBox" Name="chkThoughtProcOrganized" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Organized" Ref="146">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkThoughtProcOrganized] == &apos;true&apos;, True, False)" Ref="147">
                             </Item1>
                           </ExpressionBindings>
                         </Item1>
-                        <Item2 ControlType="XRCheckBox" Name="chkThoughtProcLinear" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,40" Font="Times New Roman, 9pt" Text="Linear" Ref="148">
+                        <Item2 ControlType="XRCheckBox" Name="chkThoughtProcLinear" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,30" Font="Times New Roman, 9pt" Text="Linear" Ref="148">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkThoughtProcLinear] == &apos;true&apos;, True, False)" Ref="149">
                             </Item1>
@@ -461,15 +461,15 @@
                         </Item2>
                       </Controls>
                     </Item3>
-                    <Item4 ControlType="XRTableCell" Name="column_4" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="150">
+                    <Item4 ControlType="XRTableCell" Name="column_4" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="150">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkThoughtProcCircumstantial" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Circumstantial" Ref="151">
+                        <Item1 ControlType="XRCheckBox" Name="chkThoughtProcCircumstantial" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Circumstantial" Ref="151">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkThoughtProcCircumstantial] == &apos;true&apos;, True, False)" Ref="152">
                             </Item1>
                           </ExpressionBindings>
                         </Item1>
-                        <Item2 ControlType="XRCheckBox" Name="chkThoughtProcOther" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,40" Font="Times New Roman, 9pt" Text="Other (Please specify)" Ref="153">
+                        <Item2 ControlType="XRCheckBox" Name="chkThoughtProcOther" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,30" Font="Times New Roman, 9pt" Text="Other (Please specify)" Ref="153">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkThoughtProcOther] == &apos;true&apos;, True, False)" Ref="154">
                             </Item1>
@@ -481,38 +481,38 @@
                 </Item1>
               </Rows>
             </Item18>
-            <Item19 ControlType="XRLabel" Name="txtaThoughtProcOther" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="550,60" LocationFloat="10,1230" Font="Times New Roman, 9pt" Ref="155">
+            <Item19 ControlType="XRLabel" Name="txtaThoughtProcOther" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="660,40" LocationFloat="10,940" Font="Times New Roman, 9pt" Ref="155">
               <ExpressionBindings>
                 <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtaThoughtProcOther]" Ref="156">
                 </Item1>
               </ExpressionBindings>
             </Item19>
-            <Item20 ControlType="XRLabel" Name="html48" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="730,30" LocationFloat="10,1300" Font="Times New Roman, 9pt" Text="&lt;b&gt;Thought Content&lt;/b&gt;" Ref="157" />
-            <Item21 ControlType="XRTable" Name="columns28" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="730,170" LocationFloat="10,1340" KeepTogether="true" AdjustToContainerWidth="true" Ref="158">
+            <Item20 ControlType="XRLabel" Name="html48" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="880,20" LocationFloat="10,990" Font="Times New Roman, 9pt" Text="&lt;b&gt;Thought Content&lt;/b&gt;" Ref="157" />
+            <Item21 ControlType="XRTable" Name="columns28" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="880,130" LocationFloat="10,1020" KeepTogether="true" AdjustToContainerWidth="true" Ref="158">
               <Rows>
-                <Item1 ControlType="XRTableRow" Name="columnsRow_1775148917946" Weight="1" Ref="159">
+                <Item1 ControlType="XRTableRow" Name="columnsRow_1775152540010" Weight="1" Ref="159">
                   <Cells>
-                    <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="160">
+                    <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="160">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkThoughtContNoAbnormal" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="No abnormal content" Ref="161">
+                        <Item1 ControlType="XRCheckBox" Name="chkThoughtContNoAbnormal" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="No abnormal content" Ref="161">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkThoughtContNoAbnormal] == &apos;true&apos;, True, False)" Ref="162">
                             </Item1>
                           </ExpressionBindings>
                         </Item1>
-                        <Item2 ControlType="XRCheckBox" Name="chkThoughtContHopeless" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,40" Font="Times New Roman, 9pt" Text="Hopeless" Ref="163">
+                        <Item2 ControlType="XRCheckBox" Name="chkThoughtContHopeless" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,30" Font="Times New Roman, 9pt" Text="Hopeless" Ref="163">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkThoughtContHopeless] == &apos;true&apos;, True, False)" Ref="164">
                             </Item1>
                           </ExpressionBindings>
                         </Item2>
-                        <Item3 ControlType="XRCheckBox" Name="chkThoughtContInflatedConfidence" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,80" Font="Times New Roman, 9pt" Text="Inflated confidence/grandiose" Ref="165">
+                        <Item3 ControlType="XRCheckBox" Name="chkThoughtContInflatedConfidence" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,60" Font="Times New Roman, 9pt" Text="Inflated confidence/grandiose" Ref="165">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkThoughtContInflatedConfidence] == &apos;true&apos;, True, False)" Ref="166">
                             </Item1>
                           </ExpressionBindings>
                         </Item3>
-                        <Item4 ControlType="XRCheckBox" Name="chkThoughtContRuminations" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,120" Font="Times New Roman, 9pt" Text="Ruminations" Ref="167">
+                        <Item4 ControlType="XRCheckBox" Name="chkThoughtContRuminations" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,90" Font="Times New Roman, 9pt" Text="Ruminations" Ref="167">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkThoughtContRuminations] == &apos;true&apos;, True, False)" Ref="168">
                             </Item1>
@@ -520,27 +520,27 @@
                         </Item4>
                       </Controls>
                     </Item1>
-                    <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="169">
+                    <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="169">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkThoughtContObsession" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Obsessions/compulsions" Ref="170">
+                        <Item1 ControlType="XRCheckBox" Name="chkThoughtContObsession" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Obsessions/compulsions" Ref="170">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkThoughtContObsession] == &apos;true&apos;, True, False)" Ref="171">
                             </Item1>
                           </ExpressionBindings>
                         </Item1>
-                        <Item2 ControlType="XRCheckBox" Name="chkThoughtContDelusion" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,40" Font="Times New Roman, 9pt" Text="Delusions" Ref="172">
+                        <Item2 ControlType="XRCheckBox" Name="chkThoughtContDelusion" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,30" Font="Times New Roman, 9pt" Text="Delusions" Ref="172">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkThoughtContDelusion] == &apos;true&apos;, True, False)" Ref="173">
                             </Item1>
                           </ExpressionBindings>
                         </Item2>
-                        <Item3 ControlType="XRCheckBox" Name="chkThoughtContParanoia" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,80" Font="Times New Roman, 9pt" Text="Paranoia/suspicions" Ref="174">
+                        <Item3 ControlType="XRCheckBox" Name="chkThoughtContParanoia" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,60" Font="Times New Roman, 9pt" Text="Paranoia/suspicions" Ref="174">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkThoughtContParanoia] == &apos;true&apos;, True, False)" Ref="175">
                             </Item1>
                           </ExpressionBindings>
                         </Item3>
-                        <Item4 ControlType="XRCheckBox" Name="chkThoughtContOther" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,120" Font="Times New Roman, 9pt" Text="Other (Please specify)" Ref="176">
+                        <Item4 ControlType="XRCheckBox" Name="chkThoughtContOther" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,90" Font="Times New Roman, 9pt" Text="Other (Please specify)" Ref="176">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkThoughtContOther] == &apos;true&apos;, True, False)" Ref="177">
                             </Item1>
@@ -548,21 +548,21 @@
                         </Item4>
                       </Controls>
                     </Item2>
-                    <Item3 ControlType="XRTableCell" Name="column_3" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="178">
+                    <Item3 ControlType="XRTableCell" Name="column_3" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="178">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkThoughtContFutureOriented" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Future oriented" Ref="179">
+                        <Item1 ControlType="XRCheckBox" Name="chkThoughtContFutureOriented" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Future oriented" Ref="179">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkThoughtContFutureOriented] == &apos;true&apos;, True, False)" Ref="180">
                             </Item1>
                           </ExpressionBindings>
                         </Item1>
-                        <Item2 ControlType="XRCheckBox" Name="chkThoughtContHelpless" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,40" Font="Times New Roman, 9pt" Text="Helpless" Ref="181">
+                        <Item2 ControlType="XRCheckBox" Name="chkThoughtContHelpless" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,30" Font="Times New Roman, 9pt" Text="Helpless" Ref="181">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkThoughtContHelpless] == &apos;true&apos;, True, False)" Ref="182">
                             </Item1>
                           </ExpressionBindings>
                         </Item2>
-                        <Item3 ControlType="XRCheckBox" Name="chkThoughtContPoorConfidence" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,80" Font="Times New Roman, 9pt" Text="Poor confidence/self-esteem" Ref="183">
+                        <Item3 ControlType="XRCheckBox" Name="chkThoughtContPoorConfidence" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,60" Font="Times New Roman, 9pt" Text="Poor confidence/self-esteem" Ref="183">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkThoughtContPoorConfidence] == &apos;true&apos;, True, False)" Ref="184">
                             </Item1>
@@ -570,21 +570,21 @@
                         </Item3>
                       </Controls>
                     </Item3>
-                    <Item4 ControlType="XRTableCell" Name="column_4" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="185">
+                    <Item4 ControlType="XRTableCell" Name="column_4" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="185">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkThoughtContPhobia" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Phobias" Ref="186">
+                        <Item1 ControlType="XRCheckBox" Name="chkThoughtContPhobia" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Phobias" Ref="186">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkThoughtContPhobia] == &apos;true&apos;, True, False)" Ref="187">
                             </Item1>
                           </ExpressionBindings>
                         </Item1>
-                        <Item2 ControlType="XRCheckBox" Name="chkThoughtContHallucination" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,40" Font="Times New Roman, 9pt" Text="Hallucinations" Ref="188">
+                        <Item2 ControlType="XRCheckBox" Name="chkThoughtContHallucination" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,30" Font="Times New Roman, 9pt" Text="Hallucinations" Ref="188">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkThoughtContHallucination] == &apos;true&apos;, True, False)" Ref="189">
                             </Item1>
                           </ExpressionBindings>
                         </Item2>
-                        <Item3 ControlType="XRCheckBox" Name="chkThoughtContPerseverations" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,80" Font="Times New Roman, 9pt" Text="Perseverations" Ref="190">
+                        <Item3 ControlType="XRCheckBox" Name="chkThoughtContPerseverations" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,60" Font="Times New Roman, 9pt" Text="Perseverations" Ref="190">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkThoughtContPerseverations] == &apos;true&apos;, True, False)" Ref="191">
                             </Item1>
@@ -596,36 +596,36 @@
                 </Item1>
               </Rows>
             </Item21>
-            <Item22 ControlType="XRLabel" Name="txtaThoughtContOther" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="550,60" LocationFloat="10,1520" Font="Times New Roman, 9pt" Ref="192">
+            <Item22 ControlType="XRLabel" Name="txtaThoughtContOther" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="660,40" LocationFloat="10,1160" Font="Times New Roman, 9pt" Ref="192">
               <ExpressionBindings>
                 <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtaThoughtContOther]" Ref="193">
                 </Item1>
               </ExpressionBindings>
             </Item22>
-            <Item23 ControlType="XRLabel" Name="html50" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="730,30" LocationFloat="10,1590" Font="Times New Roman, 9pt" Text="&lt;b&gt;Thoughts of Hurting Self or Others&lt;/b&gt;" Ref="194" />
-            <Item24 ControlType="XRTable" Name="columns5" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="730,150" LocationFloat="10,1630" KeepTogether="true" AdjustToContainerWidth="true" Ref="195">
+            <Item23 ControlType="XRLabel" Name="html50" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="880,20" LocationFloat="10,1210" Font="Times New Roman, 9pt" Text="&lt;b&gt;Thoughts of Hurting Self or Others&lt;/b&gt;" Ref="194" />
+            <Item24 ControlType="XRTable" Name="columns5" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="880,110" LocationFloat="10,1240" KeepTogether="true" AdjustToContainerWidth="true" Ref="195">
               <Rows>
-                <Item1 ControlType="XRTableRow" Name="columnsRow_1775148917949" Weight="1" Ref="196">
+                <Item1 ControlType="XRTableRow" Name="columnsRow_1775152540014" Weight="1" Ref="196">
                   <Cells>
-                    <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="197">
+                    <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="197">
                       <Controls>
-                        <Item1 ControlType="XRLabel" Name="label_cmbThoughtHurtSuicidalIdeation" Text="Suicidal Ideation" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt, style=Bold" TextAlignment="MiddleLeft" Padding="2,0,0,0,100" Borders="None" Ref="198">
+                        <Item1 ControlType="XRLabel" Name="label_cmbThoughtHurtSuicidalIdeation" Text="Suicidal Ideation" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt, style=Bold" TextAlignment="MiddleLeft" Padding="2,0,0,0,100" Borders="None" Ref="198">
                         </Item1>
-                        <Item2 ControlType="XRPanel" Name="radioPanel_cmbThoughtHurtSuicidalIdeation" TextAlignment="MiddleLeft" Padding="2,2,0,0,100" CanShrink="true" Text="Suicidal Ideation" SizeF="170,30" LocationFloat="10,30" Ref="199">
+                        <Item2 ControlType="XRPanel" Name="radioPanel_cmbThoughtHurtSuicidalIdeation" TextAlignment="MiddleLeft" Padding="2,2,0,0,100" CanShrink="true" Text="Suicidal Ideation" SizeF="200,20" LocationFloat="10,20" Ref="199">
                           <Controls>
-                            <Item1 ControlType="XRCheckBox" Name="radio_cmbThoughtHurtSuicidalIdeation_1" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="None" SizeF="60,30" LocationFloat="0,0" Ref="200">
+                            <Item1 ControlType="XRCheckBox" Name="radio_cmbThoughtHurtSuicidalIdeation_1" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="None" SizeF="70,20" LocationFloat="0,0" Ref="200">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([cmbThoughtHurtSuicidalIdeation] == &apos;None&apos;, True, False)" Ref="201">
                                 </Item1>
                               </ExpressionBindings>
                             </Item1>
-                            <Item2 ControlType="XRCheckBox" Name="radio_cmbThoughtHurtSuicidalIdeation_2" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="Passive" SizeF="60,30" LocationFloat="60,0" Ref="202">
+                            <Item2 ControlType="XRCheckBox" Name="radio_cmbThoughtHurtSuicidalIdeation_2" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="Passive" SizeF="70,20" LocationFloat="70,0" Ref="202">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([cmbThoughtHurtSuicidalIdeation] == &apos;Passive&apos;, True, False)" Ref="203">
                                 </Item1>
                               </ExpressionBindings>
                             </Item2>
-                            <Item3 ControlType="XRCheckBox" Name="radio_cmbThoughtHurtSuicidalIdeation_3" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="Active" SizeF="60,30" LocationFloat="110,0" Ref="204">
+                            <Item3 ControlType="XRCheckBox" Name="radio_cmbThoughtHurtSuicidalIdeation_3" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="Active" SizeF="70,20" LocationFloat="140,0" Ref="204">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([cmbThoughtHurtSuicidalIdeation] == &apos;Active&apos;, True, False)" Ref="205">
                                 </Item1>
@@ -633,23 +633,23 @@
                             </Item3>
                           </Controls>
                         </Item2>
-                        <Item3 ControlType="XRLabel" Name="label_cmbThoughtHurtHomicidalIdeation" Text="Homicidal Ideation" SizeF="170,30" LocationFloat="10,70" Font="Times New Roman, 9pt, style=Bold" TextAlignment="MiddleLeft" Padding="2,0,0,0,100" Borders="None" Ref="206">
+                        <Item3 ControlType="XRLabel" Name="label_cmbThoughtHurtHomicidalIdeation" Text="Homicidal Ideation" SizeF="200,20" LocationFloat="10,50" Font="Times New Roman, 9pt, style=Bold" TextAlignment="MiddleLeft" Padding="2,0,0,0,100" Borders="None" Ref="206">
                         </Item3>
-                        <Item4 ControlType="XRPanel" Name="radioPanel_cmbThoughtHurtHomicidalIdeation" TextAlignment="MiddleLeft" Padding="2,2,0,0,100" CanShrink="true" Text="Homicidal Ideation" SizeF="170,30" LocationFloat="10,100" Ref="207">
+                        <Item4 ControlType="XRPanel" Name="radioPanel_cmbThoughtHurtHomicidalIdeation" TextAlignment="MiddleLeft" Padding="2,2,0,0,100" CanShrink="true" Text="Homicidal Ideation" SizeF="200,20" LocationFloat="10,70" Ref="207">
                           <Controls>
-                            <Item1 ControlType="XRCheckBox" Name="radio_cmbThoughtHurtHomicidalIdeation_1" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="None" SizeF="60,30" LocationFloat="0,0" Ref="208">
+                            <Item1 ControlType="XRCheckBox" Name="radio_cmbThoughtHurtHomicidalIdeation_1" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="None" SizeF="70,20" LocationFloat="0,0" Ref="208">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([cmbThoughtHurtHomicidalIdeation] == &apos;None&apos;, True, False)" Ref="209">
                                 </Item1>
                               </ExpressionBindings>
                             </Item1>
-                            <Item2 ControlType="XRCheckBox" Name="radio_cmbThoughtHurtHomicidalIdeation_2" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="Passive" SizeF="60,30" LocationFloat="60,0" Ref="210">
+                            <Item2 ControlType="XRCheckBox" Name="radio_cmbThoughtHurtHomicidalIdeation_2" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="Passive" SizeF="70,20" LocationFloat="70,0" Ref="210">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([cmbThoughtHurtHomicidalIdeation] == &apos;Passive&apos;, True, False)" Ref="211">
                                 </Item1>
                               </ExpressionBindings>
                             </Item2>
-                            <Item3 ControlType="XRCheckBox" Name="radio_cmbThoughtHurtHomicidalIdeation_3" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="Active" SizeF="60,30" LocationFloat="110,0" Ref="212">
+                            <Item3 ControlType="XRCheckBox" Name="radio_cmbThoughtHurtHomicidalIdeation_3" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="Active" SizeF="70,20" LocationFloat="140,0" Ref="212">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([cmbThoughtHurtHomicidalIdeation] == &apos;Active&apos;, True, False)" Ref="213">
                                 </Item1>
@@ -659,19 +659,19 @@
                         </Item4>
                       </Controls>
                     </Item1>
-                    <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="214">
+                    <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="214">
                       <Controls>
-                        <Item1 ControlType="XRLabel" Name="label_cmbThoughtHurtSuicidalPlan" Text="Has suicidal plan?" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt, style=Bold" TextAlignment="MiddleLeft" Padding="2,0,0,0,100" Borders="None" Ref="215">
+                        <Item1 ControlType="XRLabel" Name="label_cmbThoughtHurtSuicidalPlan" Text="Has suicidal plan?" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt, style=Bold" TextAlignment="MiddleLeft" Padding="2,0,0,0,100" Borders="None" Ref="215">
                         </Item1>
-                        <Item2 ControlType="XRPanel" Name="radioPanel_cmbThoughtHurtSuicidalPlan" TextAlignment="MiddleLeft" Padding="2,2,0,0,100" CanShrink="true" Text="Has suicidal plan?" SizeF="170,30" LocationFloat="10,30" Ref="216">
+                        <Item2 ControlType="XRPanel" Name="radioPanel_cmbThoughtHurtSuicidalPlan" TextAlignment="MiddleLeft" Padding="2,2,0,0,100" CanShrink="true" Text="Has suicidal plan?" SizeF="200,20" LocationFloat="10,20" Ref="216">
                           <Controls>
-                            <Item1 ControlType="XRCheckBox" Name="radio_cmbThoughtHurtSuicidalPlan_1" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="Yes" SizeF="80,30" LocationFloat="0,0" Ref="217">
+                            <Item1 ControlType="XRCheckBox" Name="radio_cmbThoughtHurtSuicidalPlan_1" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="Yes" SizeF="100,20" LocationFloat="0,0" Ref="217">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([cmbThoughtHurtSuicidalPlan] == &apos;yes&apos;, True, False)" Ref="218">
                                 </Item1>
                               </ExpressionBindings>
                             </Item1>
-                            <Item2 ControlType="XRCheckBox" Name="radio_cmbThoughtHurtSuicidalPlan_2" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="No" SizeF="80,30" LocationFloat="80,0" Ref="219">
+                            <Item2 ControlType="XRCheckBox" Name="radio_cmbThoughtHurtSuicidalPlan_2" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="No" SizeF="100,20" LocationFloat="100,0" Ref="219">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([cmbThoughtHurtSuicidalPlan] == &apos;no&apos;, True, False)" Ref="220">
                                 </Item1>
@@ -679,17 +679,17 @@
                             </Item2>
                           </Controls>
                         </Item2>
-                        <Item3 ControlType="XRLabel" Name="label_cmbThoughtHurtPlanToHurt" Text="Has plan to hurt someone?" SizeF="170,30" LocationFloat="10,70" Font="Times New Roman, 9pt, style=Bold" TextAlignment="MiddleLeft" Padding="2,0,0,0,100" Borders="None" Ref="221">
+                        <Item3 ControlType="XRLabel" Name="label_cmbThoughtHurtPlanToHurt" Text="Has plan to hurt someone?" SizeF="200,20" LocationFloat="10,50" Font="Times New Roman, 9pt, style=Bold" TextAlignment="MiddleLeft" Padding="2,0,0,0,100" Borders="None" Ref="221">
                         </Item3>
-                        <Item4 ControlType="XRPanel" Name="radioPanel_cmbThoughtHurtPlanToHurt" TextAlignment="MiddleLeft" Padding="2,2,0,0,100" CanShrink="true" Text="Has plan to hurt someone?" SizeF="170,30" LocationFloat="10,100" Ref="222">
+                        <Item4 ControlType="XRPanel" Name="radioPanel_cmbThoughtHurtPlanToHurt" TextAlignment="MiddleLeft" Padding="2,2,0,0,100" CanShrink="true" Text="Has plan to hurt someone?" SizeF="200,20" LocationFloat="10,70" Ref="222">
                           <Controls>
-                            <Item1 ControlType="XRCheckBox" Name="radio_cmbThoughtHurtPlanToHurt_1" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="Yes" SizeF="80,30" LocationFloat="0,0" Ref="223">
+                            <Item1 ControlType="XRCheckBox" Name="radio_cmbThoughtHurtPlanToHurt_1" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="Yes" SizeF="100,20" LocationFloat="0,0" Ref="223">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([cmbThoughtHurtPlanToHurt] == &apos;yes&apos;, True, False)" Ref="224">
                                 </Item1>
                               </ExpressionBindings>
                             </Item1>
-                            <Item2 ControlType="XRCheckBox" Name="radio_cmbThoughtHurtPlanToHurt_2" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="No" SizeF="80,30" LocationFloat="80,0" Ref="225">
+                            <Item2 ControlType="XRCheckBox" Name="radio_cmbThoughtHurtPlanToHurt_2" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="No" SizeF="100,20" LocationFloat="100,0" Ref="225">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([cmbThoughtHurtPlanToHurt] == &apos;no&apos;, True, False)" Ref="226">
                                 </Item1>
@@ -699,19 +699,19 @@
                         </Item4>
                       </Controls>
                     </Item2>
-                    <Item3 ControlType="XRTableCell" Name="column_3" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="227">
+                    <Item3 ControlType="XRTableCell" Name="column_3" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="227">
                       <Controls>
-                        <Item1 ControlType="XRLabel" Name="label_cmbThoughtHurtIntentToDie" Text="Has intent to die?" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt, style=Bold" TextAlignment="MiddleLeft" Padding="2,0,0,0,100" Borders="None" Ref="228">
+                        <Item1 ControlType="XRLabel" Name="label_cmbThoughtHurtIntentToDie" Text="Has intent to die?" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt, style=Bold" TextAlignment="MiddleLeft" Padding="2,0,0,0,100" Borders="None" Ref="228">
                         </Item1>
-                        <Item2 ControlType="XRPanel" Name="radioPanel_cmbThoughtHurtIntentToDie" TextAlignment="MiddleLeft" Padding="2,2,0,0,100" CanShrink="true" Text="Has intent to die?" SizeF="170,30" LocationFloat="10,30" Ref="229">
+                        <Item2 ControlType="XRPanel" Name="radioPanel_cmbThoughtHurtIntentToDie" TextAlignment="MiddleLeft" Padding="2,2,0,0,100" CanShrink="true" Text="Has intent to die?" SizeF="200,20" LocationFloat="10,20" Ref="229">
                           <Controls>
-                            <Item1 ControlType="XRCheckBox" Name="radio_cmbThoughtHurtIntentToDie_1" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="Yes" SizeF="80,30" LocationFloat="0,0" Ref="230">
+                            <Item1 ControlType="XRCheckBox" Name="radio_cmbThoughtHurtIntentToDie_1" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="Yes" SizeF="100,20" LocationFloat="0,0" Ref="230">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([cmbThoughtHurtIntentToDie] == &apos;yes&apos;, True, False)" Ref="231">
                                 </Item1>
                               </ExpressionBindings>
                             </Item1>
-                            <Item2 ControlType="XRCheckBox" Name="radio_cmbThoughtHurtIntentToDie_2" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="No" SizeF="80,30" LocationFloat="80,0" Ref="232">
+                            <Item2 ControlType="XRCheckBox" Name="radio_cmbThoughtHurtIntentToDie_2" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="No" SizeF="100,20" LocationFloat="100,0" Ref="232">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([cmbThoughtHurtIntentToDie] == &apos;no&apos;, True, False)" Ref="233">
                                 </Item1>
@@ -719,17 +719,17 @@
                             </Item2>
                           </Controls>
                         </Item2>
-                        <Item3 ControlType="XRLabel" Name="label_cmbThoughtHurtIntentToHurt" Text="Has intent to hurt someone?" SizeF="170,30" LocationFloat="10,70" Font="Times New Roman, 9pt, style=Bold" TextAlignment="MiddleLeft" Padding="2,0,0,0,100" Borders="None" Ref="234">
+                        <Item3 ControlType="XRLabel" Name="label_cmbThoughtHurtIntentToHurt" Text="Has intent to hurt someone?" SizeF="200,20" LocationFloat="10,50" Font="Times New Roman, 9pt, style=Bold" TextAlignment="MiddleLeft" Padding="2,0,0,0,100" Borders="None" Ref="234">
                         </Item3>
-                        <Item4 ControlType="XRPanel" Name="radioPanel_cmbThoughtHurtIntentToHurt" TextAlignment="MiddleLeft" Padding="2,2,0,0,100" CanShrink="true" Text="Has intent to hurt someone?" SizeF="170,30" LocationFloat="10,100" Ref="235">
+                        <Item4 ControlType="XRPanel" Name="radioPanel_cmbThoughtHurtIntentToHurt" TextAlignment="MiddleLeft" Padding="2,2,0,0,100" CanShrink="true" Text="Has intent to hurt someone?" SizeF="200,20" LocationFloat="10,70" Ref="235">
                           <Controls>
-                            <Item1 ControlType="XRCheckBox" Name="radio_cmbThoughtHurtIntentToHurt_1" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="Yes" SizeF="80,30" LocationFloat="0,0" Ref="236">
+                            <Item1 ControlType="XRCheckBox" Name="radio_cmbThoughtHurtIntentToHurt_1" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="Yes" SizeF="100,20" LocationFloat="0,0" Ref="236">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([cmbThoughtHurtIntentToHurt] == &apos;yes&apos;, True, False)" Ref="237">
                                 </Item1>
                               </ExpressionBindings>
                             </Item1>
-                            <Item2 ControlType="XRCheckBox" Name="radio_cmbThoughtHurtIntentToHurt_2" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="No" SizeF="80,30" LocationFloat="80,0" Ref="238">
+                            <Item2 ControlType="XRCheckBox" Name="radio_cmbThoughtHurtIntentToHurt_2" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="No" SizeF="100,20" LocationFloat="100,0" Ref="238">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([cmbThoughtHurtIntentToHurt] == &apos;no&apos;, True, False)" Ref="239">
                                 </Item1>
@@ -739,19 +739,19 @@
                         </Item4>
                       </Controls>
                     </Item3>
-                    <Item4 ControlType="XRTableCell" Name="column_4" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="240">
+                    <Item4 ControlType="XRTableCell" Name="column_4" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="240">
                       <Controls>
-                        <Item1 ControlType="XRLabel" Name="label_cmbThoughtHurtMeansToKillSelf" Text="Has means to kill themself?" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt, style=Bold" TextAlignment="MiddleLeft" Padding="2,0,0,0,100" Borders="None" Ref="241">
+                        <Item1 ControlType="XRLabel" Name="label_cmbThoughtHurtMeansToKillSelf" Text="Has means to kill themself?" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt, style=Bold" TextAlignment="MiddleLeft" Padding="2,0,0,0,100" Borders="None" Ref="241">
                         </Item1>
-                        <Item2 ControlType="XRPanel" Name="radioPanel_cmbThoughtHurtMeansToKillSelf" TextAlignment="MiddleLeft" Padding="2,2,0,0,100" CanShrink="true" Text="Has means to kill themself?" SizeF="170,30" LocationFloat="10,30" Ref="242">
+                        <Item2 ControlType="XRPanel" Name="radioPanel_cmbThoughtHurtMeansToKillSelf" TextAlignment="MiddleLeft" Padding="2,2,0,0,100" CanShrink="true" Text="Has means to kill themself?" SizeF="200,20" LocationFloat="10,20" Ref="242">
                           <Controls>
-                            <Item1 ControlType="XRCheckBox" Name="radio_cmbThoughtHurtMeansToKillSelf_1" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="Yes" SizeF="80,30" LocationFloat="0,0" Ref="243">
+                            <Item1 ControlType="XRCheckBox" Name="radio_cmbThoughtHurtMeansToKillSelf_1" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="Yes" SizeF="100,20" LocationFloat="0,0" Ref="243">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([cmbThoughtHurtMeansToKillSelf] == &apos;yes&apos;, True, False)" Ref="244">
                                 </Item1>
                               </ExpressionBindings>
                             </Item1>
-                            <Item2 ControlType="XRCheckBox" Name="radio_cmbThoughtHurtMeansToKillSelf_2" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="No" SizeF="80,30" LocationFloat="80,0" Ref="245">
+                            <Item2 ControlType="XRCheckBox" Name="radio_cmbThoughtHurtMeansToKillSelf_2" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="No" SizeF="100,20" LocationFloat="100,0" Ref="245">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([cmbThoughtHurtMeansToKillSelf] == &apos;no&apos;, True, False)" Ref="246">
                                 </Item1>
@@ -759,17 +759,17 @@
                             </Item2>
                           </Controls>
                         </Item2>
-                        <Item3 ControlType="XRLabel" Name="label_cmbThoughtHurtMeansToHurt" Text="Has means to hurt someone?" SizeF="170,30" LocationFloat="10,70" Font="Times New Roman, 9pt, style=Bold" TextAlignment="MiddleLeft" Padding="2,0,0,0,100" Borders="None" Ref="247">
+                        <Item3 ControlType="XRLabel" Name="label_cmbThoughtHurtMeansToHurt" Text="Has means to hurt someone?" SizeF="200,20" LocationFloat="10,50" Font="Times New Roman, 9pt, style=Bold" TextAlignment="MiddleLeft" Padding="2,0,0,0,100" Borders="None" Ref="247">
                         </Item3>
-                        <Item4 ControlType="XRPanel" Name="radioPanel_cmbThoughtHurtMeansToHurt" TextAlignment="MiddleLeft" Padding="2,2,0,0,100" CanShrink="true" Text="Has means to hurt someone?" SizeF="170,30" LocationFloat="10,100" Ref="248">
+                        <Item4 ControlType="XRPanel" Name="radioPanel_cmbThoughtHurtMeansToHurt" TextAlignment="MiddleLeft" Padding="2,2,0,0,100" CanShrink="true" Text="Has means to hurt someone?" SizeF="200,20" LocationFloat="10,70" Ref="248">
                           <Controls>
-                            <Item1 ControlType="XRCheckBox" Name="radio_cmbThoughtHurtMeansToHurt_1" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="Yes" SizeF="80,30" LocationFloat="0,0" Ref="249">
+                            <Item1 ControlType="XRCheckBox" Name="radio_cmbThoughtHurtMeansToHurt_1" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="Yes" SizeF="100,20" LocationFloat="0,0" Ref="249">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([cmbThoughtHurtMeansToHurt] == &apos;yes&apos;, True, False)" Ref="250">
                                 </Item1>
                               </ExpressionBindings>
                             </Item1>
-                            <Item2 ControlType="XRCheckBox" Name="radio_cmbThoughtHurtMeansToHurt_2" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="No" SizeF="80,30" LocationFloat="80,0" Ref="251">
+                            <Item2 ControlType="XRCheckBox" Name="radio_cmbThoughtHurtMeansToHurt_2" Padding="2,2,0,0,100" GlyphOptions="[object Object]" Text="No" SizeF="100,20" LocationFloat="100,0" Ref="251">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([cmbThoughtHurtMeansToHurt] == &apos;no&apos;, True, False)" Ref="252">
                                 </Item1>
@@ -783,14 +783,14 @@
                 </Item1>
               </Rows>
             </Item24>
-            <Item25 ControlType="XRLabel" Name="html53" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="730,30" LocationFloat="10,1790" Font="Times New Roman, 9pt" Text="&lt;b&gt;Insight/Judgment&lt;/b&gt;" Ref="253" />
-            <Item26 ControlType="XRTable" Name="columns29" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="730,50" LocationFloat="10,1830" KeepTogether="true" AdjustToContainerWidth="true" Ref="254">
+            <Item25 ControlType="XRLabel" Name="html53" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="880,20" LocationFloat="10,1360" Font="Times New Roman, 9pt" Text="&lt;b&gt;Insight/Judgment&lt;/b&gt;" Ref="253" />
+            <Item26 ControlType="XRTable" Name="columns29" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="880,40" LocationFloat="10,1390" KeepTogether="true" AdjustToContainerWidth="true" Ref="254">
               <Rows>
-                <Item1 ControlType="XRTableRow" Name="columnsRow_1775148917953" Weight="1" Ref="255">
+                <Item1 ControlType="XRTableRow" Name="columnsRow_1775152540018" Weight="1" Ref="255">
                   <Cells>
-                    <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.333333" WidthF="240" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="256">
+                    <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.333333" WidthF="290" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="256">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkInsightIntact" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="230,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Intact" Ref="257">
+                        <Item1 ControlType="XRCheckBox" Name="chkInsightIntact" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="280,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Intact" Ref="257">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkInsightIntact] == &apos;true&apos;, True, False)" Ref="258">
                             </Item1>
@@ -798,9 +798,9 @@
                         </Item1>
                       </Controls>
                     </Item1>
-                    <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.333333" WidthF="240" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="259">
+                    <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.333333" WidthF="290" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="259">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkInsightImpairedJudgmnt" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="230,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Impaired judgment" Ref="260">
+                        <Item1 ControlType="XRCheckBox" Name="chkInsightImpairedJudgmnt" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="280,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Impaired judgment" Ref="260">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkInsightImpairedJudgmnt] == &apos;true&apos;, True, False)" Ref="261">
                             </Item1>
@@ -808,9 +808,9 @@
                         </Item1>
                       </Controls>
                     </Item2>
-                    <Item3 ControlType="XRTableCell" Name="column_3" Weight="0.333333" WidthF="240" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="262">
+                    <Item3 ControlType="XRTableCell" Name="column_3" Weight="0.333333" WidthF="290" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="262">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkInsightPoor" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="230,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Poor insight" Ref="263">
+                        <Item1 ControlType="XRCheckBox" Name="chkInsightPoor" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="280,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Poor insight" Ref="263">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkInsightPoor] == &apos;true&apos;, True, False)" Ref="264">
                             </Item1>
@@ -822,26 +822,26 @@
                 </Item1>
               </Rows>
             </Item26>
-            <Item27 ControlType="XRCheckBox" Name="chkInsightOther" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="730,30" LocationFloat="10,1890" Font="Times New Roman, 9pt" Text="Other (Please specify)" Ref="265">
+            <Item27 ControlType="XRCheckBox" Name="chkInsightOther" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="880,20" LocationFloat="10,1440" Font="Times New Roman, 9pt" Text="Other (Please specify)" Ref="265">
               <ExpressionBindings>
                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkInsightOther] == &apos;true&apos;, True, False)" Ref="266">
                 </Item1>
               </ExpressionBindings>
             </Item27>
-            <Item28 ControlType="XRLabel" Name="txtaInsightOther" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="550,60" LocationFloat="10,1930" Font="Times New Roman, 9pt" Ref="267">
+            <Item28 ControlType="XRLabel" Name="txtaInsightOther" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="660,40" LocationFloat="10,1470" Font="Times New Roman, 9pt" Ref="267">
               <ExpressionBindings>
                 <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtaInsightOther]" Ref="268">
                 </Item1>
               </ExpressionBindings>
             </Item28>
-            <Item29 ControlType="XRLabel" Name="html51" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="730,30" LocationFloat="10,2000" Font="Times New Roman, 9pt" Text="&lt;b&gt;Consciousness&lt;/b&gt;" Ref="269" />
-            <Item30 ControlType="XRTable" Name="columns30" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="730,50" LocationFloat="10,2040" KeepTogether="true" AdjustToContainerWidth="true" Ref="270">
+            <Item29 ControlType="XRLabel" Name="html51" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="880,20" LocationFloat="10,1520" Font="Times New Roman, 9pt" Text="&lt;b&gt;Consciousness&lt;/b&gt;" Ref="269" />
+            <Item30 ControlType="XRTable" Name="columns30" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="880,40" LocationFloat="10,1550" KeepTogether="true" AdjustToContainerWidth="true" Ref="270">
               <Rows>
-                <Item1 ControlType="XRTableRow" Name="columnsRow_1775148917956" Weight="1" Ref="271">
+                <Item1 ControlType="XRTableRow" Name="columnsRow_1775152540020" Weight="1" Ref="271">
                   <Cells>
-                    <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="272">
+                    <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="272">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkConscAlert" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Alert/awake" Ref="273">
+                        <Item1 ControlType="XRCheckBox" Name="chkConscAlert" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Alert/awake" Ref="273">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkConscAlert] == &apos;true&apos;, True, False)" Ref="274">
                             </Item1>
@@ -849,9 +849,9 @@
                         </Item1>
                       </Controls>
                     </Item1>
-                    <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="275">
+                    <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="275">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkConscFluctuating" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Fluctuating" Ref="276">
+                        <Item1 ControlType="XRCheckBox" Name="chkConscFluctuating" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Fluctuating" Ref="276">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkConscFluctuating] == &apos;true&apos;, True, False)" Ref="277">
                             </Item1>
@@ -859,9 +859,9 @@
                         </Item1>
                       </Controls>
                     </Item2>
-                    <Item3 ControlType="XRTableCell" Name="column_3" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="278">
+                    <Item3 ControlType="XRTableCell" Name="column_3" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="278">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkConscDrowsy" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Drowsy" Ref="279">
+                        <Item1 ControlType="XRCheckBox" Name="chkConscDrowsy" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Drowsy" Ref="279">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkConscDrowsy] == &apos;true&apos;, True, False)" Ref="280">
                             </Item1>
@@ -869,9 +869,9 @@
                         </Item1>
                       </Controls>
                     </Item3>
-                    <Item4 ControlType="XRTableCell" Name="column_4" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="281">
+                    <Item4 ControlType="XRTableCell" Name="column_4" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="281">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkConscOther" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Other (Please specify)" Ref="282">
+                        <Item1 ControlType="XRCheckBox" Name="chkConscOther" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Other (Please specify)" Ref="282">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkConscOther] == &apos;true&apos;, True, False)" Ref="283">
                             </Item1>
@@ -883,20 +883,20 @@
                 </Item1>
               </Rows>
             </Item30>
-            <Item31 ControlType="XRLabel" Name="txtaConscOther" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="550,60" LocationFloat="10,2100" Font="Times New Roman, 9pt" Ref="284">
+            <Item31 ControlType="XRLabel" Name="txtaConscOther" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="660,40" LocationFloat="10,1600" Font="Times New Roman, 9pt" Ref="284">
               <ExpressionBindings>
                 <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtaConscOther]" Ref="285">
                 </Item1>
               </ExpressionBindings>
             </Item31>
-            <Item32 ControlType="XRLabel" Name="html52" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="730,30" LocationFloat="10,2170" Font="Times New Roman, 9pt" Text="&lt;b&gt;Orientation&lt;/b&gt;" Ref="286" />
-            <Item33 ControlType="XRTable" Name="columns31" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="730,50" LocationFloat="10,2210" KeepTogether="true" AdjustToContainerWidth="true" Ref="287">
+            <Item32 ControlType="XRLabel" Name="html52" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="880,20" LocationFloat="10,1650" Font="Times New Roman, 9pt" Text="&lt;b&gt;Orientation&lt;/b&gt;" Ref="286" />
+            <Item33 ControlType="XRTable" Name="columns31" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="880,40" LocationFloat="10,1680" KeepTogether="true" AdjustToContainerWidth="true" Ref="287">
               <Rows>
-                <Item1 ControlType="XRTableRow" Name="columnsRow_1775148917958" Weight="1" Ref="288">
+                <Item1 ControlType="XRTableRow" Name="columnsRow_1775152540023" Weight="1" Ref="288">
                   <Cells>
-                    <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="289">
+                    <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="289">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkOrientPerson" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Person" Ref="290">
+                        <Item1 ControlType="XRCheckBox" Name="chkOrientPerson" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Person" Ref="290">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkOrientPerson] == &apos;true&apos;, True, False)" Ref="291">
                             </Item1>
@@ -904,9 +904,9 @@
                         </Item1>
                       </Controls>
                     </Item1>
-                    <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="292">
+                    <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="292">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkOrientPlace" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Place" Ref="293">
+                        <Item1 ControlType="XRCheckBox" Name="chkOrientPlace" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Place" Ref="293">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkOrientPlace] == &apos;true&apos;, True, False)" Ref="294">
                             </Item1>
@@ -914,9 +914,9 @@
                         </Item1>
                       </Controls>
                     </Item2>
-                    <Item3 ControlType="XRTableCell" Name="column_3" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="295">
+                    <Item3 ControlType="XRTableCell" Name="column_3" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="295">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkOrientTime" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Time" Ref="296">
+                        <Item1 ControlType="XRCheckBox" Name="chkOrientTime" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Time" Ref="296">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkOrientTime] == &apos;true&apos;, True, False)" Ref="297">
                             </Item1>
@@ -924,9 +924,9 @@
                         </Item1>
                       </Controls>
                     </Item3>
-                    <Item4 ControlType="XRTableCell" Name="column_4" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="298">
+                    <Item4 ControlType="XRTableCell" Name="column_4" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="298">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkOrientOther" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Other (Please specify)" Ref="299">
+                        <Item1 ControlType="XRCheckBox" Name="chkOrientOther" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Other (Please specify)" Ref="299">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkOrientOther] == &apos;true&apos;, True, False)" Ref="300">
                             </Item1>
@@ -938,20 +938,20 @@
                 </Item1>
               </Rows>
             </Item33>
-            <Item34 ControlType="XRLabel" Name="txtaOrientOther" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="550,60" LocationFloat="10,2270" Font="Times New Roman, 9pt" Ref="301">
+            <Item34 ControlType="XRLabel" Name="txtaOrientOther" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="660,40" LocationFloat="10,1730" Font="Times New Roman, 9pt" Ref="301">
               <ExpressionBindings>
                 <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtaOrientOther]" Ref="302">
                 </Item1>
               </ExpressionBindings>
             </Item34>
-            <Item35 ControlType="XRLabel" Name="html54" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="730,30" LocationFloat="10,2340" Font="Times New Roman, 9pt" Text="&lt;b&gt;Memory&lt;/b&gt;" Ref="303" />
-            <Item36 ControlType="XRTable" Name="columns32" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="730,50" LocationFloat="10,2380" KeepTogether="true" AdjustToContainerWidth="true" Ref="304">
+            <Item35 ControlType="XRLabel" Name="html54" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="880,20" LocationFloat="10,1780" Font="Times New Roman, 9pt" Text="&lt;b&gt;Memory&lt;/b&gt;" Ref="303" />
+            <Item36 ControlType="XRTable" Name="columns32" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="880,40" LocationFloat="10,1810" KeepTogether="true" AdjustToContainerWidth="true" Ref="304">
               <Rows>
-                <Item1 ControlType="XRTableRow" Name="columnsRow_1775148917960" Weight="1" Ref="305">
+                <Item1 ControlType="XRTableRow" Name="columnsRow_1775152540025" Weight="1" Ref="305">
                   <Cells>
-                    <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="306">
+                    <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="306">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkMemoryRecentIntact" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Recent intact" Ref="307">
+                        <Item1 ControlType="XRCheckBox" Name="chkMemoryRecentIntact" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Recent intact" Ref="307">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkMemoryRecentIntact] == &apos;true&apos;, True, False)" Ref="308">
                             </Item1>
@@ -959,9 +959,9 @@
                         </Item1>
                       </Controls>
                     </Item1>
-                    <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="309">
+                    <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="309">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkMemoryRemoteIntact" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Remote intact" Ref="310">
+                        <Item1 ControlType="XRCheckBox" Name="chkMemoryRemoteIntact" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Remote intact" Ref="310">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkMemoryRemoteIntact] == &apos;true&apos;, True, False)" Ref="311">
                             </Item1>
@@ -969,9 +969,9 @@
                         </Item1>
                       </Controls>
                     </Item2>
-                    <Item3 ControlType="XRTableCell" Name="column_3" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="312">
+                    <Item3 ControlType="XRTableCell" Name="column_3" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="312">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkMemoryImpaired" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Impaired memory" Ref="313">
+                        <Item1 ControlType="XRCheckBox" Name="chkMemoryImpaired" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Impaired memory" Ref="313">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkMemoryImpaired] == &apos;true&apos;, True, False)" Ref="314">
                             </Item1>
@@ -979,9 +979,9 @@
                         </Item1>
                       </Controls>
                     </Item3>
-                    <Item4 ControlType="XRTableCell" Name="column_4" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="315">
+                    <Item4 ControlType="XRTableCell" Name="column_4" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="315">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkMemoryOther" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="170,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Other (Please specify)" Ref="316">
+                        <Item1 ControlType="XRCheckBox" Name="chkMemoryOther" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Other (Please specify)" Ref="316">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkMemoryOther] == &apos;true&apos;, True, False)" Ref="317">
                             </Item1>
@@ -993,20 +993,20 @@
                 </Item1>
               </Rows>
             </Item36>
-            <Item37 ControlType="XRLabel" Name="txtaMemoryOther" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="550,60" LocationFloat="10,2440" Font="Times New Roman, 9pt" Ref="318">
+            <Item37 ControlType="XRLabel" Name="txtaMemoryOther" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="660,40" LocationFloat="10,1860" Font="Times New Roman, 9pt" Ref="318">
               <ExpressionBindings>
                 <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtaMemoryOther]" Ref="319">
                 </Item1>
               </ExpressionBindings>
             </Item37>
-            <Item38 ControlType="XRLabel" Name="html55" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="730,30" LocationFloat="10,2510" Font="Times New Roman, 9pt" Text="&lt;b&gt;Attention/Concentration&lt;/b&gt;" Ref="320" />
-            <Item39 ControlType="XRTable" Name="columns33" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="730,50" LocationFloat="10,2550" KeepTogether="true" AdjustToContainerWidth="true" Ref="321">
+            <Item38 ControlType="XRLabel" Name="html55" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="880,20" LocationFloat="10,1910" Font="Times New Roman, 9pt" Text="&lt;b&gt;Attention/Concentration&lt;/b&gt;" Ref="320" />
+            <Item39 ControlType="XRTable" Name="columns33" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="880,40" LocationFloat="10,1940" KeepTogether="true" AdjustToContainerWidth="true" Ref="321">
               <Rows>
-                <Item1 ControlType="XRTableRow" Name="columnsRow_1775148917961" Weight="1" Ref="322">
+                <Item1 ControlType="XRTableRow" Name="columnsRow_1775152540042" Weight="1" Ref="322">
                   <Cells>
-                    <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.333333" WidthF="240" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="323">
+                    <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.333333" WidthF="290" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="323">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkAttentionIntact" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="230,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Intact" Ref="324">
+                        <Item1 ControlType="XRCheckBox" Name="chkAttentionIntact" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="280,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Intact" Ref="324">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkAttentionIntact] == &apos;true&apos;, True, False)" Ref="325">
                             </Item1>
@@ -1014,9 +1014,9 @@
                         </Item1>
                       </Controls>
                     </Item1>
-                    <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.333333" WidthF="240" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="326">
+                    <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.333333" WidthF="290" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="326">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkAttentionDistractible" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="230,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Distractible/Inattentive" Ref="327">
+                        <Item1 ControlType="XRCheckBox" Name="chkAttentionDistractible" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="280,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Distractible/Inattentive" Ref="327">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkAttentionDistractible] == &apos;true&apos;, True, False)" Ref="328">
                             </Item1>
@@ -1024,9 +1024,9 @@
                         </Item1>
                       </Controls>
                     </Item2>
-                    <Item3 ControlType="XRTableCell" Name="column_3" Weight="0.333333" WidthF="240" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="329">
+                    <Item3 ControlType="XRTableCell" Name="column_3" Weight="0.333333" WidthF="290" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="329">
                       <Controls>
-                        <Item1 ControlType="XRCheckBox" Name="chkAttentionOther" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="230,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Other (please specify)" Ref="330">
+                        <Item1 ControlType="XRCheckBox" Name="chkAttentionOther" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="280,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Other (please specify)" Ref="330">
                           <ExpressionBindings>
                             <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkAttentionOther] == &apos;true&apos;, True, False)" Ref="331">
                             </Item1>
@@ -1038,7 +1038,7 @@
                 </Item1>
               </Rows>
             </Item39>
-            <Item40 ControlType="XRLabel" Name="txtaAttentionOther" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="550,60" LocationFloat="10,2610" Font="Times New Roman, 9pt" Ref="332">
+            <Item40 ControlType="XRLabel" Name="txtaAttentionOther" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="660,40" LocationFloat="10,1990" Font="Times New Roman, 9pt" Ref="332">
               <ExpressionBindings>
                 <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtaAttentionOther]" Ref="333">
                 </Item1>
@@ -1046,21 +1046,21 @@
             </Item40>
           </Controls>
         </Item1>
-        <Item2 ControlType="XRPanel" Name="additional" CanShrink="true" Borders="None" Padding="2,2,0,0,100" SizeF="750,1300" LocationFloat="0,2730" Ref="334">
+        <Item2 ControlType="XRPanel" Name="additional" CanShrink="true" Borders="None" Padding="2,2,0,0,100" SizeF="900,1000" LocationFloat="0,2090" Ref="334">
           <Controls>
-            <Item1 ControlType="XRLabel" Name="label_additional" Text="Additional" SizeF="100,30" LocationFloat="0,0" Font="Times New Roman, 11pt, style=Bold" TextAlignment="MiddleLeft" Padding="2,0,0,0,100" Borders="None" Ref="335">
+            <Item1 ControlType="XRLabel" Name="label_additional" Text="Additional" SizeF="100,20" LocationFloat="0,0" Font="Times New Roman, 11pt, style=Bold" TextAlignment="MiddleLeft" Padding="2,0,0,0,100" Borders="None" Ref="335">
             </Item1>
-            <Item2 ControlType="XRPanel" Name="fieldset" CanShrink="true" Borders="None" Padding="2,2,0,0,100" SizeF="730,1260" LocationFloat="10,30" Ref="336">
+            <Item2 ControlType="XRPanel" Name="fieldset" CanShrink="true" Borders="None" Padding="2,2,0,0,100" SizeF="880,970" LocationFloat="10,20" Ref="336">
               <Controls>
-                <Item1 ControlType="XRLabel" Name="html" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="710,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="&lt;b&gt;Language(naming)&lt;/b&gt;" Ref="337">
+                <Item1 ControlType="XRLabel" Name="html" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="860,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="&lt;b&gt;Language(naming)&lt;/b&gt;" Ref="337">
                 </Item1>
-                <Item2 ControlType="XRTable" Name="columns" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="710,50" LocationFloat="10,40" KeepTogether="true" AdjustToContainerWidth="true" Ref="338">
+                <Item2 ControlType="XRTable" Name="columns" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="860,40" LocationFloat="10,30" KeepTogether="true" AdjustToContainerWidth="true" Ref="338">
                   <Rows>
-                    <Item1 ControlType="XRTableRow" Name="columnsRow_1775148917992" Weight="1" Ref="339">
+                    <Item1 ControlType="XRTableRow" Name="columnsRow_1775152540080" Weight="1" Ref="339">
                       <Cells>
-                        <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="340">
+                        <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="340">
                           <Controls>
-                            <Item1 ControlType="XRCheckBox" Name="chkLanguageNamingIntact" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="160,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Intact" Ref="341">
+                            <Item1 ControlType="XRCheckBox" Name="chkLanguageNamingIntact" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Intact" Ref="341">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkLanguageNamingIntact] == &apos;true&apos;, True, False)" Ref="342">
                                 </Item1>
@@ -1068,9 +1068,9 @@
                             </Item1>
                           </Controls>
                         </Item1>
-                        <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="343">
+                        <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="343">
                           <Controls>
-                            <Item1 ControlType="XRCheckBox" Name="chkLanguageNamingObjects" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="160,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="3/3 Objects" Ref="344">
+                            <Item1 ControlType="XRCheckBox" Name="chkLanguageNamingObjects" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="3/3 Objects" Ref="344">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkLanguageNamingObjects] == &apos;true&apos;, True, False)" Ref="345">
                                 </Item1>
@@ -1078,9 +1078,9 @@
                             </Item1>
                           </Controls>
                         </Item2>
-                        <Item3 ControlType="XRTableCell" Name="column_3" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="346">
+                        <Item3 ControlType="XRTableCell" Name="column_3" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="346">
                           <Controls>
-                            <Item1 ControlType="XRCheckBox" Name="chkLanguageNamingImpaired" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="160,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Impaired" Ref="347">
+                            <Item1 ControlType="XRCheckBox" Name="chkLanguageNamingImpaired" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Impaired" Ref="347">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkLanguageNamingImpaired] == &apos;true&apos;, True, False)" Ref="348">
                                 </Item1>
@@ -1088,9 +1088,9 @@
                             </Item1>
                           </Controls>
                         </Item3>
-                        <Item4 ControlType="XRTableCell" Name="column_4" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="349">
+                        <Item4 ControlType="XRTableCell" Name="column_4" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="349">
                           <Controls>
-                            <Item1 ControlType="XRCheckBox" Name="chkLanguageNamingOther" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="160,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Other" Ref="350">
+                            <Item1 ControlType="XRCheckBox" Name="chkLanguageNamingOther" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Other" Ref="350">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkLanguageNamingOther] == &apos;true&apos;, True, False)" Ref="351">
                                 </Item1>
@@ -1102,21 +1102,21 @@
                     </Item1>
                   </Rows>
                 </Item2>
-                <Item3 ControlType="XRLabel" Name="txtaLanguageNamingOther" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="530,60" LocationFloat="10,100" Font="Times New Roman, 9pt" Ref="352">
+                <Item3 ControlType="XRLabel" Name="txtaLanguageNamingOther" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="650,40" LocationFloat="10,80" Font="Times New Roman, 9pt" Ref="352">
                   <ExpressionBindings>
                     <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtaLanguageNamingOther]" Ref="353">
                     </Item1>
                   </ExpressionBindings>
                 </Item3>
-                <Item4 ControlType="XRLabel" Name="html1" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="710,30" LocationFloat="10,170" Font="Times New Roman, 9pt" Text="&lt;b&gt;Language(repeating phrase)&lt;/b&gt;" Ref="354">
+                <Item4 ControlType="XRLabel" Name="html1" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="860,20" LocationFloat="10,130" Font="Times New Roman, 9pt" Text="&lt;b&gt;Language(repeating phrase)&lt;/b&gt;" Ref="354">
                 </Item4>
-                <Item5 ControlType="XRTable" Name="columns1" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="710,50" LocationFloat="10,210" KeepTogether="true" AdjustToContainerWidth="true" Ref="355">
+                <Item5 ControlType="XRTable" Name="columns1" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="860,40" LocationFloat="10,160" KeepTogether="true" AdjustToContainerWidth="true" Ref="355">
                   <Rows>
-                    <Item1 ControlType="XRTableRow" Name="columnsRow_1775148917993" Weight="1" Ref="356">
+                    <Item1 ControlType="XRTableRow" Name="columnsRow_1775152540081" Weight="1" Ref="356">
                       <Cells>
-                        <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="357">
+                        <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="357">
                           <Controls>
-                            <Item1 ControlType="XRCheckBox" Name="chkLanguageRepeatingIntact" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="160,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Intact" Ref="358">
+                            <Item1 ControlType="XRCheckBox" Name="chkLanguageRepeatingIntact" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Intact" Ref="358">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkLanguageRepeatingIntact] == &apos;true&apos;, True, False)" Ref="359">
                                 </Item1>
@@ -1124,9 +1124,9 @@
                             </Item1>
                           </Controls>
                         </Item1>
-                        <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="360">
+                        <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="360">
                           <Controls>
-                            <Item1 ControlType="XRCheckBox" Name="chkLanguageRepeatingIntactNoIfs" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="160,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Intact(no if&amp;apos;s and&amp;apos;s, or but&amp;apos;s)" Ref="361">
+                            <Item1 ControlType="XRCheckBox" Name="chkLanguageRepeatingIntactNoIfs" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Intact(no if&amp;apos;s and&amp;apos;s, or but&amp;apos;s)" Ref="361">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkLanguageRepeatingIntactNoIfs] == &apos;true&apos;, True, False)" Ref="362">
                                 </Item1>
@@ -1134,9 +1134,9 @@
                             </Item1>
                           </Controls>
                         </Item2>
-                        <Item3 ControlType="XRTableCell" Name="column_3" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="363">
+                        <Item3 ControlType="XRTableCell" Name="column_3" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="363">
                           <Controls>
-                            <Item1 ControlType="XRCheckBox" Name="chkLanguageRepeatingImpaired" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="160,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Impaired" Ref="364">
+                            <Item1 ControlType="XRCheckBox" Name="chkLanguageRepeatingImpaired" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Impaired" Ref="364">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkLanguageRepeatingImpaired] == &apos;true&apos;, True, False)" Ref="365">
                                 </Item1>
@@ -1144,9 +1144,9 @@
                             </Item1>
                           </Controls>
                         </Item3>
-                        <Item4 ControlType="XRTableCell" Name="column_4" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="366">
+                        <Item4 ControlType="XRTableCell" Name="column_4" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="366">
                           <Controls>
-                            <Item1 ControlType="XRCheckBox" Name="chkLanguageRepeatingOther" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="160,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Other" Ref="367">
+                            <Item1 ControlType="XRCheckBox" Name="chkLanguageRepeatingOther" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Other" Ref="367">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkLanguageRepeatingOther] == &apos;true&apos;, True, False)" Ref="368">
                                 </Item1>
@@ -1158,20 +1158,20 @@
                     </Item1>
                   </Rows>
                 </Item5>
-                <Item6 ControlType="XRLabel" Name="txtaLanguageRepeatingOther" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="530,60" LocationFloat="10,270" Font="Times New Roman, 9pt" Ref="369">
+                <Item6 ControlType="XRLabel" Name="txtaLanguageRepeatingOther" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="650,40" LocationFloat="10,210" Font="Times New Roman, 9pt" Ref="369">
                   <ExpressionBindings>
                     <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtaLanguageRepeatingOther]" Ref="370">
                     </Item1>
                   </ExpressionBindings>
                 </Item6>
-                <Item7 ControlType="XRLabel" Name="html2" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="710,30" LocationFloat="10,340" Font="Times New Roman, 9pt" Text="&lt;b&gt;Language(Abstraction)&lt;/b&gt;" Ref="371" />
-                <Item8 ControlType="XRTable" Name="columns2" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="710,50" LocationFloat="10,380" KeepTogether="true" AdjustToContainerWidth="true" Ref="372">
+                <Item7 ControlType="XRLabel" Name="html2" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="860,20" LocationFloat="10,260" Font="Times New Roman, 9pt" Text="&lt;b&gt;Language(Abstraction)&lt;/b&gt;" Ref="371" />
+                <Item8 ControlType="XRTable" Name="columns2" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="860,40" LocationFloat="10,290" KeepTogether="true" AdjustToContainerWidth="true" Ref="372">
                   <Rows>
-                    <Item1 ControlType="XRTableRow" Name="columnsRow_1775148917995" Weight="1" Ref="373">
+                    <Item1 ControlType="XRTableRow" Name="columnsRow_1775152540082" Weight="1" Ref="373">
                       <Cells>
-                        <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.333333" WidthF="240" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="374">
+                        <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.333333" WidthF="290" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="374">
                           <Controls>
-                            <Item1 ControlType="XRCheckBox" Name="chkLanguageAbstractionAbstract" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="220,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Abstract" Ref="375">
+                            <Item1 ControlType="XRCheckBox" Name="chkLanguageAbstractionAbstract" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="270,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Abstract" Ref="375">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkLanguageAbstractionAbstract] == &apos;true&apos;, True, False)" Ref="376">
                                 </Item1>
@@ -1179,9 +1179,9 @@
                             </Item1>
                           </Controls>
                         </Item1>
-                        <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.333333" WidthF="240" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="377">
+                        <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.333333" WidthF="290" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="377">
                           <Controls>
-                            <Item1 ControlType="XRCheckBox" Name="chkLanguageAbstractionConcrete" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="220,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Concrete" Ref="378">
+                            <Item1 ControlType="XRCheckBox" Name="chkLanguageAbstractionConcrete" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="270,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Concrete" Ref="378">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkLanguageAbstractionConcrete] == &apos;true&apos;, True, False)" Ref="379">
                                 </Item1>
@@ -1189,9 +1189,9 @@
                             </Item1>
                           </Controls>
                         </Item2>
-                        <Item3 ControlType="XRTableCell" Name="column_3" Weight="0.333333" WidthF="240" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="380">
+                        <Item3 ControlType="XRTableCell" Name="column_3" Weight="0.333333" WidthF="290" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="380">
                           <Controls>
-                            <Item1 ControlType="XRCheckBox" Name="chkLanguageAbstractionOther" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="220,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Other" Ref="381">
+                            <Item1 ControlType="XRCheckBox" Name="chkLanguageAbstractionOther" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="270,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Other" Ref="381">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkLanguageAbstractionOther] == &apos;true&apos;, True, False)" Ref="382">
                                 </Item1>
@@ -1203,20 +1203,20 @@
                     </Item1>
                   </Rows>
                 </Item8>
-                <Item9 ControlType="XRLabel" Name="txtaLanguageAbstractionOther" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="530,60" LocationFloat="10,440" Font="Times New Roman, 9pt" Ref="383">
+                <Item9 ControlType="XRLabel" Name="txtaLanguageAbstractionOther" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="650,40" LocationFloat="10,340" Font="Times New Roman, 9pt" Ref="383">
                   <ExpressionBindings>
                     <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtaLanguageAbstractionOther]" Ref="384">
                     </Item1>
                   </ExpressionBindings>
                 </Item9>
-                <Item10 ControlType="XRLabel" Name="html3" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="710,30" LocationFloat="10,510" Font="Times New Roman, 9pt" Text="&lt;b&gt;Fund of knowledge&lt;/b&gt;" Ref="385" />
-                <Item11 ControlType="XRTable" Name="columns3" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="710,50" LocationFloat="10,550" KeepTogether="true" AdjustToContainerWidth="true" Ref="386">
+                <Item10 ControlType="XRLabel" Name="html3" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="860,20" LocationFloat="10,390" Font="Times New Roman, 9pt" Text="&lt;b&gt;Fund of knowledge&lt;/b&gt;" Ref="385" />
+                <Item11 ControlType="XRTable" Name="columns3" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="860,40" LocationFloat="10,420" KeepTogether="true" AdjustToContainerWidth="true" Ref="386">
                   <Rows>
-                    <Item1 ControlType="XRTableRow" Name="columnsRow_1775148917996" Weight="1" Ref="387">
+                    <Item1 ControlType="XRTableRow" Name="columnsRow_1775152540084" Weight="1" Ref="387">
                       <Cells>
-                        <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.333333" WidthF="240" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="388">
+                        <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.333333" WidthF="290" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="388">
                           <Controls>
-                            <Item1 ControlType="XRCheckBox" Name="chkFundKnowledgeExcellent" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="220,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Excellent" Ref="389">
+                            <Item1 ControlType="XRCheckBox" Name="chkFundKnowledgeExcellent" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="270,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Excellent" Ref="389">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkFundKnowledgeExcellent] == &apos;true&apos;, True, False)" Ref="390">
                                 </Item1>
@@ -1224,9 +1224,9 @@
                             </Item1>
                           </Controls>
                         </Item1>
-                        <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.333333" WidthF="240" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="391">
+                        <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.333333" WidthF="290" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="391">
                           <Controls>
-                            <Item1 ControlType="XRCheckBox" Name="chkFundKnowledgeAverage" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="220,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Average" Ref="392">
+                            <Item1 ControlType="XRCheckBox" Name="chkFundKnowledgeAverage" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="270,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Average" Ref="392">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkFundKnowledgeAverage] == &apos;true&apos;, True, False)" Ref="393">
                                 </Item1>
@@ -1234,9 +1234,9 @@
                             </Item1>
                           </Controls>
                         </Item2>
-                        <Item3 ControlType="XRTableCell" Name="column_3" Weight="0.333333" WidthF="240" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="394">
+                        <Item3 ControlType="XRTableCell" Name="column_3" Weight="0.333333" WidthF="290" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="394">
                           <Controls>
-                            <Item1 ControlType="XRCheckBox" Name="chkFundKnowledgePoor" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="220,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Poor as evidenced by" Ref="395">
+                            <Item1 ControlType="XRCheckBox" Name="chkFundKnowledgePoor" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="270,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Poor as evidenced by" Ref="395">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkFundKnowledgePoor] == &apos;true&apos;, True, False)" Ref="396">
                                 </Item1>
@@ -1248,20 +1248,20 @@
                     </Item1>
                   </Rows>
                 </Item11>
-                <Item12 ControlType="XRLabel" Name="txtaFundKnowledgeOther" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="530,60" LocationFloat="10,610" Font="Times New Roman, 9pt" Ref="397">
+                <Item12 ControlType="XRLabel" Name="txtaFundKnowledgeOther" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="650,40" LocationFloat="10,470" Font="Times New Roman, 9pt" Ref="397">
                   <ExpressionBindings>
                     <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtaFundKnowledgeOther]" Ref="398">
                     </Item1>
                   </ExpressionBindings>
                 </Item12>
-                <Item13 ControlType="XRLabel" Name="html4" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="710,30" LocationFloat="10,680" Font="Times New Roman, 9pt" Text="&lt;b&gt;Gait/Station&lt;/b&gt;" Ref="399" />
-                <Item14 ControlType="XRTable" Name="columns6" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="710,50" LocationFloat="10,720" KeepTogether="true" AdjustToContainerWidth="true" Ref="400">
+                <Item13 ControlType="XRLabel" Name="html4" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="860,20" LocationFloat="10,520" Font="Times New Roman, 9pt" Text="&lt;b&gt;Gait/Station&lt;/b&gt;" Ref="399" />
+                <Item14 ControlType="XRTable" Name="columns6" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="860,40" LocationFloat="10,550" KeepTogether="true" AdjustToContainerWidth="true" Ref="400">
                   <Rows>
-                    <Item1 ControlType="XRTableRow" Name="columnsRow_1775148917997" Weight="1" Ref="401">
+                    <Item1 ControlType="XRTableRow" Name="columnsRow_1775152540085" Weight="1" Ref="401">
                       <Cells>
-                        <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.500000" WidthF="360" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="402">
+                        <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.500000" WidthF="430" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="402">
                           <Controls>
-                            <Item1 ControlType="XRCheckBox" Name="chkGaitNL" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="340,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="NL" Ref="403">
+                            <Item1 ControlType="XRCheckBox" Name="chkGaitNL" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="410,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="NL" Ref="403">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkGaitNL] == &apos;true&apos;, True, False)" Ref="404">
                                 </Item1>
@@ -1269,9 +1269,9 @@
                             </Item1>
                           </Controls>
                         </Item1>
-                        <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.500000" WidthF="360" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="405">
+                        <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.500000" WidthF="430" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="405">
                           <Controls>
-                            <Item1 ControlType="XRCheckBox" Name="chkGaitImpaired" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="340,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Impaired" Ref="406">
+                            <Item1 ControlType="XRCheckBox" Name="chkGaitImpaired" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="410,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Impaired" Ref="406">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkGaitImpaired] == &apos;true&apos;, True, False)" Ref="407">
                                 </Item1>
@@ -1283,20 +1283,20 @@
                     </Item1>
                   </Rows>
                 </Item14>
-                <Item15 ControlType="XRLabel" Name="txtaGaitOther" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="530,60" LocationFloat="10,780" Font="Times New Roman, 9pt" Ref="408">
+                <Item15 ControlType="XRLabel" Name="txtaGaitOther" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="650,40" LocationFloat="10,600" Font="Times New Roman, 9pt" Ref="408">
                   <ExpressionBindings>
                     <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtaGaitOther]" Ref="409">
                     </Item1>
                   </ExpressionBindings>
                 </Item15>
-                <Item16 ControlType="XRLabel" Name="html5" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="710,30" LocationFloat="10,850" Font="Times New Roman, 9pt" Text="&lt;b&gt;Muscle Strength&lt;/b&gt;" Ref="410" />
-                <Item17 ControlType="XRTable" Name="columns7" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="710,50" LocationFloat="10,890" KeepTogether="true" AdjustToContainerWidth="true" Ref="411">
+                <Item16 ControlType="XRLabel" Name="html5" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="860,20" LocationFloat="10,650" Font="Times New Roman, 9pt" Text="&lt;b&gt;Muscle Strength&lt;/b&gt;" Ref="410" />
+                <Item17 ControlType="XRTable" Name="columns7" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="860,40" LocationFloat="10,680" KeepTogether="true" AdjustToContainerWidth="true" Ref="411">
                   <Rows>
-                    <Item1 ControlType="XRTableRow" Name="columnsRow_1775148917998" Weight="1" Ref="412">
+                    <Item1 ControlType="XRTableRow" Name="columnsRow_1775152540086" Weight="1" Ref="412">
                       <Cells>
-                        <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.333333" WidthF="240" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="413">
+                        <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.333333" WidthF="290" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="413">
                           <Controls>
-                            <Item1 ControlType="XRCheckBox" Name="chkMuscleStrengthNL" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="220,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="NL" Ref="414">
+                            <Item1 ControlType="XRCheckBox" Name="chkMuscleStrengthNL" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="270,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="NL" Ref="414">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkMuscleStrengthNL] == &apos;true&apos;, True, False)" Ref="415">
                                 </Item1>
@@ -1304,9 +1304,9 @@
                             </Item1>
                           </Controls>
                         </Item1>
-                        <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.333333" WidthF="240" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="416">
+                        <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.333333" WidthF="290" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="416">
                           <Controls>
-                            <Item1 ControlType="XRCheckBox" Name="chkMuscleStrengthImpaired" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="220,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Impaired" Ref="417">
+                            <Item1 ControlType="XRCheckBox" Name="chkMuscleStrengthImpaired" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="270,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Impaired" Ref="417">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkMuscleStrengthImpaired] == &apos;true&apos;, True, False)" Ref="418">
                                 </Item1>
@@ -1314,9 +1314,9 @@
                             </Item1>
                           </Controls>
                         </Item2>
-                        <Item3 ControlType="XRTableCell" Name="column_3" Weight="0.333333" WidthF="240" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="419">
+                        <Item3 ControlType="XRTableCell" Name="column_3" Weight="0.333333" WidthF="290" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="419">
                           <Controls>
-                            <Item1 ControlType="XRCheckBox" Name="chkMuscleStrengthOther" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="220,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Other" Ref="420">
+                            <Item1 ControlType="XRCheckBox" Name="chkMuscleStrengthOther" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="270,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Other" Ref="420">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkMuscleStrengthOther] == &apos;true&apos;, True, False)" Ref="421">
                                 </Item1>
@@ -1328,20 +1328,20 @@
                     </Item1>
                   </Rows>
                 </Item17>
-                <Item18 ControlType="XRLabel" Name="txtaMuscleStrengthOther" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="530,60" LocationFloat="10,950" Font="Times New Roman, 9pt" Ref="422">
+                <Item18 ControlType="XRLabel" Name="txtaMuscleStrengthOther" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="650,40" LocationFloat="10,730" Font="Times New Roman, 9pt" Ref="422">
                   <ExpressionBindings>
                     <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtaMuscleStrengthOther]" Ref="423">
                     </Item1>
                   </ExpressionBindings>
                 </Item18>
-                <Item19 ControlType="XRLabel" Name="html6" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="710,30" LocationFloat="10,1020" Font="Times New Roman, 9pt" Text="&lt;b&gt;Muscle Tone&lt;/b&gt;" Ref="424" />
-                <Item20 ControlType="XRTable" Name="columns8" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="710,50" LocationFloat="10,1060" KeepTogether="true" AdjustToContainerWidth="true" Ref="425">
+                <Item19 ControlType="XRLabel" Name="html6" TextAlignment="TopLeft" Borders="None" Padding="2,2,0,0,100" Multiline="false" AllowMarkupText="true" SizeF="860,20" LocationFloat="10,780" Font="Times New Roman, 9pt" Text="&lt;b&gt;Muscle Tone&lt;/b&gt;" Ref="424" />
+                <Item20 ControlType="XRTable" Name="columns8" AnchorHorizontal="Both" AnchorVertical="Top" Padding="0,0,0,0,96" SizeF="860,40" LocationFloat="10,810" KeepTogether="true" AdjustToContainerWidth="true" Ref="425">
                   <Rows>
-                    <Item1 ControlType="XRTableRow" Name="columnsRow_1775148917999" Weight="1" Ref="426">
+                    <Item1 ControlType="XRTableRow" Name="columnsRow_1775152540087" Weight="1" Ref="426">
                       <Cells>
-                        <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="427">
+                        <Item1 ControlType="XRTableCell" Name="column_1" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="427">
                           <Controls>
-                            <Item1 ControlType="XRCheckBox" Name="chkMuscleToneNL" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="160,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="NL" Ref="428">
+                            <Item1 ControlType="XRCheckBox" Name="chkMuscleToneNL" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="NL" Ref="428">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkMuscleToneNL] == &apos;true&apos;, True, False)" Ref="429">
                                 </Item1>
@@ -1349,9 +1349,9 @@
                             </Item1>
                           </Controls>
                         </Item1>
-                        <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="430">
+                        <Item2 ControlType="XRTableCell" Name="column_2" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="430">
                           <Controls>
-                            <Item1 ControlType="XRCheckBox" Name="chkMuscleToneFlaccid" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="160,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Flaccid" Ref="431">
+                            <Item1 ControlType="XRCheckBox" Name="chkMuscleToneFlaccid" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Flaccid" Ref="431">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkMuscleToneFlaccid] == &apos;true&apos;, True, False)" Ref="432">
                                 </Item1>
@@ -1359,9 +1359,9 @@
                             </Item1>
                           </Controls>
                         </Item2>
-                        <Item3 ControlType="XRTableCell" Name="column_3" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="433">
+                        <Item3 ControlType="XRTableCell" Name="column_3" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="433">
                           <Controls>
-                            <Item1 ControlType="XRCheckBox" Name="chkMuscleToneCogWheel" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="160,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Cog Wheel" Ref="434">
+                            <Item1 ControlType="XRCheckBox" Name="chkMuscleToneCogWheel" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Cog Wheel" Ref="434">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkMuscleToneCogWheel] == &apos;true&apos;, True, False)" Ref="435">
                                 </Item1>
@@ -1369,9 +1369,9 @@
                             </Item1>
                           </Controls>
                         </Item3>
-                        <Item4 ControlType="XRTableCell" Name="column_4" Weight="0.250000" WidthF="180" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="436">
+                        <Item4 ControlType="XRTableCell" Name="column_4" Weight="0.250000" WidthF="220" Padding="8,8,8,8,96" Borders="None" TextAlignment="TopLeft" Ref="436">
                           <Controls>
-                            <Item1 ControlType="XRCheckBox" Name="chkMuscleToneSpastic" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="160,30" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Spastic" Ref="437">
+                            <Item1 ControlType="XRCheckBox" Name="chkMuscleToneSpastic" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="200,20" LocationFloat="10,0" Font="Times New Roman, 9pt" Text="Spastic" Ref="437">
                               <ExpressionBindings>
                                 <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkMuscleToneSpastic] == &apos;true&apos;, True, False)" Ref="438">
                                 </Item1>
@@ -1383,13 +1383,13 @@
                     </Item1>
                   </Rows>
                 </Item20>
-                <Item21 ControlType="XRCheckBox" Name="chkMuscleToneOther" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="710,30" LocationFloat="10,1120" Font="Times New Roman, 9pt" Text="Other" Ref="439">
+                <Item21 ControlType="XRCheckBox" Name="chkMuscleToneOther" Padding="2,2,0,0,100" GlyphOptions="[object Object]" SizeF="860,20" LocationFloat="10,860" Font="Times New Roman, 9pt" Text="Other" Ref="439">
                   <ExpressionBindings>
                     <Item1 EventName="BeforePrint" PropertyName="CheckBoxState" Expression="IIF([chkMuscleToneOther] == &apos;true&apos;, True, False)" Ref="440">
                     </Item1>
                   </ExpressionBindings>
                 </Item21>
-                <Item22 ControlType="XRLabel" Name="txtaMuscleToneOther" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="530,60" LocationFloat="10,1160" Font="Times New Roman, 9pt" Ref="441">
+                <Item22 ControlType="XRLabel" Name="txtaMuscleToneOther" TextAlignment="BottomLeft" Multiline="true" Borders="Bottom" Padding="2,2,0,0,100" SizeF="650,40" LocationFloat="10,890" Font="Times New Roman, 9pt" Ref="441">
                   <ExpressionBindings>
                     <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[txtaMuscleToneOther]" Ref="442">
                     </Item1>
@@ -1399,7 +1399,7 @@
             </Item2>
           </Controls>
         </Item2>
-        <Item3 ControlType="XRLabel" Name="submit" Visible="false" SizeF="750,30" LocationFloat="0,4040" Font="Times New Roman, 9pt" Ref="443">
+        <Item3 ControlType="XRLabel" Name="submit" Visible="false" SizeF="900,20" LocationFloat="0,3100" Font="Times New Roman, 9pt" Ref="443">
           <ExpressionBindings>
             <Item1 EventName="BeforePrint" PropertyName="Text" Expression="[submit]" Ref="444">
             </Item1>
