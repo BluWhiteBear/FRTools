@@ -280,14 +280,28 @@ class XMLProcessor
         // ? Assign ref count if needed
         if (node.needsRef)
         {
-            // console.log('[assignReferences] Assigning Ref:', {
-            //     currentRef: this.currentRef,
-            //     nodeType: node.type,
-            //     nodeName: node.attributes?.Name || 'unnamed'
-            // });
-            //console.log('[assignReferences] Before increment, currentRef:', this.currentRef);
-            node.attributes.Ref = this.currentRef++;
-            //console.log('[assignReferences] After increment, currentRef:', this.currentRef);
+            const hasExplicitRef = node.attributes && node.attributes.Ref !== undefined && node.attributes.Ref !== null && node.attributes.Ref !== '';
+
+            if (hasExplicitRef)
+            {
+                // Preserve explicitly assigned refs (ex: ComponentStorage Item1 must remain Ref="0").
+                const explicitRefNum = Number.parseInt(String(node.attributes.Ref), 10);
+                if (!Number.isNaN(explicitRefNum))
+                {
+                    this.currentRef = Math.max(this.currentRef, explicitRefNum + 1);
+                }
+            }
+            else
+            {
+                // console.log('[assignReferences] Assigning Ref:', {
+                //     currentRef: this.currentRef,
+                //     nodeType: node.type,
+                //     nodeName: node.attributes?.Name || 'unnamed'
+                // });
+                //console.log('[assignReferences] Before increment, currentRef:', this.currentRef);
+                node.attributes.Ref = this.currentRef++;
+                //console.log('[assignReferences] After increment, currentRef:', this.currentRef);
+            }
         }
 
         // ? Recursively process all children elements if they exist
