@@ -841,8 +841,8 @@ export class ComponentProcessor
                 } else if (comp.type === 'content' && comp.html) {
                     componentHeight = this.calculateHtmlHeight(comp.html, childContainerWidth);
                 } else if (comp.type === 'panel' || comp.type === 'fieldset' || comp.type === 'well') {
-                    // Pass isNested = true so child containers don't add their own outer padding
-                    componentHeight = this.calculateContainerHeight(comp, true, childContainerWidth);
+                    // Parent estimates must match rendered child SizeF, which includes section padding.
+                    componentHeight = this.calculateContainerHeight(comp, false, childContainerWidth);
                 } else if (comp.type === 'table' && comp.rows) {
                     componentHeight = this.calculateTableHeight(comp, childContainerWidth);
                 } else if (comp.type === 'columns' && comp.columns) {
@@ -852,7 +852,7 @@ export class ComponentProcessor
                 } else if (comp.type === 'tabs' && comp.components) {
                     // Use LAYOUT.VERTICAL_SPACING to match the spacing processTabs actually applies
                     componentHeight = comp.components.reduce((tabsHeight, tab) => {
-                        const tabHeight = this.calculateContainerHeight(tab, true, childContainerWidth);
+                        const tabHeight = this.calculateContainerHeight(tab, false, childContainerWidth);
                         return tabsHeight + tabHeight + LAYOUT.VERTICAL_SPACING;
                     }, 0);
                 }
@@ -1408,7 +1408,7 @@ export class ComponentProcessor
                     }
                     else if (comp.type === 'panel' || comp.type === 'fieldset' || comp.type === 'well')
                     {
-                        componentHeight = this.calculateContainerHeight(comp, true, cellWidth);
+                        componentHeight = this.calculateContainerHeight(comp, false, cellWidth);
                     }
                     else if (comp.type === 'table' && comp.rows)
                     {
@@ -1425,7 +1425,7 @@ export class ComponentProcessor
                     else if (comp.type === 'tabs' && comp.components)
                     {
                         componentHeight = comp.components.reduce((tabsHeight, tab) => {
-                            const tabHeight = this.calculateContainerHeight(tab, true, cellWidth);
+                            const tabHeight = this.calculateContainerHeight(tab, false, cellWidth);
                             return tabsHeight + tabHeight + LAYOUT.VERTICAL_SPACING;
                         }, 0);
                     }
@@ -1495,7 +1495,7 @@ export class ComponentProcessor
                     }
                     else if (comp.type === 'panel' || comp.type === 'fieldset' || comp.type === 'well')
                     {
-                        componentHeight = this.calculateContainerHeight(comp, true, columnWidth);
+                        componentHeight = this.calculateContainerHeight(comp, false, columnWidth);
                     }
                     else if (comp.type === 'table' && comp.rows)
                     {
@@ -1512,7 +1512,7 @@ export class ComponentProcessor
                     else if (comp.type === 'tabs' && comp.components)
                     {
                         componentHeight = comp.components.reduce((tabsHeight, tab) => {
-                            const tabHeight = this.calculateContainerHeight(tab, true, columnWidth);
+                            const tabHeight = this.calculateContainerHeight(tab, false, columnWidth);
                             return tabsHeight + tabHeight + LAYOUT.VERTICAL_SPACING;
                         }, 0);
                     }
