@@ -217,40 +217,92 @@ window.addEventListener('DOMContentLoaded', () => {
     const applyBtn = document.getElementById('applySettingsBtn');
     if (applyBtn) {
         applyBtn.addEventListener('click', () => {
-            SettingsManager.saveSettings();
-            applyLayoutSettingsFromUI();
-            // Use the most up-to-date form data reference
-            const formData = window.currentFormioData || window.lastUploadedForm;
-            if (formData) {
-                DevExpressConverter.applySettings();
-                DevExpressConverter.initialize();
-                // Generate DevExpress report output
-                const devExpressJson = DevExpressConverter.transformToDevExpress(formData);
-                DevExpressConverter.state.devExpressJson = devExpressJson;
+            const conflicts = validateSettingsConflicts();
+            if (conflicts.length > 0) {
+                // Populate and show the conflict modal
+                const list = document.getElementById('settingsConflictList');
+                list.innerHTML = conflicts.map(c => `<li>${c}</li>`).join('');
+                const modalEl = document.getElementById('settingsConflictModal');
+                const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
 
-                // Update DevExpress JSON preview
-                const devExpressJsonContainer = document.getElementById('devexpress-json');
-                if (devExpressJsonContainer) {
-                    devExpressJsonContainer.innerHTML = `<code class="language-json">${JSON.stringify(devExpressJson, null, 2)}</code>`;
-                    Prism.highlightAll();
-                }
+                // Wire "Apply Anyway" to proceed after dismissing
+                const applyAnywayBtn = document.getElementById('settingsConflictApplyAnywayBtn');
+                const onApplyAnyway = () => {
+                    modal.hide();
+                    applyAnywayBtn.removeEventListener('click', onApplyAnyway);
+                    doApplySettings();
+                };
+                applyAnywayBtn.addEventListener('click', onApplyAnyway);
 
-                // Regenerate SQL preview
-                Utils.generateSqlQuery(formData);
+                // Clean up listener if modal is dismissed without applying
+                modalEl.addEventListener('hidden.bs.modal', () => {
+                    applyAnywayBtn.removeEventListener('click', onApplyAnyway);
+                }, { once: true });
 
-                if (window.showToast) {
-                    window.showToast('Settings applied and printout regenerated.', 'success');
-                }
-                //console.log('[SettingsManager] Settings applied and printout regenerated.');
+                modal.show();
             } else {
-                if (window.showToast) {
-                    window.showToast('No form uploaded. Cannot regenerate printout.', 'warning');
-                }
-                //console.warn('[SettingsManager] No form uploaded. Cannot regenerate printout.');
+                doApplySettings();
             }
         });
     }
 });
+
+function doApplySettings() {
+    SettingsManager.saveSettings();
+    applyLayoutSettingsFromUI();
+    const formData = window.currentFormioData || window.lastUploadedForm;
+    if (formData) {
+        DevExpressConverter.applySettings();
+        DevExpressConverter.initialize();
+        const devExpressJson = DevExpressConverter.transformToDevExpress(formData);
+        DevExpressConverter.state.devExpressJson = devExpressJson;
+
+        const devExpressJsonContainer = document.getElementById('devexpress-json');
+        if (devExpressJsonContainer) {
+            devExpressJsonContainer.innerHTML = `<code class="language-json">${JSON.stringify(devExpressJson, null, 2)}</code>`;
+            Prism.highlightAll();
+        }
+
+        Utils.generateSqlQuery(formData);
+
+        if (window.showToast) {
+            window.showToast('Settings applied and printout regenerated.', 'success');
+        }
+    } else {
+        if (window.showToast) {
+            window.showToast('No form uploaded. Cannot regenerate printout.', 'warning');
+        }
+    }
+}
+
+function validateSettingsConflicts() {
+    const conflicts = [];
+
+    const alignToGrid = document.getElementById('settings_alignToGrid')?.checked;
+    if (!alignToGrid) return conflicts;
+
+    const gridSize = parseFloat(document.getElementById('settings_snapGridSize')?.value) || 10;
+
+    const checks = [
+        { id: 'settings_pageWidth',      label: 'Page Width' },
+        { id: 'settings_marginsLeft',    label: 'Left Margin' },
+        { id: 'settings_marginsRight',   label: 'Right Margin' },
+        { id: 'settings_marginsTop',     label: 'Top Margin' },
+        { id: 'settings_marginsBottom',  label: 'Bottom Margin' },
+        { id: 'settings_labelHeight',    label: 'Label Height' },
+        { id: 'settings_outputHeight',   label: 'Output Height' },
+        { id: 'settings_verticalSpacing', label: 'Vertical Spacing' },
+    ];
+
+    for (const { id, label } of checks) {
+        const val = parseFloat(document.getElementById(id)?.value);
+        if (!isNaN(val) && val % gridSize !== 0) {
+            conflicts.push(`${label} (${val}) is not divisible by snap grid size (${gridSize})`);
+        }
+    }
+
+    return conflicts;
+}
 
 function applyLayoutSettingsFromUI() {
     // Get the Page Width field value
