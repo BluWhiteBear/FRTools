@@ -178,7 +178,8 @@
     box-sizing: border-box;
     min-height: 1px;
     width: 100%;
-    overflow: visible;
+    /* hidden prevents content in one band from visually bleeding into the next */
+    overflow: hidden;
 }
 
 /* Component Base Styles */
@@ -245,26 +246,12 @@
     outline-offset: 1px;
 }
 
-/* Expression Fields */
+/* Expression Fields — keep position:absolute so layout is not broken */
 .report-component.expression-field {
-    position: relative;
+    outline: 1px dashed rgba(255, 140, 0, 0.5);
 }
 
-.report-component.expression-field::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    pointer-events: none;
-}
 
-/* Panel specific styles */
-.component-panel {
-    position: absolute;
-    overflow: visible;
-}
 
 /* Margin Bands */
 .band-margin {
@@ -350,16 +337,7 @@
     z-index: 1;
 }
 
-/* Component Styles */
-.report-component {
-    position: absolute;
-    box-sizing: border-box;
-}
 
-/* Boundary Visualization */
-.show-boundaries .report-band {
-    outline: 2px dashed rgb(0, 0, 0);
-}
 
 /* Band Type Colors (visible when boundaries are shown) */
 .show-boundaries .report-band[data-band-type="TopMarginBand"] {

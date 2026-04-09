@@ -167,13 +167,9 @@ class ReportViewer {
         const rootEl = xmlDoc.querySelector('XtraReportsLayoutSerializer');
         const pageWidth = parseFloat(rootEl?.getAttribute('PageWidth')) || 850;
         const margins = this.parseMargins(rootEl?.getAttribute('Margins'));
+        this.currentMargins = margins;
 
         page.style.width = `${pageWidth}px`;
-        page.style.paddingLeft = `${margins.left}px`;
-        page.style.paddingRight = `${margins.right}px`;
-        page.style.paddingTop = `${margins.top}px`;
-        page.style.paddingBottom = `${margins.bottom}px`;
-        page.style.boxSizing = 'border-box';
 
         const bandsContainer = xmlDoc.querySelector('XtraReportsLayoutSerializer > Bands');
         if (!bandsContainer) {
@@ -194,7 +190,7 @@ class ReportViewer {
 
             const bandEl = this.createBandElement(bandXml);
             bandEl.style.top = `${currentY}px`;
-            this.processComponents(bandXml, bandEl);
+            this.processComponents(bandXml, bandEl, this.currentMargins.left);
             page.appendChild(bandEl);
 
             currentY += parseFloat(bandXml.getAttribute('HeightF')) || 0;
@@ -233,19 +229,19 @@ class ReportViewer {
         return band;
     }
 
-    processComponents(parentXml, parentElement) {
+    processComponents(parentXml, parentElement, xOffset = 0) {
         const controls = parentXml.querySelector(':scope > Controls');
         if (!controls) return;
 
         Array.from(controls.children).forEach((controlXml) => {
             const controlType = controlXml.getAttribute('ControlType') || '';
             if (!controlType.startsWith('XR')) return;
-            const child = this.createComponentElement(controlXml);
+            const child = this.createComponentElement(controlXml, xOffset);
             if (child) parentElement.appendChild(child);
         });
     }
 
-    createComponentElement(componentXml) {
+    createComponentElement(componentXml, xOffset = 0) {
         const controlType = componentXml.getAttribute('ControlType') || '';
 
         const element = document.createElement('div');
@@ -260,7 +256,7 @@ class ReportViewer {
         if (locStr && sizeStr) {
             const [x, y] = locStr.split(',').map((n) => parseFloat(n.trim()) || 0);
             const [w, h] = sizeStr.split(',').map((n) => parseFloat(n.trim()) || 0);
-            element.style.left = `${x}px`;
+            element.style.left = `${x + xOffset}px`;
             element.style.top = `${y}px`;
             element.style.width = `${w}px`;
             element.style.height = `${h}px`;
