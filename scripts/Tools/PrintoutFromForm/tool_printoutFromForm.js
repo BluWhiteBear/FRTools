@@ -3059,7 +3059,9 @@ function generateMinimalXmlTemplate()
                 // Create keys band with nested DetailBand
                 const keysReport = processor.createItemNode(undefined, "DetailReportBand", {
                     Name: `DetailReport_${gridBaseName}_keys`,
-                    HeightF: window.LAYOUT.INPUT_HEIGHT.toString()
+                    HeightF: window.LAYOUT.INPUT_HEIGHT.toString(),
+                    DataSource: `#Ref-${325 + group.gridIndex}`,
+                    DataMember: `cstm_${deptName}_${name}_${gridBaseName}`
                 });
                 const keysBands = processor.buildNode('Bands', {}, [
                     processor.createItemNode(1, "DetailBand", {
