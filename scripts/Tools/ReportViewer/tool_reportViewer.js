@@ -600,9 +600,12 @@ class ReportViewer {
                 ? Array.from(cellsContainer.children).filter((el) => el.getAttribute('ControlType') === 'XRTableCell')
                 : [];
 
+            const totalCellWeight = cellXmls.reduce((sum, c) => sum + (parseFloat(c.getAttribute('Weight')) || 1), 0);
+
             let cellX = 0;
             cellXmls.forEach((cellXml) => {
-                const cellW = parseFloat(cellXml.getAttribute('WidthF')) || 0;
+                const cellWeight = parseFloat(cellXml.getAttribute('Weight')) || 1;
+                const cellW = totalCellWeight > 0 ? (cellWeight / totalCellWeight) * tableW : tableW / cellXmls.length;
 
                 const cellDiv = document.createElement('div');
                 cellDiv.className = 'report-table-cell';
@@ -639,6 +642,17 @@ class ReportViewer {
                         const child = this.createComponentElement(controlXml);
                         if (child) cellDiv.appendChild(child);
                     });
+                } else {
+                    // XRTableCell with a direct Text attribute and no child controls
+                    const cellText = cellXml.getAttribute('Text');
+                    if (cellText) {
+                        const textAlign = cellXml.getAttribute('TextAlignment') || '';
+                        this.applyTextAlignment(cellDiv, textAlign);
+                        this.applyFont(cellDiv, cellXml.getAttribute('Font'));
+                        const fg = this.parseColor(cellXml.getAttribute('ForeColor'));
+                        if (fg) cellDiv.style.color = fg;
+                        cellDiv.textContent = cellText;
+                    }
                 }
 
                 rowDiv.appendChild(cellDiv);
