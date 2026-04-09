@@ -210,7 +210,9 @@ function buildComponentStorage(formioData, processor) {
     ];
     
     // Find and process grid components for Item2+
-    const grids = DevExpressConverter.findDataGridComponents(formioData);
+    // Data grids are defined under FormioTemplate in the uploaded payload.
+    const gridSource = formioData?.FormioTemplate || formioData;
+    const grids = DevExpressConverter.findDataGridComponents(gridSource);
     
     grids.forEach((grid, idx) => {
         const gridKey = grid.key || `grid${idx}`;
