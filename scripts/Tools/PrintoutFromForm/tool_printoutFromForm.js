@@ -209,10 +209,10 @@ function buildComponentStorage(formioData, processor) {
         })
     ];
     
-    // Find and process grid components for Item2+
-    // Data grids are defined under FormioTemplate in the uploaded payload.
+    // Find and process grid components (DataGrid + FormGrid) for Item2+
+    // Grids are defined under FormioTemplate in the uploaded payload.
     const gridSource = formioData?.FormioTemplate || formioData;
-    const grids = DevExpressConverter.findDataGridComponents(gridSource);
+    const grids = DevExpressConverter.findAllGridComponents(gridSource);
     
     grids.forEach((grid, idx) => {
         const gridKey = grid.key || `grid${idx}`;
@@ -965,6 +965,61 @@ class DevExpressConverter
             if (component.components)
             {
                 this.findDataGridComponents(
+                {
+                    components: component.components
+                }, results);
+            }
+        }
+
+        return results;
+    }
+
+    // ? Recursively finds all grid components (DataGrid + FormGrid) in source order
+    // ? Returns an array of component objects
+    static findAllGridComponents(formioData, results = [])
+    {
+        // ! /// EARLY EXIT ///
+        if (!formioData) return results;
+
+        // ? Adds root-level DataGrid/FormGrid if present
+        if (formioData.Grid?.dataGrid?.DBTableName)
+        {
+            results.push({
+                DBName: formioData.Grid.dataGrid.DBTableName,
+                type: 'datagrid',
+                key: formioData.Grid.dataGrid.key || 'mainGrid'
+            });
+        }
+        if (formioData.Grid?.formGrid?.DBTableName)
+        {
+            results.push({
+                DBName: formioData.Grid.formGrid.DBTableName,
+                type: 'formgrid',
+                IsFormGrid: true,
+                key: formioData.Grid.formGrid.key || 'mainFormGrid'
+            });
+        }
+
+        const components = formioData.components;
+        if (!components) return results;
+
+        for (const component of components)
+        {
+            const isGridType = component.type === 'datagrid' || component.type === 'formgrid';
+            const isFormGridFlagged = component.type === 'datagrid' && component.IsFormGrid;
+
+            if ((isGridType || isFormGridFlagged) && component.DBName)
+            {
+                const safeKey = component.key || `grid_${results.length + 1}`;
+                results.push({
+                    ...component,
+                    key: safeKey
+                });
+            }
+
+            if (component.components)
+            {
+                this.findAllGridComponents(
                 {
                     components: component.components
                 }, results);
