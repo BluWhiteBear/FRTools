@@ -186,72 +186,29 @@
     position: absolute;
     box-sizing: border-box;
     pointer-events: all;
-    font-family: Arial, sans-serif;
-}
-
-/* Component Categories */
-.component-text {
-    display: flex;
-    align-items: center;
-    overflow: hidden;
-    white-space: pre-wrap;
-}
-
-.component-input {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.component-media {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    font-family: "Times New Roman", serif;
+    font-size: 9pt;
+    color: #000;
     overflow: hidden;
 }
 
-.component-container {
-    display: block;
-    overflow: visible;
-}
+/* Panels and tables overflow visible so positioned children render correctly */
 
 /* Specific Component Types */
-.component-label {
-    
-}
-
-.component-checkbox {
-    
-}
-
 .component-picture-box img {
-    max-width: 100%;
-    max-height: 100%;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
 }
 
-.component-panel {
-    background: transparent;
-}
+.component-panel,
+.component-table { overflow: visible; background: transparent; }
 
-.component-rich-text {
-    overflow-y: auto;
-    padding: 2px;
-}
+.report-table-row  { overflow: visible; }
+.report-table-cell { position: absolute; box-sizing: border-box; overflow: visible; }
 
-.component-table {
-    overflow: hidden;
-}
-
-.component-line {
-    padding: 0;
-    overflow: visible;
-}
-
-.component-shape {
-    padding: 0;
-    overflow: visible;
-}
+.component-line,
+.component-shape  { overflow: visible; }
 
 /* Show boundaries when enabled */
 .show-boundaries .report-component {
@@ -267,6 +224,7 @@
         rgba(var(--band-color), 0.2) 10px,
         rgba(var(--band-color), 0.2) 20px
     );
+    background-blend-mode: multiply;
 }
 
 .show-boundaries .component-checkbox {

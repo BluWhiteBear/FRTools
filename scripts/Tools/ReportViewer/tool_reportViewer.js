@@ -7,29 +7,18 @@ class ReportViewer {
         this.selectedComponent = null;
         this.reportData = null;
         this.xmlIndentSize = 2;
-
-        console.log('ReportViewer initialized with container:', container);
-        // Initialize event handlers
         this.initEventHandlers();
     }
 
     initEventHandlers() {
-        // Zoom controls
         document.getElementById('zoomIn')?.addEventListener('click', () => this.setZoom(this.scale * 1.2));
         document.getElementById('zoomOut')?.addEventListener('click', () => this.setZoom(this.scale * 0.8));
-
-        // Show boundaries toggle
         document.getElementById('showBoundaries')?.addEventListener('change', (e) => {
             this.showBoundaries = e.target.checked;
             this.container.classList.toggle('show-boundaries', this.showBoundaries);
         });
-
-        // File upload
         const uploadElement = document.getElementById('reportUpload');
-        console.log('Found upload element:', uploadElement);
         uploadElement?.addEventListener('change', (e) => this.handleFileUpload(e));
-
-        // Copy buttons
         document.getElementById('copyJsonBtn')?.addEventListener('click', () => this.copyToClipboard('devexpress-json'));
         document.getElementById('copyXmlBtn')?.addEventListener('click', () => this.copyToClipboard('devexpress-xml'));
     }
@@ -397,602 +386,488 @@ class ReportViewer {
         console.log('Found Bands container with', bandsContainer.childNodes.length, 'children');
 
         // Clear previous content
-        this.container.innerHTML = '';
-
-        // Create report page
-        const page = document.createElement('div');
-        page.className = 'report-page';
-        
-        // Set page size from XtraReport element
-        const report = xmlDoc.querySelector('XtraReport');
-        if (report) {
-            const pageWidth = parseFloat(report.getAttribute('PageWidth')) || 850;
-            const pageHeight = parseFloat(report.getAttribute('PageHeight')) || 1100;
-            page.style.width = `${pageWidth}px`;
-            page.style.height = `${pageHeight}px`;
+        const parserError = xmlDoc.querySelector('parsererror');
+        if (parserError) {
+            console.error('XML parsing error:', parserError.textContent);
+            alert('Failed to parse the report XML.');
+            return;
         }
 
-        // Get all band elements in order
-        const bandElements = Array.from(bandsContainer.children).filter(el => {
-            const controlType = el.getAttribute('ControlType');
-            return controlType && controlType.includes('Band');
-        });
+        this.reportData = xmlDoc;
+        this.container.innerHTML = '';
 
-        console.log('Found band elements:', bandElements.map(band => ({
-            type: band.getAttribute('ControlType'),
-            name: band.getAttribute('Name'),
-            height: band.getAttribute('HeightF')
-        })));
+        const page = document.createElement('div');
+        page.className = 'report-page';
 
-        console.log('Found bands:', bandElements.length);
-        if (bandElements.length === 0) {
-            // If no bands found, let's log more structure details
-            console.log('Document structure:', this.dumpElementStructure(xmlDoc.documentElement));
+        const rootEl = xmlDoc.querySelector('XtraReportsLayoutSerializer');
+        const pageWidth = parseFloat(rootEl?.getAttribute('PageWidth')) || 850;
+        const margins = this._parseMargins(rootEl?.getAttribute('Margins'));
+        page.style.width = `${pageWidth}px`;
+        page.style.paddingLeft   = `${margins.left}px`;
+        page.style.paddingRight  = `${margins.right}px`;
+        page.style.paddingTop    = `${margins.top}px`;
+        page.style.paddingBottom = `${margins.bottom}px`;
+        page.style.boxSizing = 'border-box';
+
+        const bandsContainer = xmlDoc.querySelector('XtraReportsLayoutSerializer > Bands');
+        if (!bandsContainer) {
+            console.error('No Bands container found');
+            this.container.appendChild(page);
+            return;
         }
 
         let currentY = 0;
-        
-        // Helper function to process a band and its nested reports
-        const processBandAndNestedReports = (band) => {
-            const controlType = band.getAttribute('ControlType');
-            let totalHeight = 0;
 
-            // If this is a DetailReportBand, process its nested bands
-            if (controlType === 'DetailReportBand') {
-                const reportBandHeight = parseFloat(band.getAttribute('HeightF') || 0);
-                console.log('Processing DetailReportBand:', {
-                    name: band.getAttribute('Name'),
-                    height: reportBandHeight
-                });
-                
-                // Find the Detail band within this DetailReportBand
-                const nestedBands = band.querySelector('Bands');
-                if (nestedBands) {
-                    const nestedBandElements = Array.from(nestedBands.children).filter(el => {
-                        const type = el.getAttribute('ControlType');
-                        return type && type.includes('Band');
-                    });
+        const processBand = (bandXml) => {
+            const ct = bandXml.getAttribute('ControlType') || '';
+            if (!ct.includes('Band')) return;
 
-                    console.log(`Found ${nestedBandElements.length} nested bands`);
-                    
-                    // Special case: single DetailBand should inherit parent's height if it's larger
-                    if (nestedBandElements.length === 1 && 
-                        nestedBandElements[0].getAttribute('ControlType') === 'DetailBand') {
-                        
-                        const detailBand = nestedBandElements[0];
-                        const detailBandHeight = parseFloat(detailBand.getAttribute('HeightF') || 0);
-                        
-                        console.log('Single DetailBand found, comparing heights:', {
-                            detailBandHeight,
-                            reportBandHeight,
-                            name: detailBand.getAttribute('Name')
-                        });
-                        
-                        // Use the larger of the two heights
-                        if (reportBandHeight > detailBandHeight) {
-                            console.log(`Using DetailReportBand height (${reportBandHeight}) instead of DetailBand height (${detailBandHeight})`);
-                            detailBand.setAttribute('HeightF', reportBandHeight.toString());
-                        } else if (detailBandHeight > reportBandHeight) {
-                            console.log(`Keeping DetailBand height (${detailBandHeight}) as it's larger than DetailReportBand height (${reportBandHeight})`);
-                        }
-                        
-                        const nestedHeight = processBandAndNestedReports(detailBand);
-                        totalHeight = nestedHeight;
-                    } else {
-                        // Process each nested band normally
-                        nestedBandElements.forEach(nestedBand => {
-                            const nestedHeight = processBandAndNestedReports(nestedBand);
-                            totalHeight += nestedHeight;
-                        });
-                    }
-                }
-            } else {
-                // Regular band processing
-                console.log(`Processing band:`, {
-                    type: controlType,
-                    name: band.getAttribute('Name'),
-                    height: band.getAttribute('HeightF')
-                });
-                
-                const bandElement = this.createBandElement(band);
-                bandElement.style.top = `${currentY}px`;
-                
-                // Process components within band
-                this.processComponents(band, bandElement);
-                
-                page.appendChild(bandElement);
-                
-                const height = parseFloat(band.getAttribute('HeightF') || 0);
-                totalHeight = height;
-                currentY += height;
+            // DetailReportBand: expand its nested Bands inline
+            if (ct === 'DetailReportBand') {
+                const nested = bandXml.querySelector('Bands');
+                if (nested) Array.from(nested.children).forEach(b => processBand(b));
+                return;
             }
 
-            return totalHeight;
+            const bandEl = this.createBandElement(bandXml);
+            bandEl.style.top = `${currentY}px`;
+            this.processComponents(bandXml, bandEl);
+            page.appendChild(bandEl);
+            currentY += parseFloat(bandXml.getAttribute('HeightF')) || 0;
         };
 
-        // Process all top-level bands
-        bandElements.forEach((band, index) => {
-            const height = processBandAndNestedReports(band);
-            console.log(`Processed band ${index + 1}/${bandElements.length}, height: ${height}px`);
-        });
-
-        if (bandElements.length === 0) {
-            console.warn('No bands found in the report template');
-        }
+        Array.from(bandsContainer.children).forEach(b => processBand(b));
+        page.style.height = `${currentY}px`;
 
         this.container.appendChild(page);
-        this.setZoom(1.0); // Reset zoom
-        this.updateInspector(null); // Clear inspector
+        this.setZoom(1.0);
+        this.updateInspector(null);
+    }
+
+    _parseMargins(marginsStr) {
+        // DevExpress format: "Left, Right, Top, Bottom"
+        if (!marginsStr) return { left: 50, right: 50, top: 50, bottom: 50 };
+        const p = marginsStr.split(',').map(n => parseFloat(n.trim()) || 0);
+        return { left: p[0] ?? 50, right: p[1] ?? 50, top: p[2] ?? 50, bottom: p[3] ?? 50 };
     }
 
     createBandElement(bandXml) {
         const band = document.createElement('div');
         band.className = 'report-band';
-        
-        // Set band type based on ControlType
-        const controlType = bandXml.getAttribute('ControlType');
-        band.dataset.bandType = controlType || 'UnknownBand';
-        
-        // Add specific class based on band type
-        if (controlType) {
-            // Convert DevExpress band type to CSS class name
-            // e.g., TopMarginBand -> band-top-margin
-            const cssClass = 'band-' + controlType
-                .replace('Band', '')
-                .split(/(?=[A-Z])/)
-                .join('-')
-                .toLowerCase();
-            band.classList.add(cssClass);
-            
-            // Also add a general class for the band category
-            if (controlType.includes('Margin')) {
-                band.classList.add('band-margin');
-            } else if (controlType.includes('Header')) {
-                band.classList.add('band-header');
-            } else if (controlType.includes('Footer')) {
-                band.classList.add('band-footer');
-            } else if (controlType.includes('Detail')) {
-                band.classList.add('band-content');
-            }
-        }
-        
-        // Set name if available
+        const ct = bandXml.getAttribute('ControlType') || '';
+        band.dataset.bandType = ct;
         const name = bandXml.getAttribute('Name');
-        if (name) {
-            band.dataset.name = name;
-        }
-        
-        // Set height
-        const height = parseFloat(bandXml.getAttribute('HeightF') || 0);
-        band.style.height = `${height}px`;
-        
-        // Debug info
-        console.log('Creating band element:', {
-            type: controlType,
-            cssClasses: Array.from(band.classList),
-            name: name,
-            height: height,
-            controls: bandXml.querySelector('Controls')?.childNodes.length || 0
-        });
-        
+        if (name) band.dataset.name = name;
+        band.style.height = `${parseFloat(bandXml.getAttribute('HeightF')) || 0}px`;
+        if (ct.includes('Margin')) band.style.backgroundColor = '#f5f5f5';
         return band;
     }
 
     processComponents(bandXml, bandElement) {
-        // Process all XRControl elements under the Controls node
-        const controls = Array.from(bandXml.querySelectorAll('Controls > *[ControlType^="XR"]'));
-        if (controls.length === 0) {
-            console.log('No XRControl elements found in band:', bandElement.dataset.name);
-            return;
-        }
-
-        console.log(`Processing ${controls.length} XR controls in band ${bandElement.dataset.name}`);
-
-        controls.forEach((control, index) => {
-            const controlType = control.getAttribute('ControlType');
-            console.log(`Processing control ${index + 1}/${controls.length}:`, {
-                type: controlType,
-                name: control.getAttribute('Name')
-            });
-
-            switch (controlType) {
-                case 'XRLabel':
-                case 'XRPictureBox':
-                case 'XRCheckBox':
-                case 'XRPanel':
-                    // For top-level components in a band, pass null as parent since positions are band-relative
-                    const componentElement = this.createComponentElement(control, null);
-                    if (componentElement) {
-                        bandElement.appendChild(componentElement);
-                    }
-                    break;
-                default:
-                    console.log(`Skipping unsupported control type: ${controlType}`);
-            }
+        const controls = bandXml.querySelector('Controls');
+        if (!controls) return;
+        Array.from(controls.children).forEach(ctrl => {
+            const ct = ctrl.getAttribute('ControlType') || '';
+            if (!ct.startsWith('XR')) return;
+            const el = this.createComponentElement(ctrl);
+            if (el) bandElement.appendChild(el);
         });
     }
 
-    createComponentElement(componentXml, parentComponent = null) {
-        const component = document.createElement('div');
-        const controlType = componentXml.getAttribute('ControlType');
-        
-        // Add base component class
-        component.className = 'report-component';
-        
-        // Add specific class based on component type
-        if (controlType) {
-            // Convert XRLabel to component-label, XRCheckBox to component-checkbox, etc.
-            const cssClass = 'component-' + controlType
-                .substring(2) // Remove 'XR' prefix
-                .split(/(?=[A-Z])/)
-                .join('-')
-                .toLowerCase();
-            component.classList.add(cssClass);
-            
-            // Also add a general class for the component category
-            if (controlType.includes('Label')) {
-                component.classList.add('component-text');
-            } else if (controlType.includes('CheckBox')) {
-                component.classList.add('component-input');
-            } else if (controlType.includes('Picture')) {
-                component.classList.add('component-media');
-            } else if (controlType.includes('Panel')) {
-                component.classList.add('component-container');
-            }
+    createComponentElement(componentXml) {
+        const ct = componentXml.getAttribute('ControlType') || '';
+        const el = document.createElement('div');
+        el.className = 'report-component';
+        if (ct) {
+            // XRLabel → component-label, XRCheckBox → component-check-box, etc.
+            const suffix = ct.replace(/^XR/, '')
+                .replace(/([A-Z])/g, (m, c, i) => i > 0 ? '-' + c.toLowerCase() : c.toLowerCase());
+            el.classList.add(`component-${suffix}`);
         }
-        
-        component.dataset.type = controlType;
-        
-        // Get component name if available
+        el.dataset.type = ct;
         const name = componentXml.getAttribute('Name');
-        if (name) {
-            component.dataset.name = name;
+        if (name) el.dataset.name = name;
+
+        // Absolute position and size from XML attributes
+        const locStr  = componentXml.getAttribute('LocationFloat');
+        const sizeStr = componentXml.getAttribute('SizeF');
+        if (locStr && sizeStr) {
+            const [x, y] = locStr.split(',').map(n => parseFloat(n.trim()) || 0);
+            const [w, h] = sizeStr.split(',').map(n => parseFloat(n.trim()) || 0);
+            el.style.left   = `${x}px`;
+            el.style.top    = `${y}px`;
+            el.style.width  = `${w}px`;
+            el.style.height = `${h}px`;
         }
 
-        // Position
-        const locationString = componentXml.getAttribute('LocationFloat');
-        const sizeString = componentXml.getAttribute('SizeF');
-        
-        console.log('Component position data:', {
-            type: controlType,
-            name: name,
-            location: locationString,
-            size: sizeString,
-            parentType: parentComponent?.dataset.type
-        });
+        el.dataset.xml = componentXml.outerHTML;
+        el.addEventListener('click', e => { e.stopPropagation(); this.selectComponent(el); });
 
-        if (locationString && sizeString) {
-            const [x, y] = locationString.split(',').map(n => parseFloat(n) || 0);
-            const [width, height] = sizeString.split(',').map(n => parseFloat(n) || 0);
-            
-            // If this is a child of a panel or other container, adjust position relative to parent
-            if (parentComponent) {
-                const parentX = parseFloat(parentComponent.style.left) || 0;
-                const parentY = parseFloat(parentComponent.style.top) || 0;
-                console.log('Adjusting position relative to parent:', {
-                    parentX,
-                    parentY,
-                    originalX: x,
-                    originalY: y,
-                    adjustedX: x - parentX,
-                    adjustedY: y - parentY
-                });
-                component.style.left = `${x - parentX}px`;
-                component.style.top = `${y - parentY}px`;
-            } else {
-                component.style.left = `${x}px`;
-                component.style.top = `${y}px`;
-            }
-            
-            component.style.width = `${width}px`;
-            component.style.height = `${height}px`;
-        } else {
-            console.warn('Missing position/size data for component:', { type: controlType, name });
+        switch (ct) {
+            case 'XRLabel':      this.renderLabel(el, componentXml);      break;
+            case 'XRCheckBox':   this.renderCheckBox(el, componentXml);   break;
+            case 'XRPictureBox': this.renderPictureBox(el, componentXml); break;
+            case 'XRPanel':      this.renderPanel(el, componentXml);      break;
+            case 'XRTable':      this.renderTable(el, componentXml);      break;
+            case 'XRPageInfo':   this.renderPageInfo(el, componentXml);   break;
+            case 'XRLine':       this.renderLine(el, componentXml);       break;
+            default: /* unknown type: still shows as a positioned box */ break;
         }
 
-        // Store XML data for inspection
-        component.dataset.xml = componentXml.outerHTML;
+        return el;
+    }
+        const xmlTab = document.getElementById('xmlViewer');
+    // ─── HELPER PARSERS ──────────────────────────────────────────
 
-        // Add click handler for inspection
-        component.addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.selectComponent(component);
-        });
-
-        // Render component content based on type
-        switch (controlType) {
-            case 'XRLabel':
-                this.renderLabel(component, componentXml);
-                break;
-            case 'XRPictureBox':
-                this.renderPictureBox(component, componentXml);
-                break;
-            case 'XRCheckBox':
-                this.renderCheckBox(component, componentXml);
-                break;
-            case 'XRPanel':
-                this.renderPanel(component, componentXml);
-                break;
-            // Add more component types as needed
-        }
-
-        return component;
+    /**
+     * Parse DevExpress Font string attribute.
+     * Format: "Times New Roman, 9pt" or "Times New Roman, 14pt, style=Bold" or "Arial, 10pt, style=Bold, Italic"
+     */
+    parseFont(fontStr) {
+        if (!fontStr) return null;
+        const firstComma = fontStr.indexOf(',');
+        if (firstComma === -1) return { family: fontStr.trim(), size: 10, bold: false, italic: false, underline: false, strikeout: false };
+        const family = fontStr.substring(0, firstComma).trim();
+        const rest = fontStr.substring(firstComma + 1).trim();
+        const parts = rest.split(',').map(p => p.trim());
+        const sizeMatch = (parts[0] || '').match(/(\d+(?:\.\d+)?)\s*pt/i);
+        const size = sizeMatch ? parseFloat(sizeMatch[1]) : 10;
+        const styleStr = parts.slice(1).join(' ').toLowerCase();
+        return {
+            family,
+            size,
+            bold:      styleStr.includes('bold'),
+            italic:    styleStr.includes('italic'),
+            underline: styleStr.includes('underline'),
+            strikeout: styleStr.includes('strikeout'),
+        };
     }
 
+    /**
+     * Convert a DevExpress color value to a CSS color string.
+     * Handles named colors (DarkGray, Transparent…), bare hex (rrggbb / aarrggbb).
+     */
+    parseColor(colorStr) {
+        if (!colorStr) return null;
+        const lc = colorStr.toLowerCase().trim();
+        if (lc === 'transparent') return 'transparent';
+        if (/^[0-9a-f]{6}$/.test(lc)) return `#${lc}`;
+        if (/^[0-9a-f]{8}$/.test(lc)) {
+            // ARGB 8-digit hex: first 2 = alpha
+            const a = parseInt(lc.substring(0, 2), 16) / 255;
+            const hex = lc.substring(2);
+            return a >= 1 ? `#${hex}` : `rgba(${parseInt(hex.substring(0,2),16)},${parseInt(hex.substring(2,4),16)},${parseInt(hex.substring(4,6),16)},${a.toFixed(2)})`;
+        }
+        if (colorStr.startsWith('#')) return colorStr;
+        // Named color — CSS and .NET share most names (DarkGray, LightGray, etc.)
+        return colorStr;
+    }
+
+    /**
+     * Parse DevExpress Padding attribute: "Left,Right,Top,Bottom[,DPI]"
+     */
+    parsePadding(paddingStr) {
+        if (!paddingStr) return null;
+        const p = paddingStr.split(',').map(n => parseFloat(n.trim()) || 0);
+        if (p.length < 4) return null;
+        return { left: p[0], right: p[1], top: p[2], bottom: p[3] };
+    }
+
+    /**
+     * Apply CSS borders from DevExpress Borders / BorderColor / BorderWidth attributes.
+     * bordersStr: "None" | "All" | "Left" | "Right" | "Top" | "Bottom" | comma combinations
+     */
+    applyBorders(element, bordersStr, borderColorStr, borderWidthStr) {
+        if (!bordersStr || bordersStr.toLowerCase() === 'none') return;
+        const color = this.parseColor(borderColorStr) || '#000000';
+        const width = parseFloat(borderWidthStr) || 1;
+        const bw = `${width}px solid ${color}`;
+        if (bordersStr.toLowerCase() === 'all') { element.style.border = bw; return; }
+        const sides = bordersStr.toLowerCase().split(',').map(s => s.trim());
+        if (sides.includes('left'))   element.style.borderLeft   = bw;
+        if (sides.includes('right'))  element.style.borderRight  = bw;
+        if (sides.includes('top'))    element.style.borderTop    = bw;
+        if (sides.includes('bottom')) element.style.borderBottom = bw;
+    }
+
+    /**
+     * Apply font from a DevExpress Font string attribute to an HTML element.
+     */
+    applyFont(element, fontStr) {
+        const font = this.parseFont(fontStr);
+        if (!font) return;
+        element.style.fontFamily = `"${font.family}", serif`;
+        element.style.fontSize   = `${font.size}pt`;
+        element.style.fontWeight = font.bold   ? 'bold'   : 'normal';
+        element.style.fontStyle  = font.italic ? 'italic' : 'normal';
+        const deco = [font.underline && 'underline', font.strikeout && 'line-through'].filter(Boolean).join(' ');
+        if (deco) element.style.textDecoration = deco;
+    }
+
+    /**
+     * Apply flexbox-based text alignment from a DevExpress TextAlignment string.
+     * TextAlignment values: "MiddleLeft", "TopCenter", "BottomRight", etc.
+     */
+    applyTextAlignment(element, textAlignment) {
+        if (!textAlignment) return;
+        const ta = textAlignment.toLowerCase();
+        const jsContent = ta.includes('right')  ? 'flex-end' : ta.includes('center') ? 'center' : 'flex-start';
+        const asItems   = ta.includes('bottom') ? 'flex-end' : ta.includes('middle') ? 'center' : 'flex-start';
+        const cssText   = ta.includes('right')  ? 'right'    : ta.includes('center') ? 'center' : 'left';
+        element.style.display        = 'flex';
+        element.style.alignItems     = asItems;
+        element.style.justifyContent = jsContent;
+        element.style.textAlign      = cssText;
+    }
+        
+    // ─── COMPONENT RENDERERS ─────────────────────────────────────
+        if (!component) {
     renderLabel(element, xmlData) {
-        // First check for ExpressionBindings
-        const expressionBinding = xmlData.querySelector('ExpressionBindings > Item1[PropertyName="Text"]');
-        let text = null;
-        let expression = null;
+        this.applyFont(element, xmlData.getAttribute('Font'));
+        this.applyTextAlignment(element, xmlData.getAttribute('TextAlignment'));
+        this.applyBorders(element,
+            xmlData.getAttribute('Borders'),
+            xmlData.getAttribute('BorderColor'),
+            xmlData.getAttribute('BorderWidth'));
 
-        if (expressionBinding) {
-            expression = expressionBinding.getAttribute('Expression');
-            if (expression) {
-                element.textContent = `${expression}`;
-                element.classList.add('expression-field');
-                console.log('Found expression binding:', expression);
-            }
+        const backColor = this.parseColor(xmlData.getAttribute('BackColor'));
+        if (backColor && backColor !== 'transparent') element.style.backgroundColor = backColor;
+        const foreColor = this.parseColor(xmlData.getAttribute('ForeColor'));
+        if (foreColor) element.style.color = foreColor;
+
+        const padding = this.parsePadding(xmlData.getAttribute('Padding'));
+        if (padding) {
+            element.style.paddingLeft   = `${padding.left}px`;
+            element.style.paddingRight  = `${padding.right}px`;
+            element.style.paddingTop    = `${padding.top}px`;
+            element.style.paddingBottom = `${padding.bottom}px`;
+        }
+
+        // Text content: expression binding takes priority
+        const exprNode = Array.from(xmlData.querySelectorAll('ExpressionBindings > *'))
+            .find(n => n.getAttribute('PropertyName') === 'Text');
+        if (exprNode) {
+            element.textContent = `[${exprNode.getAttribute('Expression') || ''}]`;
+            element.classList.add('expression-field');
         } else {
-            // If no expression binding, use the Text attribute
-            text = xmlData.getAttribute('Text');
-            if (text !== null) {
-                element.textContent = text;
-                console.log('Using static text:', text);
+            const text = xmlData.getAttribute('Text') ?? '';
+            if (xmlData.getAttribute('AllowMarkupText') === 'true' && text) {
+                const span = document.createElement('span');
+                span.innerHTML = this._sanitizeMarkup(text);
+                element.appendChild(span);
             } else {
-                element.textContent = '[Empty]';
-                console.log('No text content found');
+                element.textContent = text;
             }
         }
+    }
+            propertiesTab.innerHTML = '<p class="text-muted">No component selected</p>';
+    _sanitizeMarkup(html) {
+        // Allow basic inline formatting tags only; strip everything else
+        return html
+            .replace(/<script[\s\S]*?<\/script>/gi, '')
+            .replace(/<(?!\/?(?:b|i|u|em|strong|span|br|s)\b)[^>]+>/gi, '');
+    }
+            xmlTab.innerHTML = '';
+    renderCheckBox(element, xmlData) {
+        this.applyBorders(element,
+            xmlData.getAttribute('Borders'),
+            xmlData.getAttribute('BorderColor'),
+            xmlData.getAttribute('BorderWidth'));
+        const backColor = this.parseColor(xmlData.getAttribute('BackColor'));
+        if (backColor && backColor !== 'transparent') element.style.backgroundColor = backColor;
 
-        // Apply text formatting
-        const font = xmlData.querySelector('Font');
-        if (font) {
-            element.style.fontFamily = font.getAttribute('Name') || 'Arial';
-            element.style.fontSize = `${font.getAttribute('Size') || 10}pt`;
-            element.style.fontWeight = font.getAttribute('Bold') === 'true' ? 'bold' : 'normal';
-            element.style.fontStyle = font.getAttribute('Italic') === 'true' ? 'italic' : 'normal';
-            
-            // Handle additional font properties
-            if (font.getAttribute('Underline') === 'true') element.style.textDecoration = 'underline';
-            if (font.getAttribute('Strikeout') === 'true') element.style.textDecoration = 'line-through';
+        const padding = this.parsePadding(xmlData.getAttribute('Padding'));
+        if (padding) {
+            element.style.paddingLeft   = `${padding.left}px`;
+            element.style.paddingRight  = `${padding.right}px`;
+            element.style.paddingTop    = `${padding.top}px`;
+            element.style.paddingBottom = `${padding.bottom}px`;
         }
-
-        // Text alignment
-        const textAlignment = xmlData.getAttribute('TextAlignment');
-        if (textAlignment) {
-            switch(textAlignment.toLowerCase()) {
-                case 'middleleft': 
-                    element.style.textAlign = 'left';
-                    element.style.verticalAlign = 'middle';
-                    break;
-                case 'middlecenter':
-                    element.style.textAlign = 'center';
-                    element.style.verticalAlign = 'middle';
-                    break;
-                case 'middleright':
-                    element.style.textAlign = 'right';
-                    element.style.verticalAlign = 'middle';
-                    break;
-                case 'topleft':
-                    element.style.textAlign = 'left';
-                    element.style.verticalAlign = 'top';
-                    break;
-                case 'topcenter':
-                    element.style.textAlign = 'center';
-                    element.style.verticalAlign = 'top';
-                    break;
-                case 'topright':
-                    element.style.textAlign = 'right';
-                    element.style.verticalAlign = 'top';
-                    break;
-                case 'bottomleft':
-                    element.style.textAlign = 'left';
-                    element.style.verticalAlign = 'bottom';
-                    break;
-                case 'bottomcenter':
-                    element.style.textAlign = 'center';
-                    element.style.verticalAlign = 'bottom';
-                    break;
-                case 'bottomright':
-                    element.style.textAlign = 'right';
-                    element.style.verticalAlign = 'bottom';
-                    break;
-                default:
-                    element.style.textAlign = 'left';
-                    element.style.verticalAlign = 'top';
-            }
+            return;
+        element.style.display    = 'flex';
+        element.style.flexDirection = 'row';
+        element.style.alignItems = 'center';
+        element.style.overflow   = 'hidden';
         }
+        // Checkbox glyph square
+        const glyph = document.createElement('div');
+        glyph.className = 'checkbox-glyph';
+        glyph.style.cssText = 'flex-shrink:0;width:13px;height:13px;border:1.5px solid #444;background:#fff;'
+            + 'box-sizing:border-box;margin-right:5px;display:flex;align-items:center;justify-content:center;';
 
-        // Handle background color
-        const backColor = xmlData.getAttribute('BackColor');
-        if (backColor) {
-            element.style.backgroundColor = `#${backColor}`;
+        // Check state
+        const checkState = xmlData.getAttribute('CheckState');
+        if (checkState === 'Checked') {
+            glyph.innerHTML = '<svg width="9" height="9" viewBox="0 0 9 9">'
+                + '<polyline points="1,4 3.5,7.5 8,1.5" stroke="#222" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'
+                + '</svg>';
+        } else {
+            const exprNode = Array.from(xmlData.querySelectorAll('ExpressionBindings > *'))
+                .find(n => n.getAttribute('PropertyName') === 'CheckBoxState' || n.getAttribute('PropertyName') === 'CheckState');
+            if (exprNode) element.classList.add('expression-field');
         }
-
-        // Handle fore color (text color)
-        const foreColor = xmlData.getAttribute('ForeColor');
-        if (foreColor) {
-            element.style.color = `#${foreColor}`;
+        element.appendChild(glyph);
+        // Update Properties tab
+        // Text label
+        const text = xmlData.getAttribute('Text') || '';
+        if (text) {
+            const label = document.createElement('span');
+            label.style.overflow     = 'hidden';
+            label.style.textOverflow = 'ellipsis';
+            label.style.whiteSpace   = 'nowrap';
+            this.applyFont(label, xmlData.getAttribute('Font'));
+            const foreColor = this.parseColor(xmlData.getAttribute('ForeColor'));
+            if (foreColor) label.style.color = foreColor;
+            label.textContent = text;
+            element.appendChild(label);
         }
-
-        console.log('Rendered label:', {
-            text: text,
-            expression: expression,
-            font: font ? {
-                name: font.getAttribute('Name'),
-                size: font.getAttribute('Size'),
-                bold: font.getAttribute('Bold'),
-                italic: font.getAttribute('Italic')
-            } : null,
-            alignment: textAlignment
-        });
-    }    
-    
+    }
+        const xmlData = new DOMParser().parseFromString(component.dataset.xml, 'text/xml').documentElement;
     renderPictureBox(element, xmlData) {
         const imageData = xmlData.querySelector('Image')?.textContent;
         if (imageData) {
             const img = document.createElement('img');
             img.src = `data:image/png;base64,${imageData}`;
-            img.style.width = '100%';
-            img.style.height = '100%';
-            img.style.objectFit = 'contain';
+            img.style.cssText = 'width:100%;height:100%;object-fit:contain;';
             element.appendChild(img);
+        } else {
+            // Show expression placeholder
+            const exprNode = Array.from(xmlData.querySelectorAll('ExpressionBindings > *'))
+                .find(n => n.getAttribute('PropertyName') === 'ImageSource' || n.getAttribute('PropertyName') === 'Image');
+            element.style.background  = '#f0f0f0';
+            element.style.border      = '1px dashed #bbb';
+            element.style.display     = 'flex';
+            element.style.alignItems  = 'center';
+            element.style.justifyContent = 'center';
+            const ph = document.createElement('span');
+            ph.style.cssText = 'font-size:9pt;color:#888;text-align:center;padding:4px;';
+            ph.textContent = exprNode ? `[${exprNode.getAttribute('Expression')}]` : '[Image]';
+            element.appendChild(ph);
         }
     }
-
-    renderCheckBox(element, xmlData) {
-        // Create checkbox wrapper for better styling
-        const wrapper = document.createElement('div');
-        wrapper.className = 'checkbox-wrapper';
-        
-        // Create checkbox input
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.className = 'report-checkbox';
-        
-        // Handle check state
-        const checkState = xmlData.getAttribute('CheckState');
-        checkbox.checked = checkState === 'Checked';
-        checkbox.disabled = true; // Make it read-only in preview
-        
-        // Apply text alignment
-        const textAlignment = xmlData.getAttribute('TextAlignment');
-        if (textAlignment) {
-            wrapper.style.justifyContent = this.getAlignmentStyle(textAlignment);
-            wrapper.style.alignItems = this.getVerticalAlignmentStyle(textAlignment);
-        }
-        
-        // Handle expression bindings
-        const expressionBinding = xmlData.querySelector('ExpressionBindings > Item[PropertyName="CheckState"]');
-        if (expressionBinding) {
-            const expression = expressionBinding.getAttribute('Expression');
-            if (expression) {
-                element.classList.add('expression-field');
-                element.setAttribute('data-expression', expression);
-            }
-        }
-        
-        // Apply size styles to checkbox based on element dimensions
-        const size = Math.min(
-            parseInt(element.style.width),
-            parseInt(element.style.height)
-        );
-        checkbox.style.width = `${Math.min(size, 20)}px`;
-        checkbox.style.height = `${Math.min(size, 20)}px`;
-        
-        // Apply colors if specified
-        const backColor = xmlData.getAttribute('BackColor');
-        if (backColor) {
-            wrapper.style.backgroundColor = `#${backColor}`;
-        }
-        
-        // Add checkbox to wrapper and wrapper to element
-        wrapper.appendChild(checkbox);
-        element.appendChild(wrapper);
-    }
-    
-    getAlignmentStyle(textAlignment) {
-        if (!textAlignment) return 'flex-start';
-        if (textAlignment.toLowerCase().includes('center')) return 'center';
-        if (textAlignment.toLowerCase().includes('right')) return 'flex-end';
-        return 'flex-start';
-    }
-    
-    getVerticalAlignmentStyle(textAlignment) {
-        if (!textAlignment) return 'flex-start';
-        if (textAlignment.toLowerCase().includes('middle')) return 'center';
-        if (textAlignment.toLowerCase().includes('bottom')) return 'flex-end';
-        return 'flex-start';
-    }
-
-    renderPanel(element, xmlData) {
-        // Create panel wrapper
-        const wrapper = document.createElement('div');
-        wrapper.className = 'panel-wrapper';
-        wrapper.style.position = 'relative';
-        wrapper.style.width = '100%';
-        wrapper.style.height = '100%';
-        
-        // Apply panel styling
-        const borderColor = xmlData.getAttribute('BorderColor');
-        const borderWidth = xmlData.getAttribute('BorderWidth');
-        if (borderColor) {
-            wrapper.style.border = `${borderWidth || 1}px solid #${borderColor}`;
-        }
-
-        // Apply background color if specified
-        const backColor = xmlData.getAttribute('BackColor');
-        if (backColor) {
-            wrapper.style.backgroundColor = `#${backColor}`;
-        }
-
-        // Process child controls within the panel
-        const controls = xmlData.querySelectorAll('Controls > *[ControlType^="XR"]');
-        controls.forEach(control => {
-            // Pass the panel element as the parent for proper positioning
-            const childComponent = this.createComponentElement(control, element);
-            if (childComponent) {
-                wrapper.appendChild(childComponent);
-            }
-        });
-
-        element.appendChild(wrapper);
-    }
-
-    selectComponent(component) {
-        // Remove previous selection
-        if (this.selectedComponent) {
-            this.selectedComponent.classList.remove('selected');
-        }
-        
-        this.selectedComponent = component;
-        component.classList.add('selected');
-        
-        // Update inspector and show modal
-        this.updateInspector(component);
-        
-        // Show the modal
-        const inspectorModal = new bootstrap.Modal(document.getElementById('inspectorModal'), {
-            backdrop: false
-        });
-        inspectorModal.show();
-        
-        // Update modal title with component info
-        const modalTitle = document.getElementById('inspectorModalLabel');
-        const componentName = component.dataset.name || 'Unnamed Component';
-        const componentType = component.dataset.type || 'Unknown Type';
-        modalTitle.textContent = `${componentName} (${componentType})`;
-    }
-
-    updateInspector(component) {
-        const propertiesTab = document.getElementById('propertyInspector');
-        const xmlTab = document.getElementById('xmlViewer');
-        
-        if (!component) {
-            propertiesTab.innerHTML = '<p class="text-muted">No component selected</p>';
-            xmlTab.innerHTML = '';
-            return;
-        }
-
-        // Update Properties tab
-        const xmlData = new DOMParser().parseFromString(component.dataset.xml, 'text/xml').documentElement;
         const properties = this.extractComponentProperties(xmlData);
+    renderPanel(element, xmlData) {
+        // Panel is position:absolute (set by createComponentElement).
+        // Children use LocationFloat relative to this panel's origin,
+        // so this element itself is the CSS containing block (position:absolute is already set).
+        const backColor = this.parseColor(xmlData.getAttribute('BackColor'));
+        if (backColor && backColor !== 'transparent') element.style.backgroundColor = backColor;
+        this.applyBorders(element,
+            xmlData.getAttribute('Borders'),
+            xmlData.getAttribute('BorderColor'),
+            xmlData.getAttribute('BorderWidth'));
+        element.style.overflow = 'visible';
         
+        const controls = xmlData.querySelector('Controls');
+        if (!controls) return;
+        Array.from(controls.children).forEach(ctrl => {
+            const ct = ctrl.getAttribute('ControlType') || '';
+            if (!ct.startsWith('XR')) return;
+            const child = this.createComponentElement(ctrl);
+            if (child) element.appendChild(child);
+        });
+    }
         propertiesTab.innerHTML = Object.entries(properties)
+    renderTable(element, xmlData) {
+        const [tableW, tableH] = (xmlData.getAttribute('SizeF') || '0,0')
+            .split(',').map(n => parseFloat(n.trim()) || 0);
+        const rowsContainer = xmlData.querySelector('Rows');
+        if (!rowsContainer) return;
             .map(([group, props]) => `
+        const rowXmls = Array.from(rowsContainer.children)
+            .filter(el => el.getAttribute('ControlType') === 'XRTableRow');
+        if (!rowXmls.length) return;
                 <div class="property-group">
+        const totalWeight = rowXmls.reduce((s, r) => s + (parseFloat(r.getAttribute('Weight')) || 1), 0);
+        element.style.overflow = 'visible';
                     <h6>${group}</h6>
+        let rowY = 0;
+        rowXmls.forEach(rowXml => {
+            const weight = parseFloat(rowXml.getAttribute('Weight')) || 1;
+            const rowH   = totalWeight > 0 ? (weight / totalWeight) * tableH : tableH / rowXmls.length;
                     ${Object.entries(props)
+            const rowDiv = document.createElement('div');
+            rowDiv.className = 'report-table-row';
+            rowDiv.style.cssText = `position:absolute;top:${rowY}px;left:0;width:${tableW}px;height:${rowH}px;`;
                         .map(([key, value]) => `
+            const cellXmls = Array.from((rowXml.querySelector('Cells') || { children: [] }).children)
+                .filter(el => el.getAttribute('ControlType') === 'XRTableCell');
                             <div class="mb-1">
-                                <div class="inspector-row">
-                                    <span class="property-key">${key}: </span> <span class="property-value">${value}</span>
-                                </div>
-                            </div>
-                        `).join('')}
-                </div>
-            `).join('');
+            let cellX = 0;
+            cellXmls.forEach(cellXml => {
+                const cellW = parseFloat(cellXml.getAttribute('WidthF')) || 0;
+                const cellH = rowH;
 
+                const cellDiv = document.createElement('div');
+                cellDiv.className = 'report-table-cell';
+                cellDiv.dataset.type = 'XRTableCell';
+                cellDiv.dataset.name = cellXml.getAttribute('Name') || '';
+                cellDiv.style.cssText = `position:absolute;left:${cellX}px;top:0;width:${cellW}px;height:${cellH}px;`
+                    + 'box-sizing:border-box;overflow:visible;';
+                                <div class="inspector-row">
+                this.applyBorders(cellDiv,
+                    cellXml.getAttribute('Borders'),
+                    cellXml.getAttribute('BorderColor'),
+                    cellXml.getAttribute('BorderWidth'));
+                                    <span class="property-key">${key}: </span> <span class="property-value">${value}</span>
+                const cellPad = this.parsePadding(cellXml.getAttribute('Padding'));
+                if (cellPad) {
+                    cellDiv.style.paddingLeft   = `${cellPad.left}px`;
+                    cellDiv.style.paddingRight  = `${cellPad.right}px`;
+                    cellDiv.style.paddingTop    = `${cellPad.top}px`;
+                    cellDiv.style.paddingBottom = `${cellPad.bottom}px`;
+                }
+                                </div>
+                const backColor = this.parseColor(cellXml.getAttribute('BackColor'));
+                if (backColor && backColor !== 'transparent') cellDiv.style.backgroundColor = backColor;
+                            </div>
+                // Render controls inside cell — their LocationFloat is cell-relative
+                const controls = cellXml.querySelector('Controls');
+                if (controls) {
+                    Array.from(controls.children).forEach(ctrl => {
+                        const ct = ctrl.getAttribute('ControlType') || '';
+                        if (!ct.startsWith('XR')) return;
+                        const child = this.createComponentElement(ctrl);
+                        if (child) cellDiv.appendChild(child);
+                    });
+                }
+                        `).join('')}
+                rowDiv.appendChild(cellDiv);
+                cellX += cellW;
+            });
+                </div>
+            element.appendChild(rowDiv);
+            rowY += rowH;
+        });
+    }
+            `).join('');
+    renderPageInfo(element, xmlData) {
+        this.applyFont(element, xmlData.getAttribute('Font'));
+        this.applyTextAlignment(element, xmlData.getAttribute('TextAlignment'));
+        const padding = this.parsePadding(xmlData.getAttribute('Padding'));
+        if (padding) {
+            element.style.paddingLeft   = `${padding.left}px`;
+            element.style.paddingRight  = `${padding.right}px`;
+            element.style.paddingTop    = `${padding.top}px`;
+            element.style.paddingBottom = `${padding.bottom}px`;
+        }
+        const foreColor = this.parseColor(xmlData.getAttribute('ForeColor'));
+        if (foreColor) element.style.color = foreColor;
+        element.textContent = 'Page 1 of N';
+    }
+
+    renderLine(element, xmlData) {
+        element.style.overflow = 'visible';
+        const h = parseFloat((xmlData.getAttribute('SizeF') || '1,2').split(',')[1]) || 2;
+        const lineColor = this.parseColor(
+            xmlData.getAttribute('ForeColor') || xmlData.getAttribute('BorderColor')
+        ) || '#000000';
+        const lineWidth = parseFloat(xmlData.getAttribute('LineWidth') ?? xmlData.getAttribute('BorderWidth') ?? '1');
+        const lineDiv = document.createElement('div');
+        lineDiv.style.cssText = `position:absolute;left:0;top:${Math.max(0, h / 2 - lineWidth / 2)}px;`
+            + `width:100%;border-top:${lineWidth}px solid ${lineColor};`;
+        element.appendChild(lineDiv);
+    }
         // Update XML tab
         xmlTab.innerHTML = this.formatXML(component.dataset.xml);
     }
