@@ -643,8 +643,18 @@ class ReportViewer {
                         if (child) cellDiv.appendChild(child);
                     });
                 } else {
-                    // XRTableCell with a direct Text attribute and no child controls
-                    const cellText = cellXml.getAttribute('Text');
+                    // XRTableCell with a direct Text attribute or ExpressionBindings (no child Controls)
+                    let cellText = cellXml.getAttribute('Text');
+                    if (!cellText) {
+                        // Look for a BeforePrint Text expression binding
+                        const exprBindings = this.childByTag(cellXml, 'ExpressionBindings');
+                        if (exprBindings) {
+                            const binding = Array.from(exprBindings.children).find(
+                                (b) => b.getAttribute('PropertyName') === 'Text' && b.getAttribute('EventName') === 'BeforePrint'
+                            );
+                            if (binding) cellText = `[${binding.getAttribute('Expression') || ''}]`;
+                        }
+                    }
                     if (cellText) {
                         const textAlign = cellXml.getAttribute('TextAlignment') || '';
                         this.applyTextAlignment(cellDiv, textAlign);
