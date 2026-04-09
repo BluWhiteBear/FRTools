@@ -73,33 +73,41 @@ function formioTypeToDevExpressType(component) {
  */
 function collectLeafInputFields(components, excludeGrids = true) {
     const fields = [];
+    const seen = new Set();
+    const skippedTypes = new Set([
+        'button', 'submit', 'content', 'htmlelement', 'html',
+        'columns', 'column', 'panel', 'fieldset', 'tabs', 'tab',
+        'well', 'table', 'container', 'form', 'nestedform',
+        'datagrid', 'grid'
+    ]);
     
     function traverse(comps) {
         if (!Array.isArray(comps)) return;
         
         comps.forEach(comp => {
-            // Skip grids if excludeGrids is true
-            if (excludeGrids && comp.type === 'grid') {
+            // Skip grid-like components for main datasource collection.
+            if (excludeGrids && (comp.type === 'grid' || comp.type === 'datagrid' || comp.IsFormGrid === true)) {
                 return;
             }
-            
-            // Skip containers, nested forms, and buttons
-            if (['fieldset', 'panel', 'tabs', 'form', 'nestedform', 'button', 'submit', 'checkbox'].includes(comp.type)) {
-                // For nested forms, include their components
-                if (comp.type === 'nestedform' && comp.components) {
-                    traverse(comp.components);
-                }
-                // For containers, include their children
-                else if (comp.components) {
-                    traverse(comp.components);
-                }
+
+            // Always recurse through nested components first, but do not treat container nodes as data fields.
+            if (Array.isArray(comp.components) && comp.components.length > 0) {
+                traverse(comp.components);
+            }
+
+            // Only include data-input components with a key.
+            if (!comp.key || comp.input !== true) {
                 return;
             }
-            
-            // Skip non-input controls
-            if (comp.type === 'button' || comp.type === 'submit' || comp.type === 'content' || !comp.key) {
+
+            if (skippedTypes.has(comp.type)) {
                 return;
             }
+
+            if (seen.has(comp.key)) {
+                return;
+            }
+            seen.add(comp.key);
             
             // Add leaf field
             fields.push({
@@ -124,13 +132,15 @@ function buildSqlDataSourceXml(dsName, procName, fields) {
     let xml = `<SqlDataSource Name="${dsName}">`;
     xml += `<Connection Name="UniData" ConnectionString="" />`;
     xml += `<Query Type="StoredProcQuery" Name="${procName}">`;
-    xml += `<Parameter Name="@FormDataGUID" Type="Guid" ValueInfo="00000000-0000-0000-0000-000000000000" />`;
-    xml += `<Parameter Name="@OwnerObjectGUID" Type="Guid" ValueInfo="00000000-0000-0000-0000-000000000000" />`;
+    xml += `<Parameter Name="@FormDataGUID" Type="DevExpress.DataAccess.Expression">(System.Guid)(?FormDataGUID )</Parameter>`;
+    xml += `<Parameter Name="@OwnerObjectGUID" Type="DevExpress.DataAccess.Expression">(System.Guid)(?ObjectGUID )</Parameter>`;
     xml += `<ProcName>${procName}</ProcName>`;
     xml += `</Query>`;
     xml += `<ResultSchema>`;
     xml += `<DataSet Name="${dsName}">`;
     xml += `<View Name="${procName}">`;
+    xml += `<Field Name="first" Type="String" />`;
+    xml += `<Field Name="last" Type="String" />`;
     
     // System fields (always present)
     const systemFields = [
@@ -249,8 +259,8 @@ function buildSqlDataSourceXmlForGrid(dsName, procName, mainFields, gridSystemFi
     let xml = `<SqlDataSource Name="${dsName}">`;
     xml += `<Connection Name="UniData" ConnectionString="" />`;
     xml += `<Query Type="StoredProcQuery" Name="${procName}">`;
-    xml += `<Parameter Name="@FormDataGUID" Type="Guid" ValueInfo="00000000-0000-0000-0000-000000000000" />`;
-    xml += `<Parameter Name="@OwnerObjectGUID" Type="Guid" ValueInfo="00000000-0000-0000-0000-000000000000" />`;
+    xml += `<Parameter Name="@FormDataGUID" Type="DevExpress.DataAccess.Expression">(System.Guid)(?FormDataGUID )</Parameter>`;
+    xml += `<Parameter Name="@OwnerObjectGUID" Type="DevExpress.DataAccess.Expression">(System.Guid)(?ObjectGUID )</Parameter>`;
     xml += `<ProcName>${procName}</ProcName>`;
     xml += `</Query>`;
     xml += `<ResultSchema>`;
