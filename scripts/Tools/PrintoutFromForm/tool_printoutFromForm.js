@@ -3309,7 +3309,8 @@ function generateMinimalXmlTemplate()
                 TextAlignment: "BottomRight",
                 SizeF: (LAYOUT.PAGE_WIDTH - LAYOUT.MARGIN_LEFT - LAYOUT.MARGIN_RIGHT) + ",50",
                 LocationFloat: "0,0",
-                Padding: "2,2,0,0,100"
+                Padding: "2,2,0,0,100",
+                Font: LAYOUT.FONT_FIELDOUTPUT
             });
             pageInfoItem.addChild(processor.buildNode('StylePriority', { UseTextAlignment: "false" }));
             footerBand.addChild(processor.buildNode('Controls', {}, [pageInfoItem]));
