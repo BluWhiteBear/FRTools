@@ -3173,10 +3173,19 @@ function generateMinimalXmlTemplate()
         bands.children[1].addChild(headerControls); // ? Add header controls to ReportHeaderBand
         bands.children[2].addChild(detailControls); // ? Add detail controls to DetailBand
 
-        // ? Add empty controls to PageFooterBand (second-to-last child, before BottomMarginBand)
+        // ? Add controls to PageFooterBand
         const footerBand = bands.children.find(c => c.attributes?.Name === 'PageFooter');
         if (footerBand) {
-            footerBand.addChild(processor.buildNode('Controls', {}));
+            const pageInfoItem = processor.createItemNode(1, "XRPageInfo",
+            {
+                Name: "pageInfo1",
+                TextAlignment: "BottomRight",
+                SizeF: (LAYOUT.PAGE_WIDTH - LAYOUT.MARGIN_LEFT - LAYOUT.MARGIN_RIGHT) + ",50",
+                LocationFloat: "0,0",
+                Padding: "2,2,0,0,100"
+            });
+            pageInfoItem.addChild(processor.buildNode('StylePriority', { UseTextAlignment: "false" }));
+            footerBand.addChild(processor.buildNode('Controls', {}, [pageInfoItem]));
         }
 
         // ? Add all main sections to root
