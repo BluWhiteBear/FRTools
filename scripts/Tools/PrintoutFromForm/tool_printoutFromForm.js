@@ -3149,6 +3149,15 @@ function generateMinimalXmlTemplate()
             }
         }
 
+        // ? Add PageFooterBand
+        bandsArray.push(
+            processor.createItemNode(undefined, "PageFooterBand",
+            {
+                Name: "PageFooter",
+                HeightF: "50"
+            })
+        );
+
         // ? Add BottomMarginBand
         bandsArray.push(
             processor.createItemNode(undefined, "BottomMarginBand",
@@ -3161,8 +3170,14 @@ function generateMinimalXmlTemplate()
         const bands = processor.buildNode('Bands', {}, bandsArray);
 
         // ? Add controls to their respective bands
-        bands.children[1].addChild(headerControls); // ? Add header controls to PageHeaderBand
+        bands.children[1].addChild(headerControls); // ? Add header controls to ReportHeaderBand
         bands.children[2].addChild(detailControls); // ? Add detail controls to DetailBand
+
+        // ? Add empty controls to PageFooterBand (second-to-last child, before BottomMarginBand)
+        const footerBand = bands.children.find(c => c.attributes?.Name === 'PageFooter');
+        if (footerBand) {
+            footerBand.addChild(processor.buildNode('Controls', {}));
+        }
 
         // ? Add all main sections to root
         root.addChild(extensions);
