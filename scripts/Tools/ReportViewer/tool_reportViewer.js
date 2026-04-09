@@ -13,10 +13,30 @@ class ReportViewer {
         document.getElementById('zoomIn')?.addEventListener('click', () => this.setZoom(this.scale * 1.2));
         document.getElementById('zoomOut')?.addEventListener('click', () => this.setZoom(this.scale * 0.8));
 
-        document.getElementById('showBoundaries')?.addEventListener('change', (e) => {
-            this.showBoundaries = e.target.checked;
+        const boundaryToggle = document.getElementById('showBoundaries');
+        const applyBoundaries = (enabled) => {
+            this.showBoundaries = Boolean(enabled);
             this.container.classList.toggle('show-boundaries', this.showBoundaries);
-        });
+
+            if (!boundaryToggle) return;
+
+            if (boundaryToggle.tagName === 'BUTTON') {
+                boundaryToggle.setAttribute('aria-pressed', this.showBoundaries ? 'true' : 'false');
+                boundaryToggle.classList.toggle('btn-primary', this.showBoundaries);
+                boundaryToggle.classList.toggle('btn-outline-secondary', !this.showBoundaries);
+            } else if ('checked' in boundaryToggle) {
+                boundaryToggle.checked = this.showBoundaries;
+            }
+        };
+
+        if (boundaryToggle) {
+            if (boundaryToggle.tagName === 'BUTTON') {
+                boundaryToggle.addEventListener('click', () => applyBoundaries(!this.showBoundaries));
+                applyBoundaries(false);
+            } else {
+                boundaryToggle.addEventListener('change', (e) => applyBoundaries(e.target.checked));
+            }
+        }
 
         document.getElementById('reportUpload')?.addEventListener('change', (e) => this.handleFileUpload(e));
         document.getElementById('copyJsonBtn')?.addEventListener('click', () => this.copyToClipboard('devexpress-json'));
