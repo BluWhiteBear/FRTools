@@ -267,10 +267,42 @@ class XMLProcessor
     }
 
     // ? Second pass: Assign references sequentially
+    // ? Phase 1: collect all explicit Ref values from the entire tree into a reserved set,
+    // ? then Phase 2: auto-assign refs to nodes that don't have one, skipping reserved values.
+    // ? This prevents the root node from receiving Ref="0" when ComponentStorage Item1 already
+    // ? claims Ref="0" explicitly, which would cause DataSource="#Ref-0" to resolve to the
+    // ? report root instead of the SqlDataSource.
     assignReferences(node)
     {
+        // Phase 1: pre-scan to build a set of all explicitly claimed Ref values
+        this._reservedRefs = new Set();
+        this._collectExplicitRefs(node);
+
+        // Phase 2: assign refs, skipping any reserved values
+        this._doAssignReferences(node);
+    }
+
+    _collectExplicitRefs(node)
+    {
+        if (!node) return;
+        if (node.needsRef && node.attributes &&
+            node.attributes.Ref !== undefined && node.attributes.Ref !== null && node.attributes.Ref !== '')
+        {
+            const refNum = Number.parseInt(String(node.attributes.Ref), 10);
+            if (!Number.isNaN(refNum))
+            {
+                this._reservedRefs.add(refNum);
+            }
+        }
+        if (node.children)
+        {
+            node.children.forEach(child => { if (child) this._collectExplicitRefs(child); });
+        }
+    }
+
+    _doAssignReferences(node)
+    {
         // ! EARLY EXIT
-        // ? Check for undefined node
         if (!node)
         {
             console.warn('Skipping undefined node in assignReferences');
@@ -282,26 +314,17 @@ class XMLProcessor
         {
             const hasExplicitRef = node.attributes && node.attributes.Ref !== undefined && node.attributes.Ref !== null && node.attributes.Ref !== '';
 
-            if (hasExplicitRef)
+            if (!hasExplicitRef)
             {
-                // Preserve explicitly assigned refs (ex: ComponentStorage Item1 must remain Ref="0").
-                const explicitRefNum = Number.parseInt(String(node.attributes.Ref), 10);
-                if (!Number.isNaN(explicitRefNum))
+                // Skip any ref values that are explicitly reserved by other nodes
+                while (this._reservedRefs.has(this.currentRef))
                 {
-                    this.currentRef = Math.max(this.currentRef, explicitRefNum + 1);
+                    this.currentRef++;
                 }
-            }
-            else
-            {
-                // console.log('[assignReferences] Assigning Ref:', {
-                //     currentRef: this.currentRef,
-                //     nodeType: node.type,
-                //     nodeName: node.attributes?.Name || 'unnamed'
-                // });
-                //console.log('[assignReferences] Before increment, currentRef:', this.currentRef);
                 node.attributes.Ref = this.currentRef++;
-                //console.log('[assignReferences] After increment, currentRef:', this.currentRef);
             }
+            // Explicit refs are preserved as-is; no counter adjustment needed since
+            // reserved values are skipped during auto-assignment above.
         }
 
         // ? Recursively process all children elements if they exist
@@ -310,7 +333,7 @@ class XMLProcessor
             node.children.forEach(child => {
                 if (child)
                 {
-                    this.assignReferences(child);
+                    this._doAssignReferences(child);
                 }
             });
         }
