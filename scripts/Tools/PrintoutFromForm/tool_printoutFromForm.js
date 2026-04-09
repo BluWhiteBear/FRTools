@@ -425,6 +425,44 @@ const SettingsManager = {
         document.getElementById('font_fieldOutput_strikethrough').checked = !!settings.fontFieldOutputStrikethrough;
     },
 
+    exportSettings() {
+        this.saveSettings();
+        const settingsStr = localStorage.getItem(this.SETTINGS_KEY);
+        if (!settingsStr) return;
+        const blob = new Blob([settingsStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'printout-settings.json';
+        a.click();
+        URL.revokeObjectURL(url);
+    },
+
+    importSettings() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json,application/json';
+        input.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.addEventListener('load', (ev) => {
+                try {
+                    const settings = JSON.parse(ev.target.result);
+                    localStorage.setItem(this.SETTINGS_KEY, JSON.stringify(settings));
+                    this.loadSettings();
+                    applyLayoutSettingsFromUI();
+                    debugLog(1, '[SettingsManager] Settings imported from file.');
+                } catch (err) {
+                    console.error('[SettingsManager] Failed to parse imported settings file:', err);
+                    alert('Invalid settings file. Please select a valid JSON settings file.');
+                }
+            });
+            reader.readAsText(file);
+        });
+        input.click();
+    },
+
     setupAutoSave() {
         // Save settings on change for all relevant fields
         const fields = [
@@ -463,6 +501,18 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // Apply settings to LAYOUT
     applyLayoutSettingsFromUI();
+
+    // Add export settings button handler
+    const exportBtn = document.getElementById('exportSettingsBtn');
+    if (exportBtn) {
+        exportBtn.addEventListener('click', () => SettingsManager.exportSettings());
+    }
+
+    // Add import settings button handler
+    const importBtn = document.getElementById('importSettingsBtn');
+    if (importBtn) {
+        importBtn.addEventListener('click', () => SettingsManager.importSettings());
+    }
 
     // Add reset button handler
     const resetBtn = document.getElementById('resetSettingsBtn');
