@@ -2,87 +2,77 @@
     ><Connection Name="UniData" ConnectionString="" /><Query
         Type="StoredProcQuery"
         Name="cstm_FormIO_FormIO2DevExpressTestForm1_Printout"
-        ><Parameter
-            Name="@FormDataGUID"
-            Type="Guid"
-            ValueInfo="00000000-0000-0000-0000-000000000000"
-        /><Parameter
-            Name="@OwnerObjectGUID"
-            Type="Guid"
-            ValueInfo="00000000-0000-0000-0000-000000000000"
-        /><ProcName>cstm_FormIO_FormIO2DevExpressTestForm1_Printout</ProcName></Query
+        ><Parameter Name="@FormDataGUID" Type="DevExpress.DataAccess.Expression"
+            >(System.Guid)(?FormDataGUID )</Parameter
+        ><Parameter Name="@OwnerObjectGUID" Type="DevExpress.DataAccess.Expression"
+            >(System.Guid)(?ObjectGUID )</Parameter
+        ><ProcName>cstm_FormIO_FormIO2DevExpressTestForm1_Printout</ProcName></Query
     ><ResultSchema
         ><DataSet Name="sqlDataSource1"
             ><View Name="cstm_FormIO_FormIO2DevExpressTestForm1_Printout"
-                ><Field Name="__ID" Type="Int32" /><Field
-                    Name="__OwnerObjectGuid"
-                    Type="Guid" /><Field Name="__FormInstanceGUID" Type="Guid" /><Field
-                    Name="__FormGUID"
-                    Type="Guid" /><Field Name="__FormGroupName" Type="String" /><Field
-                    Name="__FormGroupFolder"
-                    Type="Guid" /><Field Name="__InstanceName" Type="String" /><Field
-                    Name="__Created"
-                    Type="DateTime" /><Field Name="__Modified" Type="DateTime" /><Field
-                    Name="__Locked"
-                    Type="Boolean" /><Field Name="__LockLevel" Type="Int32" /><Field
-                    Name="__LockedBy"
-                    Type="Guid" /><Field Name="__LockedTime" Type="DateTime" /><Field
-                    Name="__Referrer"
-                    Type="Guid" /><Field Name="__FormVersion" Type="Int32" /><Field
-                    Name="__CreatedBy"
-                    Type="Guid" /><Field Name="__ModifiedBy" Type="Guid" /><Field
-                    Name="txtUnnestedField1"
-                    Type="String" /><Field Name="txtUnnestedField2" Type="String" /><Field
-                    Name="txtaUnnestedField3"
-                    Type="String" /><Field Name="dgFamily" Type="String" /><Field
+                ><Field Name="first" Type="String" /><Field Name="last" Type="String" /><Field
+                    Name="__ID"
+                    Type="Int32" /><Field Name="__OwnerObjectGuid" Type="Guid" /><Field
+                    Name="__FormInstanceGUID"
+                    Type="Guid" /><Field Name="__FormGUID" Type="Guid" /><Field
+                    Name="__FormGroupName"
+                    Type="String" /><Field Name="__FormGroupFolder" Type="Guid" /><Field
+                    Name="__InstanceName"
+                    Type="String" /><Field Name="__Created" Type="DateTime" /><Field
+                    Name="__Modified"
+                    Type="DateTime" /><Field Name="__Locked" Type="Boolean" /><Field
+                    Name="__LockLevel"
+                    Type="Int32" /><Field Name="__LockedBy" Type="Guid" /><Field
+                    Name="__LockedTime"
+                    Type="DateTime" /><Field Name="__Referrer" Type="Guid" /><Field
+                    Name="__FormVersion"
+                    Type="Int32" /><Field Name="__CreatedBy" Type="Guid" /><Field
+                    Name="__ModifiedBy"
+                    Type="Guid" /><Field Name="txtUnnestedField1" Type="String" /><Field
+                    Name="txtUnnestedField2"
+                    Type="String" /><Field Name="txtaUnnestedField3" Type="String" /><Field
                     Name="txtTextField"
                     Type="String" /><Field Name="txtaTextArea" Type="String" /><Field
                     Name="txtNumber"
-                    Type="Decimal" /><Field Name="cmbSelect" Type="String" /><Field
-                    Name="rdoRadio"
-                    Type="String" /><Field Name="testNestedForm" Type="String" /><Field
-                    Name="fileUpload"
-                    Type="String" /><Field Name="txtEmail" Type="String" /><Field
-                    Name="txtURL"
-                    Type="String" /><Field Name="txtPhoneNumber" Type="String" /><Field
-                    Name="txtAddress"
-                    Type="String" /><Field Name="txtDateTime" Type="DateTime" /><Field
-                    Name="txtDay"
-                    Type="DateTime" /><Field Name="txtTime" Type="String" /><Field
-                    Name="txtCurrency"
-                    Type="Decimal" /><Field Name="sigSignature" Type="String" /><Field
-                    Name="html"
-                    Type="String" /><Field Name="columns" Type="String" /><Field
-                    Name="txtFieldsetField1"
-                    Type="String" /><Field Name="txtaFieldsetField2" Type="String" /><Field
+                    Type="Decimal" /><Field Name="chkCheckbox" Type="Boolean" /><Field
+                    Name="cmbSelect"
+                    Type="String" /><Field Name="rdoRadio" Type="String" /><Field
+                    Name="testNestedForm"
+                    Type="String" /><Field Name="fileUpload" Type="String" /><Field
+                    Name="txtEmail"
+                    Type="String" /><Field Name="txtURL" Type="String" /><Field
+                    Name="txtPhoneNumber"
+                    Type="String" /><Field Name="address1" Type="String" /><Field
+                    Name="address2"
+                    Type="String" /><Field Name="city" Type="String" /><Field
+                    Name="state"
+                    Type="String" /><Field Name="country" Type="String" /><Field
+                    Name="zip"
+                    Type="String" /><Field Name="txtAddress" Type="String" /><Field
+                    Name="txtDateTime"
+                    Type="DateTime" /><Field Name="txtDay" Type="DateTime" /><Field
+                    Name="txtTime"
+                    Type="String" /><Field Name="txtCurrency" Type="Decimal" /><Field
+                    Name="sigSignature"
+                    Type="String" /><Field Name="txtFieldsetField1" Type="String" /><Field
+                    Name="txtaFieldsetField2"
+                    Type="String" /><Field Name="chkFieldsetField3" Type="Boolean" /><Field
                     Name="txtPanelField1"
                     Type="String" /><Field Name="cmbPanelField2" Type="String" /><Field
-                    Name="table"
-                    Type="String" /><Field Name="tab2" Type="String" /><Field
-                    Name="tab3"
-                    Type="String" /><Field Name="wellComponent" Type="String" /><Field
-                    Name="dgTestDataGrid"
-                    Type="String" /><Field Name="fgTestGrid" Type="String" /><Field
-                    Name="html3"
-                    Type="String" /><Field Name="html4" Type="String" /><Field
-                    Name="html5"
-                    Type="String" /><Field Name="html6" Type="String" /><Field
-                    Name="html7"
-                    Type="String" /><Field Name="html8" Type="String" /><Field
-                    Name="columns1"
-                    Type="String" /><Field Name="textField" Type="String" /><Field
-                    Name="textField1"
-                    Type="String" /><Field Name="textField2" Type="String" /><Field
-                    Name="textField3"
-                    Type="String" /><Field Name="textField4" Type="String" /><Field
-                    Name="textField5"
-                    Type="String" /><Field Name="standardRadio" Type="String" /><Field
-                    Name="radio1"
-                    Type="String" /><Field Name="topSelect" Type="String" /><Field
-                    Name="leftSelect"
-                    Type="String" /><Field Name="hiddenLabel" Type="String" /><Field
-                    Name="hiddenLabelTextArea"
-                    Type="String" /><Field Name="hiddenLabelNumber" Type="Decimal" /><Field
+                    Name="textField"
+                    Type="String" /><Field Name="textField1" Type="String" /><Field
+                    Name="textField2"
+                    Type="String" /><Field Name="textField3" Type="String" /><Field
+                    Name="textField4"
+                    Type="String" /><Field Name="textField5" Type="String" /><Field
+                    Name="standardRadio"
+                    Type="String" /><Field Name="radio1" Type="String" /><Field
+                    Name="topSelect"
+                    Type="String" /><Field Name="leftSelect" Type="String" /><Field
+                    Name="hiddenLabel"
+                    Type="String" /><Field Name="hiddenLabelTextArea" Type="String" /><Field
+                    Name="hiddenLabelNumber"
+                    Type="Decimal" /><Field Name="hiddenLabelCheckbox" Type="Boolean" /><Field
                     Name="hiddenLabelSelect"
                     Type="String" /><Field Name="hiddenLabelRadio" Type="String" /><Field
                     Name="hiddenLabelEmail"

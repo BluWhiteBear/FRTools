@@ -6,7 +6,7 @@ export class XMLValidator
         let issues = [];
         
         // ? Check if this node has a Ref attribute
-        if (node.attributes?.Ref) 
+        if (node.attributes && node.attributes.Ref !== undefined && node.attributes.Ref !== null) 
         {
             const refNum = parseInt(node.attributes.Ref);
             if (isNaN(refNum))

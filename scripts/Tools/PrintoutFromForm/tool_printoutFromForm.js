@@ -2789,18 +2789,16 @@ function generateMinimalXmlTemplate()
 
         const parameters = processor.buildNode('Parameters',
         {}, [
-            processor.createItemNode(1, 'Parameter',
+            processor.createItemNode(1, undefined,
             {
                 Description: "FormDataGUID",
                 Name: "FormDataGUID",
-                Type: "#Ref-3",
                 ValueInfo: "00000000-0000-0000-0000-000000000000"
             }),
-            processor.createItemNode(2, 'Parameter',
+            processor.createItemNode(2, undefined,
             {
                 Description: "ObjectGUID",
                 Name: "ObjectGUID",
-                Type: "#Ref-3",
                 ValueInfo: "00000000-0000-0000-0000-000000000000"
             })
         ]);
@@ -3172,13 +3170,15 @@ function generateMinimalXmlTemplate()
         // ? Add ParameterPanelLayoutItems
         const parameterPanel = processor.buildNode('ParameterPanelLayoutItems',
         {}, [
-            processor.createItemNode(1, "Parameter",
+            processor.createItemNode(1, undefined,
             {
-                Parameter: "#Ref-3"
+                LayoutItemType: "Parameter",
+                Parameter: ""
             }),
-            processor.createItemNode(2, "Parameter",
+            processor.createItemNode(2, undefined,
             {
-                Parameter: "#Ref-4"
+                LayoutItemType: "Parameter",
+                Parameter: ""
             })
         ]);
         root.addChild(parameterPanel);
@@ -3197,6 +3197,22 @@ function generateMinimalXmlTemplate()
 
         // ? Second pass: Assign all references
         processor.assignReferences(root);
+
+        // ? Bind ParameterPanel items to the actual parameter refs assigned above.
+        if (parameters.children?.length >= 2 && parameterPanel.children?.length >= 2)
+        {
+            const formDataParamRef = parameters.children[0]?.attributes?.Ref;
+            const objectParamRef = parameters.children[1]?.attributes?.Ref;
+
+            if (formDataParamRef !== undefined)
+            {
+                parameterPanel.children[0].attributes.Parameter = `#Ref-${formDataParamRef}`;
+            }
+            if (objectParamRef !== undefined)
+            {
+                parameterPanel.children[1].attributes.Parameter = `#Ref-${objectParamRef}`;
+            }
+        }
 
         // ? Final pass: Generate XML string with proper formatting and cleanup
         const xmlContent = processor.generateXML(root);

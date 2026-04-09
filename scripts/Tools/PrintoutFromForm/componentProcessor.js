@@ -911,7 +911,7 @@ export class ComponentProcessor
         // ? Create ReportSource node with required structure
         const reportSource = this.xmlProcessor.buildNode('ReportSource',
         {
-            Ref: (this.xmlProcessor.currentRef++).toString(),
+            Ref: '0',
             ControlType: 'DevExpress.XtraReports.UI.XtraReport, DevExpress.XtraReports.v23.2, Version=23.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a',
             PageWidth: '850',
             PageHeight: '1100',
@@ -919,26 +919,21 @@ export class ComponentProcessor
             Font: 'Arial, 9pt'
         });
 
-        console.log('[componentProcessor] Before increment, currentRef:', this.xmlProcessor.currentRef);
         // ? Add bands structure
         const bandsNode = this.xmlProcessor.buildNode('Bands', null, [
             this.xmlProcessor.buildNode('Item1',
             {
-                Ref: (this.xmlProcessor.currentRef++).toString(),
                 ControlType: 'TopMarginBand'
             }, null, true),
             this.xmlProcessor.buildNode('Item2',
             {
-                Ref: (this.xmlProcessor.currentRef++).toString(),
                 ControlType: 'DetailBand'
             }, null, true),
             this.xmlProcessor.buildNode('Item3',
             {
-                Ref: (this.xmlProcessor.currentRef++).toString(),
                 ControlType: 'BottomMarginBand'
             }, null, true)
         ]);
-        console.log('[componentProcessor] After increment, currentRef:', this.xmlProcessor.currentRef);
 
         reportSource.addChild(bandsNode);
         node.addChild(reportSource);
