@@ -126,7 +126,7 @@
 #inspectorModal .nav-tabs .nav-link.active {
     color: #e0e0e0;
     background-color: rgba(255, 255, 255, 0.05);
-    border-bottom: 2px solid #0d6efd;
+    border-bottom: 2px solid var(--accent-color);
 }
 
 #inspectorModal .xml-viewer {
