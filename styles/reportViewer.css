@@ -246,8 +246,8 @@
     outline-offset: 1px;
 }
 
-/* Expression Fields — keep position:absolute so layout is not broken */
-.report-component.expression-field {
+/* Expression field debug outline only in boundary mode */
+.show-boundaries .report-component.expression-field {
     outline: 1px dashed rgba(255, 140, 0, 0.5);
 }
 

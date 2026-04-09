@@ -771,7 +771,7 @@ class ReportViewer {
                 </div>
             `).join('');
 
-        xmlTab.innerHTML = this.formatXML(component.dataset.xml);
+        xmlTab.textContent = this.formatXML(component.dataset.xml);
     }
 
     extractComponentProperties(xmlElement) {
