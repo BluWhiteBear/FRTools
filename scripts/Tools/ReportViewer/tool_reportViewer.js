@@ -226,6 +226,7 @@ class ReportViewer {
         if (name) band.dataset.name = name;
 
         band.style.height = `${parseFloat(bandXml.getAttribute('HeightF')) || 0}px`;
+        this.applyVisualStyles(band, bandXml);
         return band;
     }
 
@@ -273,6 +274,9 @@ class ReportViewer {
             element.style.width = `${w}px`;
             element.style.height = `${h}px`;
         }
+
+        // Apply common non-font visual styles for every control type.
+        this.applyVisualStyles(element, componentXml);
 
         element.dataset.xml = componentXml.outerHTML;
         element.addEventListener('click', (e) => {
@@ -378,6 +382,21 @@ class ReportViewer {
         if (sides.includes('right')) element.style.borderRight = bw;
         if (sides.includes('top')) element.style.borderTop = bw;
         if (sides.includes('bottom')) element.style.borderBottom = bw;
+    }
+
+    applyVisualStyles(element, xmlData) {
+        this.applyBorders(
+            element,
+            xmlData.getAttribute('Borders'),
+            xmlData.getAttribute('BorderColor'),
+            xmlData.getAttribute('BorderWidth')
+        );
+
+        const backColor = this.parseColor(xmlData.getAttribute('BackColor'));
+        if (backColor && backColor !== 'transparent') element.style.backgroundColor = backColor;
+
+        const foreColor = this.parseColor(xmlData.getAttribute('ForeColor'));
+        if (foreColor) element.style.color = foreColor;
     }
 
     applyFont(element, fontStr) {
