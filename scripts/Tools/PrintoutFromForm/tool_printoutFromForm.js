@@ -434,7 +434,7 @@ const SettingsManager = {
         const a = document.createElement('a');
         a.href = url;
         const ts = new Date().toISOString().replace(/:/g, '-').replace(/\..+$/, '');
-        a.download = `printout-settings_${ts}.json`;
+        a.download = `printout-settings_${ts}.dxs`;
         a.click();
         URL.revokeObjectURL(url);
     },
@@ -442,7 +442,7 @@ const SettingsManager = {
     importSettings() {
         const input = document.createElement('input');
         input.type = 'file';
-        input.accept = '.json,application/json';
+        input.accept = '.dxs';
         input.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
