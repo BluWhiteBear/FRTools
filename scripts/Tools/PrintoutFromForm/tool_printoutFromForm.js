@@ -433,7 +433,8 @@ const SettingsManager = {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'printout-settings.json';
+        const ts = new Date().toISOString().replace(/:/g, '-').replace(/\..+$/, '');
+        a.download = `printout-settings_${ts}.json`;
         a.click();
         URL.revokeObjectURL(url);
     },
