@@ -10,8 +10,8 @@ import { ComponentProcessor } from './componentProcessor.js';
 
 // ? Version info is used for generating both XML and SQL
 const VERSION_INFO = {
-    version: '0.4.5',
-    updated: '4/1/2026',
+    version: '0.4.7',
+    updated: '4/9/2026',
     devexpressVersion: '23.2.5.0'
 };
 
