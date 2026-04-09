@@ -110,6 +110,40 @@
                                 </div>
                             </div>
 
+                            <!-- Report Preview -->
+                            <div class="output-section mb-4" style="background: linear-gradient(180deg, #2a2a2a9c 0%, #1a1a1ae7 100%); border: 1px solid rgba(255,255,255,0.1);">
+                                <div class="d-flex justify-content-between align-items-center mb-2 gap-2 flex-wrap">
+                                    <button class="btn btn-link text-decoration-none text-light p-0 h5 mb-0 collapsed" 
+                                            data-bs-toggle="collapse" 
+                                            data-bs-target="#reportPreviewCollapse" 
+                                            aria-expanded="false">
+                                        <i class="bi bi-chevron-down me-2 text-light"></i>Report Preview
+                                    </button>
+                                    <div class="d-flex align-items-center gap-3 flex-wrap justify-content-end">
+                                        <div class="form-check m-0 text-nowrap flex-shrink-0">
+                                            <input type="checkbox" class="form-check-input" id="showBoundaries">
+                                            <label class="form-check-label text-light text-nowrap" for="showBoundaries">Show Boundaries</label>
+                                        </div>
+                                        <div class="btn-group flex-shrink-0">
+                                            <button id="zoomOut" class="btn btn-sm btn-secondary" title="Zoom Out" aria-label="Zoom Out">
+                                                <i class="bi bi-zoom-out"></i>
+                                            </button>
+                                            <button id="zoomLevel" class="btn btn-sm btn-secondary" disabled>100%</button>
+                                            <button id="zoomIn" class="btn btn-sm btn-secondary" title="Zoom In" aria-label="Zoom In">
+                                                <i class="bi bi-zoom-in"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="reportPreviewCollapse" class="collapse show">
+                                    <div class="p-3 rounded-3 output-container" style="background: rgba(255,255,255,0.05);">
+                                        <div class="report-container-wrapper bg-darker rounded-3 p-3">
+                                            <div id="reportContainer" class="report-container"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- DevExpress JSON Output -->
                             <div class="output-section mb-4" style="background: linear-gradient(180deg, #2a2a2a9c 0%, #1a1a1ae7 100%); border: 1px solid rgba(255,255,255,0.1);">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
@@ -147,40 +181,6 @@
                                 <div id="xmlCollapse" class="collapse">
                                     <div id="outputDevXML" class="p-4 rounded-3 output-container" style="background: rgba(255,255,255,0.05);">
                                         <pre id="devexpress-rendered" class="m-0 text-light language-xml"></pre>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Report Preview -->
-                            <div class="output-section mb-4" style="background: linear-gradient(180deg, #2a2a2a9c 0%, #1a1a1ae7 100%); border: 1px solid rgba(255,255,255,0.1);">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <button class="btn btn-link text-decoration-none text-light p-0 h5 mb-0 collapsed" 
-                                            data-bs-toggle="collapse" 
-                                            data-bs-target="#reportPreviewCollapse" 
-                                            aria-expanded="false">
-                                        <i class="bi bi-chevron-down me-2 text-light"></i>Report Preview
-                                    </button>
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="form-check m-0">
-                                            <input type="checkbox" class="form-check-input" id="showBoundaries">
-                                            <label class="form-check-label text-light" for="showBoundaries">Show Boundaries</label>
-                                        </div>
-                                        <div class="btn-group">
-                                            <button id="zoomOut" class="btn btn-sm btn-secondary" title="Zoom Out" aria-label="Zoom Out">
-                                                <i class="bi bi-zoom-out"></i>
-                                            </button>
-                                            <button id="zoomLevel" class="btn btn-sm btn-secondary" disabled>100%</button>
-                                            <button id="zoomIn" class="btn btn-sm btn-secondary" title="Zoom In" aria-label="Zoom In">
-                                                <i class="bi bi-zoom-in"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div id="reportPreviewCollapse" class="collapse show">
-                                    <div class="p-3 rounded-3 output-container" style="background: rgba(255,255,255,0.05);">
-                                        <div class="report-container-wrapper bg-darker rounded-3 p-3">
-                                            <div id="reportContainer" class="report-container"></div>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
