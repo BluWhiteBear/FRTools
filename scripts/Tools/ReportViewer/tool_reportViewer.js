@@ -357,35 +357,6 @@ class ReportViewer {
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(xmlString, 'text/xml');
         
-        // Check for parsing errors
-        const parserError = xmlDoc.querySelector('parsererror');
-        if (parserError) {
-            console.error('XML parsing error:', parserError.textContent);
-            alert('Failed to parse the report XML. Please check the console for details.');
-            return;
-        }
-        
-        this.reportData = xmlDoc;
-        console.log('XML successfully parsed');
-
-        // Log root element info
-        console.log('Root element:', {
-            name: xmlDoc.documentElement.tagName,
-            attributes: Array.from(xmlDoc.documentElement.attributes)
-                .map(a => `${a.name}="${a.value}"`)
-                .join(', ')
-        });
-
-        // Find the Bands container
-        const bandsContainer = xmlDoc.querySelector('XtraReportsLayoutSerializer > Bands');
-        if (!bandsContainer) {
-            console.error('No Bands container found in the report');
-            return;
-        }
-
-        console.log('Found Bands container with', bandsContainer.childNodes.length, 'children');
-
-        // Clear previous content
         const parserError = xmlDoc.querySelector('parsererror');
         if (parserError) {
             console.error('XML parsing error:', parserError.textContent);
