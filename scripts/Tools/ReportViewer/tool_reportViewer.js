@@ -230,7 +230,7 @@ class ReportViewer {
     }
 
     processComponents(parentXml, parentElement, xOffset = 0) {
-        const controls = parentXml.querySelector(':scope > Controls');
+        const controls = this.childByTag(parentXml, 'Controls');
         if (!controls) return;
 
         Array.from(controls.children).forEach((controlXml) => {
@@ -241,11 +241,23 @@ class ReportViewer {
         });
     }
 
+    /** Find the first direct child element whose tagName matches (case-sensitive, for XML). */
+    childByTag(el, tagName) {
+        return Array.from(el.children).find((c) => c.tagName === tagName) || null;
+    }
+
     createComponentElement(componentXml, xOffset = 0) {
         const controlType = componentXml.getAttribute('ControlType') || '';
 
         const element = document.createElement('div');
         element.className = 'report-component';
+        if (controlType) {
+            // XRLabel → component-label, XRCheckBox → component-check-box, XRTable → component-table …
+            const suffix = controlType
+                .replace(/^XR/, '')
+                .replace(/([A-Z])/g, (m, c, i) => (i > 0 ? '-' + c.toLowerCase() : c.toLowerCase()));
+            element.classList.add(`component-${suffix}`);
+        }
         element.dataset.type = controlType;
 
         const name = componentXml.getAttribute('Name');
@@ -544,7 +556,7 @@ class ReportViewer {
 
         element.style.overflow = 'visible';
 
-        const controls = xmlData.querySelector(':scope > Controls');
+        const controls = this.childByTag(xmlData, 'Controls');
         if (!controls) return;
 
         Array.from(controls.children).forEach((controlXml) => {
@@ -560,7 +572,7 @@ class ReportViewer {
             .split(',')
             .map((n) => parseFloat(n.trim()) || 0);
 
-        const rowsContainer = xmlData.querySelector(':scope > Rows');
+        const rowsContainer = this.childByTag(xmlData, 'Rows');
         if (!rowsContainer) return;
 
         const rowXmls = Array.from(rowsContainer.children)
@@ -583,7 +595,7 @@ class ReportViewer {
             rowDiv.style.width = `${tableW}px`;
             rowDiv.style.height = `${rowH}px`;
 
-            const cellsContainer = rowXml.querySelector(':scope > Cells');
+            const cellsContainer = this.childByTag(rowXml, 'Cells');
             const cellXmls = cellsContainer
                 ? Array.from(cellsContainer.children).filter((el) => el.getAttribute('ControlType') === 'XRTableCell')
                 : [];
@@ -619,7 +631,7 @@ class ReportViewer {
                 const backColor = this.parseColor(cellXml.getAttribute('BackColor'));
                 if (backColor && backColor !== 'transparent') cellDiv.style.backgroundColor = backColor;
 
-                const controls = cellXml.querySelector(':scope > Controls');
+                const controls = this.childByTag(cellXml, 'Controls');
                 if (controls) {
                     Array.from(controls.children).forEach((controlXml) => {
                         const controlType = controlXml.getAttribute('ControlType') || '';
