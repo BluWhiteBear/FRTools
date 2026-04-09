@@ -615,6 +615,26 @@ function doApplySettings() {
             Prism.highlightAll();
         }
 
+        const devExpressData = typeof devExpressJson === 'string'
+            ? JSON.parse(devExpressJson)
+            : devExpressJson;
+
+        const decodedTemplate = Utils.decodeReportTemplate(devExpressData?.[0]?.ReportTemplate);
+        const previewRenderer = DevExpressConverter.state.createDevExpressPreview;
+        if (decodedTemplate && previewRenderer) {
+            previewRenderer(devExpressData, decodedTemplate);
+        }
+
+        const xmlContainer = document.getElementById('devexpress-rendered');
+        if (xmlContainer) {
+            if (!decodedTemplate?.content) {
+                xmlContainer.innerHTML = `<div class="alert alert-danger">No XML content available</div>`;
+            } else {
+                xmlContainer.textContent = decodedTemplate.content;
+                Prism.highlightElement(xmlContainer);
+            }
+        }
+
         Utils.generateSqlQuery(formData);
         showOverlapWarnings();
 
@@ -782,7 +802,8 @@ class DevExpressConverter
     // ? Holds state information between function calls
     static state = {
         devExpressJson: null,   // ? For storing the generated JSON
-        warnings: []            // ? For storing conversion warnings
+        warnings: [],           // ? For storing conversion warnings
+        createDevExpressPreview: null
     };
 
     static initialize()
@@ -3420,6 +3441,8 @@ const Init = {
     // ! This is separated for clarity and modularity
     initializeEventListeners(createDevExpressPreview)
     {
+        DevExpressConverter.state.createDevExpressPreview = createDevExpressPreview || null;
+
         const fileUpload = document.getElementById('fileUpload');
         const copyJsonBtn = document.getElementById('copyJsonBtn');
         const downloadJsonBtn = document.getElementById('downloadJsonBtn');

@@ -9,22 +9,8 @@
 }
 
 /* Inspector Modal */
-.modal-lg {
+#inspectorModal .modal-dialog.modal-lg {
     max-width: 800px;
-}
-
-/* Hide modal backdrop */
-.modal-backdrop {
-    display: none !important;
-}
-
-/* Ensure modal appears above backdrop */
-.modal-backdrop {
-    z-index: 1040;
-}
-
-.modal {
-    z-index: 1050;
 }
 
 #inspectorModal {
