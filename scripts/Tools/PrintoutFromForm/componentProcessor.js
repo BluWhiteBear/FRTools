@@ -992,7 +992,8 @@ export class ComponentProcessor
                     Text: this.xmlProcessor.escapeText(option.label),
                     // Always use the latest value from window.LAYOUT.INPUT_HEIGHT
                     SizeF: `${buttonWidth},${window.LAYOUT && window.LAYOUT.INPUT_HEIGHT ? window.LAYOUT.INPUT_HEIGHT : 35}`,
-                    LocationFloat: `${buttonX},${buttonY}`
+                    LocationFloat: `${buttonX},${buttonY}`,
+                    Font: LAYOUT.FONT_FIELDOUTPUT
                 });
 
                 // ? Add expression binding for the checkbox state
