@@ -2118,6 +2118,25 @@ const UIHandlers = {
             {
                 let jsonData = JSON.parse(e.target.result);
 
+                // Validate file format: the first top-level property must be "Name".
+                const firstProperty = Object.keys(jsonData || {})[0];
+                if (firstProperty !== 'Name')
+                {
+                    const formatError = new Error('Uploaded file is not a supported Form.io form format.');
+                    formatError.validationErrors = [
+                        `Expected first property: Name`,
+                        `Found first property: ${firstProperty || '[none]'}`
+                    ];
+                    throw formatError;
+                }
+
+                if (!jsonData.FormioTemplate)
+                {
+                    const templateError = new Error('Conversion failed: missing required FormioTemplate data.');
+                    templateError.validationErrors = ['FormioTemplate property is required for conversion.'];
+                    throw templateError;
+                }
+
                 // Store the uploaded form globally for regeneration
                 window.lastUploadedForm = jsonData;
 
