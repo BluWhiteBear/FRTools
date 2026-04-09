@@ -3203,7 +3203,9 @@ function generateMinimalXmlTemplate()
                         spacerControls.addChild(component);
                     });
                     spacerBands.children[0].addChild(spacerControls);
-                    spacerBands.children[0].attributes.HeightF = (maxY + LAYOUT.VERTICAL_SPACING).toString();
+                    const finalSpacerHeight = maxY + LAYOUT.VERTICAL_SPACING;
+                    spacerBands.children[0].attributes.HeightF = finalSpacerHeight.toString();
+                    spacerReport.attributes.HeightF = finalSpacerHeight.toString();
                 }
                 spacerReport.addChild(spacerBands);
                 bandsArray.push(spacerReport);
@@ -3269,6 +3271,8 @@ function generateMinimalXmlTemplate()
                             HeightF: LAYOUT.LABEL_HEIGHT.toString()
                         })
                     ]);
+                    postBands.children[0].attributes.HeightF = currentYOffset.toString();
+                    postNestedFormReport.attributes.HeightF = currentYOffset.toString();
                     postBands.children[0].addChild(postContentControls);
                     postNestedFormReport.addChild(postBands);
                 }
