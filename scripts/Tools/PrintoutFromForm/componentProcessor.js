@@ -911,8 +911,7 @@ export class ComponentProcessor
         // ? Create ReportSource node with required structure
         const reportSource = this.xmlProcessor.buildNode('ReportSource',
         {
-            Ref: '0',
-            ControlType: 'DevExpress.XtraReports.UI.XtraReport, DevExpress.XtraReports.v23.2, Version=23.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a',
+              ControlType: 'DevExpress.XtraReports.UI.XtraReport, DevExpress.XtraReports.v23.2, Version=23.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a',
             PageWidth: '850',
             PageHeight: '1100',
             Version: '23.2',

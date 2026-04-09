@@ -44,7 +44,8 @@ class XMLNode
             'Item1', 'Item2', 'Item3', 'Item4',
             'Extensions', 'Parameters',
             'TopMarginBand', 'PageHeaderBand', 'DetailBand', 'BottomMarginBand',
-            'StylePriority', 'GlyphOptions'
+              'StylePriority', 'GlyphOptions',
+              'ReportSource'
         ];
 
         return refTypes.includes(type);
