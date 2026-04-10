@@ -22,7 +22,7 @@
         <div class="container my-5" style="padding-top: 4rem;">
             <header class="text-center mb-5">
                 <h1 class="display-4 fw-bold mb-2 text-light">Cheat Sheet</h1>
-                <p class="text-light">A quick reference for Form.io GUIDs and their meanings, and other miscellaneous information</p>
+                <p class="text-light">A quick reference for pulling data into Form.io forms</p>
             </header>
 
             <section class="tool-section mb-5">
@@ -39,7 +39,7 @@
                         <div class="row g-4">
                             <div class="col-md-6">
                                 <div class="tool-card h-100 p-4">
-                                    <h3 class="h5 mb-3">TheForm.User.OwnerObjectGUID.toString()</h3>
+                                    <h3 class="h5 mb-3">TheForm.DataStore.OwnerObjectGUID.toString()</h3>
                                     <p class="mb-4 text-light-emphasis">The ContactGUID of the contact that "owns" the form instance. This describes the open contact.</p>
                                 </div>
                             </div>
@@ -57,7 +57,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="tool-card h-100 p-4">
-                                    <h3 class="h5 mb-3">TheForm.FormDefinition.toString()</h3>
+                                    <h3 class="h5 mb-3">TheForm.FormDefinition.FormDefinitionGUID.toString()</h3>
                                     <p class="mb-4 text-light-emphasis">The FormDefinitionGUID of the current form. This tells the system which form is being referenced.</p>
                                 </div>
                             </div>
@@ -73,6 +73,30 @@
                                     <p class="mb-4 text-light-emphasis">This generates a new GUID.</p>
                                 </div>                                
                             </div>
+                            <div class="col-md-6">
+                                <div class="tool-card h-100 p-4">
+                                    <h3 class="h5 mb-3">theForm.User.SMTPAddress</h3>
+                                    <p class="mb-4 text-light-emphasis">This is the User Email associated with the currently signed in user.</p>
+                                </div>                                
+                            </div>
+                            <div class="col-md-6">
+                                <div class="tool-card h-100 p-4">
+                                    <h3 class="h5 mb-3">theForm.InstanceName</h3>
+                                    <p class="mb-4 text-light-emphasis">The name of the current form instance.</p>
+                                </div>                                
+                            </div>
+                            <div class="col-md-6">
+                                <div class="tool-card h-100 p-4">
+                                    <h3 class="h5 mb-3">theForm.User.FullName</h3>
+                                    <p class="mb-4 text-light-emphasis">The full name of the currently signed in user.</p>
+                                </div>                                
+                            </div>
+                            <div class="col-md-6">
+                                <div class="tool-card h-100 p-4">
+                                    <h3 class="h5 mb-3">theForm.CreatedDate</h3>
+                                    <p class="mb-4 text-light-emphasis">The date when the current form instance was created.</p>
+                                </div>                                
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -85,7 +109,7 @@
                         <div class="text-center mb-4">                    
                             <h2 class="h4 text-center text-light mb-0">
                                 <i class="bi bi-search me-2"></i>Combobox/Dropdown SQL Source
-                                <p class="text-light-emphasis small fw-light mb-0">For use in the SQL Source of Comboboxes</p>
+                                <p class="text-light-emphasis small fw-light mb-0">For use in the SQL Source of Form.io Comboboxes</p>
                             </h2>
                         </div>
                         
