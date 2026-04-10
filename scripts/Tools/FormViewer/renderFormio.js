@@ -1,24 +1,29 @@
 // Creates a form component based on the Form.io JSON definition
-function createComponent(component, formData) {
+function createComponent(component, formData)
+{
     const element = document.createElement('div');
     element.className = 'form-group mb-3';
 
     // Handle container-type components first
-    switch (component.type) {
+    switch (component.type)
+    {
         case 'panel':
             element.className = 'panel mb-3';
             const panelBody = document.createElement('div');
             panelBody.className = 'card-body';
 
-            if (component.title) {
+            if (component.title)
+            {
                 const header = document.createElement('h3');
                 header.className = 'card-title h5';
                 header.textContent = component.title;
                 element.appendChild(header);
             }
 
-            if (component.components) {
-                component.components.forEach((comp) => {
+            if (component.components)
+            {
+                component.components.forEach((comp) =>
+                {
                     panelBody.appendChild(createComponent(comp, formData));
                 });
             }
@@ -28,12 +33,16 @@ function createComponent(component, formData) {
 
         case 'columns':
             element.className = 'row g-3';
-            if (component.columns) {
-                component.columns.forEach((column) => {
+            if (component.columns)
+            {
+                component.columns.forEach((column) =>
+                {
                     const col = document.createElement('div');
                     col.className = `col-md-${12 / component.columns.length}`;
-                    if (column.components) {
-                        column.components.forEach((comp) => {
+                    if (column.components)
+                    {
+                        column.components.forEach((comp) =>
+                        {
                             col.appendChild(createComponent(comp, formData));
                         });
                     }
@@ -45,14 +54,17 @@ function createComponent(component, formData) {
         case 'fieldset':
             const fieldset = document.createElement('fieldset');
             fieldset.className = 'border p-3 rounded mb-3';
-            if (component.legend) {
+            if (component.legend)
+            {
                 const legend = document.createElement('legend');
                 legend.className = 'float-none w-auto px-2';
                 legend.textContent = component.legend;
                 fieldset.appendChild(legend);
             }
-            if (component.components) {
-                component.components.forEach((comp) => {
+            if (component.components)
+            {
+                component.components.forEach((comp) =>
+                {
                     fieldset.appendChild(createComponent(comp, formData));
                 });
             }
@@ -69,7 +81,8 @@ function createComponent(component, formData) {
     let label;
 
     // Existing input handling code...
-    switch (component.type) {
+    switch (component.type)
+    {
         case 'textfield':
             input = document.createElement('input');
             input.type = 'text';
@@ -85,8 +98,10 @@ function createComponent(component, formData) {
         case 'select':
             input = document.createElement('select');
             input.className = 'form-control formio-component-select';
-            if (component.data && component.data.values) {
-                component.data.values.forEach((option) => {
+            if (component.data && component.data.values)
+            {
+                component.data.values.forEach((option) =>
+                {
                     const optionEl = document.createElement('option');
                     optionEl.value = option.value;
                     optionEl.textContent = option.label;
@@ -128,8 +143,10 @@ function createComponent(component, formData) {
         case 'radio':
             radioGroup = document.createElement('div');
 
-            if (component.values) {
-                component.values.forEach((option) => {
+            if (component.values)
+            {
+                component.values.forEach((option) =>
+                {
                     const wrapper = document.createElement('div');
                     wrapper.className = 'form-check';
 
@@ -166,16 +183,19 @@ function createComponent(component, formData) {
             input.className = 'form-control';
 
             // Handle format options if provided
-            if (component.format) {
+            if (component.format)
+            {
                 // Convert format to HTML5 datetime-local format
                 input.step = component.enableTime ? '1' : '60'; // Include seconds if time enabled
             }
 
             // Set min/max dates if configured
-            if (component.minDate) {
+            if (component.minDate)
+            {
                 input.min = component.minDate;
             }
-            if (component.maxDate) {
+            if (component.maxDate)
+            {
                 input.max = component.maxDate;
             }
             break;
@@ -185,16 +205,19 @@ function createComponent(component, formData) {
             input.type = 'time';
             input.className = 'form-control';
 
-            if (component.format) {
+            if (component.format)
+            {
                 // Set step to include seconds if format specifies it
                 input.step = component.format.includes('ss') ? '1' : '60';
             }
 
             // Handle min/max time if specified
-            if (component.minTime) {
+            if (component.minTime)
+            {
                 input.min = component.minTime;
             }
-            if (component.maxTime) {
+            if (component.maxTime)
+            {
                 input.max = component.maxTime;
             }
             break;
@@ -205,20 +228,25 @@ function createComponent(component, formData) {
             input.className = 'form-control';
 
             // Handle number-specific attributes
-            if (component.validate) {
-                if (component.validate.min !== undefined) {
+            if (component.validate)
+            {
+                if (component.validate.min !== undefined)
+                {
                     input.min = component.validate.min;
                 }
-                if (component.validate.max !== undefined) {
+                if (component.validate.max !== undefined)
+                {
                     input.max = component.validate.max;
                 }
-                if (component.validate.step !== undefined) {
+                if (component.validate.step !== undefined)
+                {
                     input.step = component.validate.step;
                 }
             }
 
             // Handle decimal places if specified
-            if (component.decimalLimit) {
+            if (component.decimalLimit)
+            {
                 input.step = `0.${'0'.repeat(component.decimalLimit - 1)}1`;
             }
             break;
@@ -248,9 +276,12 @@ function createComponent(component, formData) {
             signatureWrapper.appendChild(clearBtn);
 
             // Initialize signature pad after the canvas is in DOM
-            requestAnimationFrame(() => {
-                try {
-                    const signaturePad = new SignaturePad(canvas, {
+            requestAnimationFrame(() =>
+            {
+                try
+                {
+                    const signaturePad = new SignaturePad(canvas,
+                    {
                         backgroundColor: 'rgb(255, 255, 255)',
                         penColor: 'rgb(0, 0, 0)',
                         minWidth: 0.5,
@@ -259,10 +290,13 @@ function createComponent(component, formData) {
 
                     clearBtn.onclick = () => signaturePad.clear();
 
-                    signaturePad.onEnd = () => {
+                    signaturePad.onEnd = () =>
+                    {
                         formData[component.key] = signaturePad.toDataURL();
                     };
-                } catch (err) {
+                }
+                catch (err)
+                {
                     console.error('Failed to initialize signature pad:', err);
                 }
             });
@@ -284,8 +318,10 @@ function createComponent(component, formData) {
             const headerRow = document.createElement('tr');
 
             // Add headers from components
-            if (component.components) {
-                component.components.forEach((col) => {
+            if (component.components)
+            {
+                component.components.forEach((col) =>
+                {
                     const th = document.createElement('th');
                     th.textContent = col.label || '';
                     headerRow.appendChild(th);
@@ -299,8 +335,10 @@ function createComponent(component, formData) {
 
             // Add at least one row
             const row = document.createElement('tr');
-            if (component.components) {
-                component.components.forEach((col) => {
+            if (component.components)
+            {
+                component.components.forEach((col) =>
+                {
                     const td = document.createElement('td');
                     td.appendChild(createComponent(col, formData));
                     row.appendChild(td);
@@ -314,7 +352,8 @@ function createComponent(component, formData) {
             addButton.type = 'button';
             addButton.className = 'btn btn-sm btn-secondary mt-2';
             addButton.textContent = 'Add Row';
-            addButton.onclick = () => {
+            addButton.onclick = () =>
+            {
                 const newRow = row.cloneNode(true);
                 tbody.appendChild(newRow);
             };
@@ -334,17 +373,22 @@ function createComponent(component, formData) {
 
         case 'htmlelement':
             input = document.createElement(component.tag || 'div');
-            if (component.className) {
+            if (component.className)
+            {
                 input.className = component.className;
             }
-            if (component.attrs) {
-                component.attrs.forEach((attr) => {
-                    if (attr.attr && attr.value) {
+            if (component.attrs)
+            {
+                component.attrs.forEach((attr) =>
+                {
+                    if (attr.attr && attr.value)
+                    {
                         input.setAttribute(attr.attr, attr.value);
                     }
                 });
             }
-            if (component.content) {
+            if (component.content)
+            {
                 input.innerHTML = component.content;
             }
             break;
@@ -358,46 +402,55 @@ function createComponent(component, formData) {
             break;
     }
 
-    if (component.type !== 'button' && component.type !== 'htmlelement') {
+    if (component.type !== 'button' && component.type !== 'htmlelement')
+    {
         label = document.createElement('label');
         label.textContent = component.label || '';
         label.htmlFor = component.key;
 
-        if (component.type === 'checkbox') {
+        if (component.type === 'checkbox')
+        {
             element.appendChild(input);
             element.appendChild(label);
-        } else {
+        }
+        else
+        {
             element.appendChild(label);
             element.appendChild(input);
         }
     }
 
-    if (input !== radioGroup) {
+    if (input !== radioGroup)
+    {
         input.id = component.key || '';
         input.name = component.key || '';
         input.value = formData[component.key] || '';
 
-        if (component.placeholder) {
+        if (component.placeholder)
+        {
             input.placeholder = component.placeholder;
         }
 
-        if (component.required) {
+        if (component.required)
+        {
             input.required = true;
         }
     }
 
     // Inside createComponent function, before returning element
     element.dataset.componentInfo = JSON.stringify(
-        {
-            _elementType: component.type,
-            ...Object.fromEntries(
-                Object.entries(component)
-                    .filter(([key, value]) => {
+            {
+                _elementType: component.type,
+                ...Object.fromEntries(
+                    Object.entries(component)
+                    .filter(([key, value]) =>
+                    {
                         // Always include JavaScript code attributes
                         if (
                             (key === 'custom' || key === 'customConditional') &&
                             typeof value === 'string'
-                        ) {
+                        )
+                        {
                             return true;
                         }
                         if (value === null || value === undefined || value === '') return false;
@@ -410,37 +463,42 @@ function createComponent(component, formData) {
                             return false;
                         return true;
                     })
-                    .map(([key, value]) => {
+                    .map(([key, value]) =>
+                    {
                         // Format JavaScript code with proper indentation and comments
                         if (
                             (key === 'custom' || key === 'customConditional') &&
                             typeof value === 'string'
-                        ) {
+                        )
+                        {
                             return [key, `\n${value.trim()}\n`];
                         }
                         return [key, value];
                     })
-            ),
-        },
-        (key, value) => {
-            if (typeof value === 'function') return '[Function]';
-            if (value && typeof value === 'object' && !Array.isArray(value)) {
-                const filtered = Object.fromEntries(
-                    Object.entries(value).filter(
-                        ([_, v]) => v !== null && v !== undefined && v !== '' && v !== false
-                    )
-                );
-                return Object.keys(filtered).length === 0 ? undefined : filtered;
-            }
-            return value;
-        },
-        2
-    )
+                ),
+            },
+            (key, value) =>
+            {
+                if (typeof value === 'function') return '[Function]';
+                if (value && typeof value === 'object' && !Array.isArray(value))
+                {
+                    const filtered = Object.fromEntries(
+                        Object.entries(value).filter(
+                            ([_, v]) => v !== null && v !== undefined && v !== '' && v !== false
+                        )
+                    );
+                    return Object.keys(filtered).length === 0 ? undefined : filtered;
+                }
+                return value;
+            },
+            2
+        )
         .replace(/\\n/g, '\n')
         .replace(/\\r/g, '\r');
 
     // Add mousemove event listener to update tooltip position
-    element.addEventListener('mousemove', (e) => {
+    element.addEventListener('mousemove', (e) =>
+    {
         element.style.setProperty('--tooltip-x', `${e.clientX + 10}px`);
         element.style.setProperty('--tooltip-y', `${e.clientY + 10}px`);
     });
@@ -449,9 +507,11 @@ function createComponent(component, formData) {
 }
 
 // Renders the Form.io form based on the JSON definition
-function reevaluateConditionals(form, formData) {
+function reevaluateConditionals(form, formData)
+{
     const components = form.querySelectorAll('[data-conditional]');
-    components.forEach((component) => {
+    components.forEach((component) =>
+    {
         const condition = component.getAttribute('data-conditional');
         const isVisible = new Function('data', `return ${condition};`)(formData);
         component.style.display = isVisible ? '' : 'none';
@@ -459,17 +519,22 @@ function reevaluateConditionals(form, formData) {
 }
 
 // Evaluates the client-side script provided in the Form.io JSON
-function evalFormScript(formioTemplate) {
-    try {
+function evalFormScript(formioTemplate)
+{
+    try
+    {
         const script = new Function('form', formioTemplate.ClientSideScript);
         script(document.querySelector('.formio-form'));
-    } catch (error) {
+    }
+    catch (error)
+    {
         console.error('Error evaluating client-side script:', error);
     }
 }
 
 // Renders the Form.io form based on the JSON definition
-function renderFormio(formioTemplate) {
+function renderFormio(formioTemplate)
+{
     const container = document.getElementById('formio-rendered');
     container.innerHTML = '';
 
@@ -481,12 +546,16 @@ function renderFormio(formioTemplate) {
     let hiddenCount = 0;
 
     // Modify form definition to unhide fields
-    const unhideFields = (components) => {
-        return components.map((comp) => {
+    const unhideFields = (components) =>
+    {
+        return components.map((comp) =>
+        {
             // Log hidden components
-            if (comp.hidden || comp.conditional || comp.customConditional) {
+            if (comp.hidden || comp.conditional || comp.customConditional)
+            {
                 hiddenCount++;
-                console.log('Found hidden component:', {
+                console.log('Found hidden component:',
+                {
                     key: comp.key,
                     type: comp.type,
                     hidden: comp.hidden,
@@ -507,11 +576,14 @@ function renderFormio(formioTemplate) {
             };
 
             // Process nested components
-            if (newComp.components) {
+            if (newComp.components)
+            {
                 newComp.components = unhideFields(newComp.components);
             }
-            if (newComp.columns) {
-                newComp.columns = newComp.columns.map((col) => ({
+            if (newComp.columns)
+            {
+                newComp.columns = newComp.columns.map((col) => (
+                {
                     ...col,
                     components: col.components ? unhideFields(col.components) : [],
                 }));
@@ -522,7 +594,8 @@ function renderFormio(formioTemplate) {
 
     // Create deep copy and modify
     const debugDefinition = JSON.parse(JSON.stringify(formDefinition));
-    if (debugDefinition.components) {
+    if (debugDefinition.components)
+    {
         debugDefinition.components = unhideFields(debugDefinition.components);
         console.log(`Found ${hiddenCount} hidden components total`);
     }
@@ -531,8 +604,10 @@ function renderFormio(formioTemplate) {
         sanitize: true,
         noAlerts: false,
         readOnly: false,
-        hooks: {
-            addComponent: (component) => {
+        hooks:
+        {
+            addComponent: (component) =>
+            {
                 const originalComponent = formDefinition.components?.find(
                     (c) => c.key === component.component.key
                 );
@@ -540,15 +615,18 @@ function renderFormio(formioTemplate) {
                     originalComponent?.hidden ||
                     originalComponent?.conditional ||
                     originalComponent?.customConditional
-                ) {
+                )
+                {
                     component.element.classList.add('debug-hidden-field');
                 }
             },
         },
         // Force show all fields
-        evalContext: {
+        evalContext:
+        {
             show: true,
-            component: {
+            component:
+            {
                 hidden: false,
             },
         },
@@ -576,7 +654,8 @@ function renderFormio(formioTemplate) {
   `;
     document.head.appendChild(style);
     // Check if Form.io is loaded
-    if (typeof Formio === 'undefined') {
+    if (typeof Formio === 'undefined')
+    {
         console.error('Form.io library not loaded');
         container.innerHTML = `
       
@@ -587,12 +666,15 @@ function renderFormio(formioTemplate) {
 
     // Create the form using modified definition
     Formio.createForm(container, debugDefinition, options)
-        .then((form) => {
-            form.on('change', () => {
+        .then((form) =>
+        {
+            form.on('change', () =>
+            {
                 console.log('Form data:', form.data);
             });
         })
-        .catch((err) => {
+        .catch((err) =>
+        {
             console.error('Error creating form:', err);
             container.innerHTML = `
         
