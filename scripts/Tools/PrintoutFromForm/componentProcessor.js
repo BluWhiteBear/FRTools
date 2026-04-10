@@ -817,17 +817,20 @@ export class ComponentProcessor
         let height = 0;
 
         // Add label height if container has a label
-        if (container.label) {
+        if (container.label)
+        {
             height += LAYOUT.LABEL_HEIGHT; // Label height plus spacing
             height += DevExpressDefinitions.commonAttributes.spacing.componentSpacing;
             console.log(`[calculateContainerHeight] Added label height: ${LAYOUT.LABEL_HEIGHT}, spacing: ${DevExpressDefinitions.commonAttributes.spacing.componentSpacing}`);
         }
 
         // Calculate height of visible components only
-        if (container.components) {
+        if (container.components)
+        {
             const childContainerWidth = Math.max(0, containerWidth - 20); // Match processContainer nested width inset
             height += container.components.reduce((total, comp, index, components) => {
-                if (this.isHidden(comp)) {
+                if (this.isHidden(comp))
+                {
                     console.log(`[calculateContainerHeight] Skipping hidden component at index ${index}`);
                     return total;
                 }
@@ -836,20 +839,33 @@ export class ComponentProcessor
                 let componentHeight = def.defaultHeight;
 
                 // Calculate special component heights
-                if (comp.type === 'htmlelement' && comp.content) {
+                if (comp.type === 'htmlelement' && comp.content)
+                {
                     componentHeight = this.calculateHtmlHeight(comp.content, childContainerWidth);
-                } else if (comp.type === 'content' && comp.html) {
+                } 
+                else if (comp.type === 'content' && comp.html)
+                {
                     componentHeight = this.calculateHtmlHeight(comp.html, childContainerWidth);
-                } else if (comp.type === 'panel' || comp.type === 'fieldset' || comp.type === 'well') {
+                } 
+                else if (comp.type === 'panel' || comp.type === 'fieldset' || comp.type === 'well')
+                {
                     // Parent estimates must match rendered child SizeF, which includes section padding.
                     componentHeight = this.calculateContainerHeight(comp, false, childContainerWidth);
-                } else if (comp.type === 'table' && comp.rows) {
+                } 
+                else if (comp.type === 'table' && comp.rows)
+                {
                     componentHeight = this.calculateTableHeight(comp, childContainerWidth);
-                } else if (comp.type === 'columns' && comp.columns) {
+                } 
+                else if (comp.type === 'columns' && comp.columns)
+                {
                     componentHeight = this.calculateColumnsHeight(comp, childContainerWidth);
-                } else if (comp.type === 'radio' && def.calculateHeight) {
+                } 
+                else if (comp.type === 'radio' && def.calculateHeight)
+                {
                     componentHeight = def.calculateHeight(comp);
-                } else if (comp.type === 'tabs' && comp.components) {
+                } 
+                else if (comp.type === 'tabs' && comp.components)
+                {
                     // Use LAYOUT.VERTICAL_SPACING to match the spacing processTabs actually applies
                     componentHeight = comp.components.reduce((tabsHeight, tab) => {
                         const tabHeight = this.calculateContainerHeight(tab, false, childContainerWidth);
@@ -1008,9 +1024,12 @@ export class ComponentProcessor
                 controlsNode.addChild(buttonNode);
                 
                 // ? Update position for next button
-                if (isInline) {
+                if (isInline)
+                {
                     optionX += buttonWidth + buttonSpacing;
-                } else {
+                } 
+                else
+                {
                     // Always use the latest value from window.LAYOUT.INPUT_HEIGHT
                     optionY += window.LAYOUT && window.LAYOUT.INPUT_HEIGHT ? window.LAYOUT.INPUT_HEIGHT : 35;
                 }
@@ -1459,6 +1478,7 @@ export class ComponentProcessor
             {
                 return containerWidth / (visibleColumns.length || 1);
             }
+            
             return (columnUnits / totalUnits) * containerWidth;
         };
 

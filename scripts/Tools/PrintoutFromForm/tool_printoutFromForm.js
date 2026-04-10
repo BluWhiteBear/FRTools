@@ -38,23 +38,17 @@ function debugWarn(level, ...args)
 
 //#region ComponentStorage Helpers
 
-/**
- * Encodes a string to Base64 using UTF-8 encoding
- * @param {string} str - The string to encode
- * @returns {string} Base64-encoded string
- */
-function utf8ToBase64(str) {
+// Base64 encoding/decoding utilities for UTF-8 strings
+function utf8ToBase64(str)
+{
     const bytes = new TextEncoder().encode(str);
     const binString = Array.from(bytes, b => String.fromCodePoint(b)).join('');
     return btoa(binString);
 }
 
-/**
- * Maps Form.io component types to DevExpress SQL types
- * @param {object} component - The Form.io component
- * @returns {string} DevExpress SQL type
- */
-function formioTypeToDevExpressType(component) {
+// Convert Form.io component types to DevExpress field types for SQL datasource schema
+function formioTypeToDevExpressType(component)
+{
     switch (component.type) {
         case 'checkbox': return 'Boolean';
         case 'datetime': 
@@ -65,13 +59,9 @@ function formioTypeToDevExpressType(component) {
     }
 }
 
-/**
- * Recursively collects leaf input fields from form components
- * @param {array} components - The Form.io components array
- * @param {boolean} excludeGrids - Skip datagrid subtrees (for main datasource)
- * @returns {array} Array of field objects with name and type
- */
-function collectLeafInputFields(components, excludeGrids = true) {
+// Recursively traverse Form.io components to collect all leaf input fields (excluding container components and optionally grids)
+function collectLeafInputFields(components, excludeGrids = true) 
+{
     const fields = [];
     const seen = new Set();
     const skippedTypes = new Set([
@@ -81,35 +71,46 @@ function collectLeafInputFields(components, excludeGrids = true) {
         'datagrid', 'grid'
     ]);
     
-    function traverse(comps) {
+    // Helper function to recursively traverse components
+    function traverse(comps) 
+    {
         if (!Array.isArray(comps)) return;
         
         comps.forEach(comp => {
             // Skip grid-like components for main datasource collection.
-            if (excludeGrids && (comp.type === 'grid' || comp.type === 'datagrid' || comp.IsFormGrid === true)) {
+            if (excludeGrids && (comp.type === 'grid' || comp.type === 'datagrid' || comp.IsFormGrid === true))
+            {
                 return;
             }
 
             // Always recurse through nested components first, but do not treat container nodes as data fields.
-            if (Array.isArray(comp.components) && comp.components.length > 0) {
+            if (Array.isArray(comp.components) && comp.components.length > 0)
+            {
                 traverse(comp.components);
             }
 
             // Only include data-input components with a key.
-            if (!comp.key || comp.input !== true) {
+            if (!comp.key || comp.input !== true)
+            {
                 return;
             }
 
-            if (skippedTypes.has(comp.type)) {
+            // Skip any components that are in the skippedTypes list, which includes all known non-input container types and other non-data components.
+            if (skippedTypes.has(comp.type))
+            {
                 return;
             }
 
-            if (seen.has(comp.key)) {
+            // Avoid duplicate fields if the same component appears multiple times in the form (e.g., in multiple tabs or sections).
+            if (seen.has(comp.key))
+            {
                 return;
             }
+
+            // Mark this component as seen to prevent duplicates
             seen.add(comp.key);
             
-            // Add leaf field
+            // Add this component as a field with its name and type (converted to DevExpress type)
             fields.push({
                 name: comp.key,
                 type: formioTypeToDevExpressType(comp)
@@ -121,14 +122,9 @@ function collectLeafInputFields(components, excludeGrids = true) {
     return fields;
 }
 
-/**
- * Builds the inner SqlDataSource XML string (to be Base64-encoded)
- * @param {string} dsName - The datasource name (e.g., "sqlDataSource1")
- * @param {string} procName - The stored procedure name
- * @param {array} fields - Array of field objects with name and type
- * @returns {string} XML string for SqlDataSource
- */
-function buildSqlDataSourceXml(dsName, procName, fields) {
+// Builds the XML string for a SQL datasource based on the provided name, stored procedure name, and fields.
+function buildSqlDataSourceXml(dsName, procName, fields)
+{
     let xml = `<SqlDataSource Name="${dsName}">`;
     xml += `<Connection Name="UniData" ConnectionString="" />`;
     xml += `<Query Type="StoredProcQuery" Name="${procName}">`;
@@ -182,13 +178,9 @@ function buildSqlDataSourceXml(dsName, procName, fields) {
     return xml;
 }
 
-/**
- * Builds the full ComponentStorage XMLNode tree
- * @param {object} formioData - The Form.io form data
- * @param {XMLProcessor} processor - The XML processor instance
- * @returns {XMLNode} The ComponentStorage node
- */
-function buildComponentStorage(formioData, processor) {
+// Builds the ComponentStorage XML node with one main datasource (Item1) and additional datasources for each grid component found in the form.
+function buildComponentStorage(formioData, processor)
+{
     const deptName = formioData?.DepartmentName || 'Unknown';
     const formName = formioData?.FormName || 'Unknown';
     
@@ -200,6 +192,7 @@ function buildComponentStorage(formioData, processor) {
     const mainSqlXml = buildSqlDataSourceXml('sqlDataSource1', mainProcName, mainFields);
     const mainBase64 = utf8ToBase64(mainSqlXml);
     
+    // Initialize items array with main datasource as Item1
     const items = [
         processor.createItemNode(1, undefined, {
             Ref: "0",
@@ -248,16 +241,9 @@ function buildComponentStorage(formioData, processor) {
     return componentStorage;
 }
 
-/**
- * Builds SQL datasource XML for grid datasources (includes system fields in correct order)
- * @param {string} dsName - Datasource name
- * @param {string} procName - Stored procedure name
- * @param {array} mainFields - Main form fields
- * @param {array} gridSystemFields - Grid extra system fields
- * @param {array} gridFields - Grid-specific fields
- * @returns {string} XML string for SqlDataSource
- */
-function buildSqlDataSourceXmlForGrid(dsName, procName, mainFields, gridSystemFields, gridFields) {
+// Builds the inner SqlDataSource XML string for a grid datasource, including main form fields, grid-specific fields, and extra system fields for grids.
+function buildSqlDataSourceXmlForGrid(dsName, procName, mainFields, gridSystemFields, gridFields)
+{
     let xml = `<SqlDataSource Name="${dsName}">`;
     xml += `<Connection Name="UniData" ConnectionString="" />`;
     xml += `<Query Type="StoredProcQuery" Name="${procName}">`;
@@ -330,8 +316,10 @@ const ConversionSettings = {
 const SettingsManager = {
     SETTINGS_KEY: 'printoutFormSettings',
 
-    saveSettings() {
-    const settings = {
+    // Save all settings from the UI to localStorage as a JSON string.
+    saveSettings()
+    {
+        const settings = {
             //orientation: document.getElementById('settings_orientation')?.value,
             pageWidth: document.getElementById('settings_pageWidth')?.value,
             marginsLeft: document.getElementById('settings_marginsLeft')?.value,
@@ -374,17 +362,21 @@ const SettingsManager = {
         };
 
         localStorage.setItem(this.SETTINGS_KEY, JSON.stringify(settings));
-        //debugLog(1, '[SettingsManager] Settings saved:', settings);
     },
 
-    loadSettings() {
+    // Load settings from localStorage and apply them to the UI fields. If no settings are found, defaults will remain in place.
+    loadSettings()
+    {
         const settingsStr = localStorage.getItem(this.SETTINGS_KEY);
-        if (!settingsStr) {
+
+        if (!settingsStr)
+        {
             debugWarn(1, '[SettingsManager] No saved settings found.');
             return;
         }
+
         const settings = JSON.parse(settingsStr);
-        //debugLog(1, '[SettingsManager] Settings loaded:', settings);
+
         document.getElementById('settings_pageWidth').value = settings.pageWidth || 850;
         document.getElementById('settings_marginsLeft').value = settings.marginsLeft || 50;
         document.getElementById('settings_marginsRight').value = settings.marginsRight || 50;
@@ -425,7 +417,9 @@ const SettingsManager = {
         document.getElementById('font_fieldOutput_strikethrough').checked = !!settings.fontFieldOutputStrikethrough;
     },
 
-    exportSettings() {
+    // Export current settings to a JSON file. This allows users to save their configuration and load it later or on another machine.
+    exportSettings()
+    {
         this.saveSettings();
         const settingsStr = localStorage.getItem(this.SETTINGS_KEY);
         if (!settingsStr) return;
@@ -439,7 +433,9 @@ const SettingsManager = {
         URL.revokeObjectURL(url);
     },
 
-    importSettings() {
+    // Import settings from a JSON file. This will overwrite current settings in localStorage and update the UI fields accordingly. The imported file must be in the same format as the exported settings file.
+    importSettings()
+    {
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = '.dxs';
@@ -448,13 +444,16 @@ const SettingsManager = {
             if (!file) return;
             const reader = new FileReader();
             reader.addEventListener('load', (ev) => {
-                try {
+                try
+                {
                     const settings = JSON.parse(ev.target.result);
                     localStorage.setItem(this.SETTINGS_KEY, JSON.stringify(settings));
                     this.loadSettings();
                     applyLayoutSettingsFromUI();
                     debugLog(1, '[SettingsManager] Settings imported from file.');
-                } catch (err) {
+                } 
+                catch (err)
+                {
                     console.error('[SettingsManager] Failed to parse imported settings file:', err);
                     alert('Invalid settings file. Please select a valid JSON settings file.');
                 }
@@ -464,8 +463,9 @@ const SettingsManager = {
         input.click();
     },
 
-    setupAutoSave() {
-        // Save settings on change for all relevant fields
+    // Set up event listeners on all relevant settings fields to automatically save settings to localStorage whenever a change is made. This ensures that user preferences are preserved without needing to click a separate "Save" button.
+    setupAutoSave()
+    {
         const fields = [
             'settings_orientation', 'settings_pageWidth', 'settings_marginsLeft', 'settings_marginsRight',
             'settings_marginsTop', 'settings_marginsBottom', 'settings_labelHeight', 'settings_outputHeight', 'settings_verticalSpacing', 'settings_alignToGrid', 'settings_snapGridSize',
@@ -483,11 +483,10 @@ const SettingsManager = {
             'font_fieldOutput_underline', 'font_fieldOutput_strikethrough'
         ];
 
-        //debugLog(1, '[DEBUG] Setting up auto-save for fields:', fields);
-
         fields.forEach(id => {
             const el = document.getElementById(id);
-            if (el) {
+            if (el)
+            {
                 el.addEventListener('change', () => this.saveSettings());
             }
         });
@@ -505,19 +504,22 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // Add export settings button handler
     const exportBtn = document.getElementById('exportSettingsBtn');
-    if (exportBtn) {
+    if (exportBtn)
+    {
         exportBtn.addEventListener('click', () => SettingsManager.exportSettings());
     }
 
     // Add import settings button handler
     const importBtn = document.getElementById('importSettingsBtn');
-    if (importBtn) {
+    if (importBtn)
+    {
         importBtn.addEventListener('click', () => SettingsManager.importSettings());
     }
 
     // Add reset button handler
     const resetBtn = document.getElementById('resetSettingsBtn');
-    if (resetBtn) {
+    if (resetBtn)
+    {
         resetBtn.addEventListener('click', () => {
             // Set all fields to their default values
             //document.getElementById('settings_orientation').value = 'orientation_portrait';
@@ -567,10 +569,12 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // Add apply settings button handler
     const applyBtn = document.getElementById('applySettingsBtn');
-    if (applyBtn) {
+    if (applyBtn)
+    {
         applyBtn.addEventListener('click', () => {
             const conflicts = validateSettingsConflicts();
-            if (conflicts.length > 0) {
+            if (conflicts.length > 0)
+            {
                 // Populate and show the conflict modal
                 const list = document.getElementById('settingsConflictList');
                 list.innerHTML = conflicts.map(c => `<li>${c}</li>`).join('');
@@ -592,25 +596,32 @@ window.addEventListener('DOMContentLoaded', () => {
                 }, { once: true });
 
                 modal.show();
-            } else {
+            }
+            else
+            {
                 doApplySettings();
             }
         });
     }
 });
 
-function doApplySettings() {
+// Apply settings to the converter and regenerate the printout preview. This function is called after validating settings and confirming with the user if there are any conflicts. It updates the converter's state, regenerates the DevExpress JSON, updates the preview, and shows any overlap warnings.
+function doApplySettings()
+{
     SettingsManager.saveSettings();
     applyLayoutSettingsFromUI();
+
     const formData = window.currentFormioData || window.lastUploadedForm;
-    if (formData) {
+    if (formData)
+    {
         DevExpressConverter.applySettings();
         DevExpressConverter.initialize();
         const devExpressJson = DevExpressConverter.transformToDevExpress(formData);
         DevExpressConverter.state.devExpressJson = devExpressJson;
 
         const devExpressJsonContainer = document.getElementById('devexpress-json');
-        if (devExpressJsonContainer) {
+        if (devExpressJsonContainer)
+        {
             devExpressJsonContainer.innerHTML = `<code class="language-json">${JSON.stringify(devExpressJson, null, 2)}</code>`;
             Prism.highlightAll();
         }
@@ -621,15 +632,21 @@ function doApplySettings() {
 
         const decodedTemplate = Utils.decodeReportTemplate(devExpressData?.[0]?.ReportTemplate);
         const previewRenderer = DevExpressConverter.state.createDevExpressPreview;
-        if (decodedTemplate && previewRenderer) {
+
+        if (decodedTemplate && previewRenderer)
+        {
             previewRenderer(devExpressData, decodedTemplate);
         }
 
         const xmlContainer = document.getElementById('devexpress-rendered');
-        if (xmlContainer) {
-            if (!decodedTemplate?.content) {
+        if (xmlContainer)
+        {
+            if (!decodedTemplate?.content)
+            {
                 xmlContainer.innerHTML = `<div class="alert alert-danger">No XML content available</div>`;
-            } else {
+            } 
+            else 
+            {
                 xmlContainer.textContent = decodedTemplate.content;
                 Prism.highlightElement(xmlContainer);
             }
@@ -638,16 +655,21 @@ function doApplySettings() {
         Utils.generateSqlQuery(formData);
         showOverlapWarnings();
 
-        if (window.showToast) {
+        if (window.showToast)
+        {
             window.showToast('Settings applied and printout regenerated.', 'success');
         }
-    } else {
-        if (window.showToast) {
+    } 
+    else 
+    {
+        if (window.showToast)
+        {
             window.showToast('No form uploaded. Cannot regenerate printout.', 'warning');
         }
     }
 }
 
+// Check for any warnings about overlapping fields that were detected during the conversion process. If there are any, populate the warnings modal with the details and display it to the user. This helps users identify potential layout issues in their printout design.
 function showOverlapWarnings()
 {
     const overlaps = DevExpressConverter.state.overlapWarnings || [];
@@ -667,7 +689,9 @@ function showOverlapWarnings()
     bootstrap.Modal.getOrCreateInstance(modalEl).show();
 }
 
-function validateSettingsConflicts() {
+// Validate settings for any conflicts or issues before applying. For example, if "Align to Grid" is enabled, check that all relevant layout values are divisible by the snap grid size. Return an array of conflict messages to display to the user. If there are no conflicts, return an empty array.
+function validateSettingsConflicts()
+{
     const conflicts = [];
 
     const alignToGrid = document.getElementById('settings_alignToGrid')?.checked;
@@ -688,7 +712,8 @@ function validateSettingsConflicts() {
 
     for (const { id, label } of checks) {
         const val = parseFloat(document.getElementById(id)?.value);
-        if (!isNaN(val) && val % gridSize !== 0) {
+        if (!isNaN(val) && val % gridSize !== 0)
+        {
             conflicts.push(`${label} (${val}) is not divisible by snap grid size (${gridSize})`);
         }
     }
@@ -696,7 +721,9 @@ function validateSettingsConflicts() {
     return conflicts;
 }
 
-function applyLayoutSettingsFromUI() {
+// Read all layout and font settings from the UI fields and apply them to the LAYOUT constants and ConversionSettings. This function is called when the user clicks "Apply Settings" after confirming any conflicts. It ensures that the converter uses the latest settings for generating the printout.
+function applyLayoutSettingsFromUI()
+{
     // Get the Page Width field value
     const pageWidthInput = document.getElementById('settings_pageWidth');
     const marginLeftInput = document.getElementById('settings_marginsLeft');
@@ -784,8 +811,6 @@ function applyLayoutSettingsFromUI() {
     if (fontFieldOutputStrikethroughInput.checked) fieldOutputStyles.push('Strikeout');
     LAYOUT.FONT_FIELDOUTPUT = `${fontFieldOutputFamilyInput.value}, ${fontFieldOutputSizeInput.value}pt`
         + (fieldOutputStyles.length ? `, style=${fieldOutputStyles.join(',')}` : '');
-
-    //debugLog(1, '[Settings] Applied:', LAYOUT);
 }
 
 //#endregion
@@ -795,7 +820,8 @@ function applyLayoutSettingsFromUI() {
 class DevExpressConverter
 {
     // Call this at the start of the conversion process
-    static applySettings() {
+    static applySettings()
+    {
         applyLayoutSettingsFromUI();
     }
 
@@ -811,7 +837,6 @@ class DevExpressConverter
         this.state.devExpressJson = null;   // ? Reset generated JSON
         this.state.warnings = [];           // ? Reset warnings
         this.state.overlapWarnings = [];    // ? Reset overlap warnings
-        //FieldGenerator.initRefs();          // ? Reset ref and item counters at start
     }
 
     // ? Counts all components recursively, including nested ones
