@@ -1,7 +1,25 @@
 document.getElementById('fileUpload').addEventListener('change', handleFileUpload);
 document.getElementById('copySqlBtn').addEventListener('click', copySQL);
 document.getElementById('statementType').addEventListener('change', generateSQL);
-['textfield', 'textarea', 'select', 'number', 'datetime', 'checkbox'].forEach(type => {
+const SUPPORTED_COMPONENT_TYPES = [
+    'textfield',
+    'textarea',
+    'select',
+    'number',
+    'datetime',
+    'checkbox',
+    'radio',
+    'email',
+    'url',
+    'phoneNumber',
+    'address',
+    'day',
+    'time',
+    'currency',
+    'signature'
+];
+
+SUPPORTED_COMPONENT_TYPES.forEach(type => {
     const checkbox = document.getElementById(type);
     if (checkbox) {
         checkbox.addEventListener('change', generateSQL);
@@ -91,86 +109,117 @@ function generateSQL() {
             `${INDENT}[__formguid] [uniqueidentifier] NULL`,
             `${INDENT}[__lockedby] [uniqueidentifier] NULL`,
             `${INDENT}[__createdby] [uniqueidentifier] NULL`,
-            `${INDENT}[__modifiedby] [uniqueidentifier] NULL`
+            `${INDENT}[__modifiedby] [uniqueidentifier] NULL`,
+            `${INDENT}[txtaDebug] [varchar](MAX) NULL`
         );
     }
 
-    // Helper function to recursively process components
-    function processComponents(components) {
-        const columns = [];
-        const processedKeys = new Set(); // Track processed component keys
+    function mapComponentTypeToSqlType(component) {
+        switch (component.type) {
+            case 'textfield':
+                return `VARCHAR(${component.validate?.maxLength || 255})`;
+            case 'textarea':
+                return 'VARCHAR(MAX)';
+            case 'number':
+                return component.decimalLimit ?
+                    `DECIMAL(18,${component.decimalLimit})` : 'INT';
+            case 'datetime':
+                return 'DATETIME';
+            case 'checkbox':
+                return 'BIT';
+            case 'select':
+            case 'radio':
+                return 'VARCHAR(100)';
+            case 'email':
+                return 'VARCHAR(255)';
+            case 'url':
+                return 'VARCHAR(2048)';
+            case 'phoneNumber':
+                return 'VARCHAR(25)';
+            case 'address':
+            case 'signature':
+                return 'VARCHAR(MAX)';
+            case 'day':
+                return 'DATE';
+            case 'time':
+                return 'TIME';
+            case 'currency':
+                return 'DECIMAL(18,2)';
+            default:
+                console.warn('Unhandled component type:', component.type);
+                return 'VARCHAR(255)';
+        }
+    }
 
+    // Helper function to recursively process components
+    function processComponents(components, columns, processedKeys) {
         if (!Array.isArray(components)) {
-            console.error('Components is not an array:', components);
-            return columns;
+            return;
         }
 
         components.forEach(component => {
+            if (!component || typeof component !== 'object') {
+                return;
+            }
+
             // Skip components inside formgrids and datagrids
             if (component.type === 'formgrid' || component.type === 'datagrid') {
                 console.log(`Skipping ${component.type} components:`, component.key);
                 return;
             }
 
-            // Handle container types (panels, fieldsets, etc)
-            if (component.components) {
-                columns.push(...processComponents(component.components));
-            } else if (selectedTypes.includes(component.type)) {
-                // Skip if we've already processed this component key
+            if (selectedTypes.includes(component.type) && component.key) {
                 if (processedKeys.has(component.key)) {
                     console.warn(`Skipping duplicate component key: ${component.key}`);
-                    return;
-                }
-
-                let sqlType;
-                console.log(`Processing component: ${component.key} of type ${component.type}`); // Debug log
-
-                switch (component.type) {
-                    case 'textfield':
-                        sqlType = `VARCHAR(${component.validate?.maxLength || 255})`;
-                        break;
-                    case 'textarea':
-                        sqlType = 'VARCHAR(MAX)';
-                        break;
-                    case 'number':
-                        sqlType = component.decimalLimit ?
-                            `DECIMAL(18,${component.decimalLimit})` : 'INT';
-                        break;
-                    case 'datetime':
-                        sqlType = 'DATETIME';
-                        break;
-                    case 'checkbox':
-                        sqlType = 'BIT';
-                        break;
-                    case 'select':
-                        sqlType = 'VARCHAR(100)';
-                        break;
-                    default:
-                        console.warn('Unhandled component type:', component.type);
-                        sqlType = 'VARCHAR(255)'; // Default type
-                        break;
-                }
-
-                processedKeys.add(component.key);
-                console.log(`Adding column: ${component.key} (${component.type}) as ${sqlType}`);
-
-                if (statementType === 'create') {
-                    columns.push(`${INDENT}[${component.key}] ${sqlType} NULL`);
                 } else {
-                    columns.push(`${INDENT}ADD [${component.key}] ${sqlType} NULL`);
+                    const sqlType = mapComponentTypeToSqlType(component);
+                    processedKeys.add(component.key);
+                    console.log(`Adding column: ${component.key} (${component.type}) as ${sqlType}`);
+
+                    if (statementType === 'create') {
+                        columns.push(`${INDENT}[${component.key}] ${sqlType} NULL`);
+                    } else {
+                        columns.push(`${INDENT}ADD [${component.key}] ${sqlType} NULL`);
+                    }
                 }
             }
-        });
 
-        return columns;
+            if (Array.isArray(component.components)) {
+                processComponents(component.components, columns, processedKeys);
+            }
+
+            if (Array.isArray(component.columns)) {
+                component.columns.forEach(column => {
+                    processComponents(column?.components, columns, processedKeys);
+                });
+            }
+
+            if (Array.isArray(component.rows)) {
+                component.rows.forEach(row => {
+                    if (!Array.isArray(row)) {
+                        return;
+                    }
+                    row.forEach(cell => {
+                        processComponents(cell?.components, columns, processedKeys);
+                    });
+                });
+            }
+
+            if (Array.isArray(component.tabs)) {
+                component.tabs.forEach(tab => {
+                    processComponents(tab?.components, columns, processedKeys);
+                });
+            }
+        });
     }
 
     // Process all components recursively
     const columns = [];
+    const processedKeys = new Set();
     if (statementType === 'create') {
         addSystemColumns(columns);
     }
-    columns.push(...processComponents(template.components));
+    processComponents(template.components, columns, processedKeys);
 
     // Generate SQL statement
     let sql = '';
@@ -191,10 +240,10 @@ function generateSQL() {
 }
 
 function getSelectedComponentTypes() {
-    const selectedTypes = ['textfield', 'textarea', 'select', 'number', 'datetime', 'checkbox']
+    const selectedTypes = SUPPORTED_COMPONENT_TYPES
         .filter(type => {
             const element = document.getElementById(type);
-            const isChecked = element?.checked;
+            const isChecked = element ? element.checked : true;
             console.log(`Component type ${type}: element exists? ${!!element}, checked? ${isChecked}`);
             return isChecked;
         });
