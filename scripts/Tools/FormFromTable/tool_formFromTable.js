@@ -5,24 +5,31 @@ document.getElementById('sqlInput').addEventListener('input', autoPopulateFromTa
 
 let formioJson = null;
 
-function generateFormioJson() {
+function generateFormioJson()
+{
     const sqlInput = document.getElementById('sqlInput').value;
     let formName = document.getElementById('formName').value;
     let departmentName = document.getElementById('departmentName').value;
     const departmentGuid = document.getElementById('departmentGuid').value || crypto.randomUUID();
 
-    try {
+    try
+    {
         // Extract table name and columns from SQL
         const tableMatch = sqlInput.match(/(?:CREATE|ALTER)\s+TABLE\s+(\[dbo\]\.\[[^\]]+\]|\[[\w\s\.-]+\]|\w+\.\w+)/i);
         const tableName = tableMatch ? tableMatch[1] : '';
         const cleanTableName = tableName.replace(/[\[\]]/g, '').replace('dbo.', '');
         
         // Try to extract department and form names from table name
-        if (tableName && !formName && !departmentName) {
+        if (tableName && !formName && !departmentName)
+        {
             const cleanTableName = tableName.replace(/[\[\]]/g, '').replace('dbo.', '');
-            if (cleanTableName.startsWith('ct_')) {
+
+            if (cleanTableName.startsWith('ct_'))
+            {
                 const parts = cleanTableName.split('_');
-                if (parts.length >= 3) {
+
+                if (parts.length >= 3)
+                {
                     // Remove 'ct_' prefix and get department name
                     departmentName = parts[1];
                     // Get everything after department as form name
@@ -61,10 +68,13 @@ function generateFormioJson() {
             };
         
             // Add type-specific properties
-            switch(component.type) {
+            switch(component.type)
+            {
                 case 'textfield':
-                    if (column.type.includes('VARCHAR')) {
+                    if (column.type.includes('VARCHAR'))
+                    {
                         const maxLength = column.type.match(/\((\d+)\)/);
+
                         if (maxLength) component.validate = { maxLength: parseInt(maxLength[1]) };
                     }
                     break;
@@ -73,10 +83,12 @@ function generateFormioJson() {
                     component.autoExpand = true;
                     break;
                 case 'number':
-                    if (column.type.includes('DECIMAL')) {
+                    if (column.type.includes('DECIMAL'))
+                    {
                         const precision = column.type.match(/\((\d+),(\d+)\)/);
                         if (precision) component.decimalLimit = parseInt(precision[2]);
                     }
+                    
                     break;
             }
         
@@ -132,29 +144,34 @@ function generateFormioJson() {
 
         // Enable and show preview
         //document.querySelector('#preview-tab').classList.remove('disabled');
-        
-        // Parse template and render preview
-        const formioTemplate = JSON.parse(formioJson.FormioTemplate);
+        //const formioTemplate = JSON.parse(formioJson.FormioTemplate);
         //renderFormio(formioTemplate);
 
         Prism.highlightAll();
 
-    } catch (error) {
+    } 
+    catch (error)
+    {
         console.error('Error generating Form.io JSON:', error);
     }
 }
 
-function autoPopulateFromTableName(event) {
+function autoPopulateFromTableName(event)
+{
     const sqlInput = event.target.value;
     const tableMatch = sqlInput.match(/(?:CREATE|ALTER)\s+TABLE\s+(\[dbo\]\.\[[^\]]+\]|\[[\w\s\.-]+\]|\w+\.\w+)/i);
     
-    if (tableMatch) {
+    if (tableMatch)
+    {
         const tableName = tableMatch[1];
         const cleanTableName = tableName.replace(/[\[\]]/g, '').replace('dbo.', '');
         
-        if (cleanTableName.startsWith('ct_')) {
+        if (cleanTableName.startsWith('ct_'))
+        {
             const parts = cleanTableName.split('_');
-            if (parts.length >= 3) {
+
+            if (parts.length >= 3)
+            {
                 // Remove 'ct_' prefix and get department name
                 const departmentName = parts[1];
                 // Get everything after department as form name
@@ -168,7 +185,8 @@ function autoPopulateFromTableName(event) {
     }
 }
 
-function mapSqlTypeToFormio(sqlType) {
+function mapSqlTypeToFormio(sqlType)
+{
     sqlType = sqlType.toUpperCase();
     if (sqlType.includes('VARCHAR') || sqlType.includes('CHAR')) return 'textfield';
     if (sqlType.includes('TEXT')) return 'textarea';
@@ -178,28 +196,36 @@ function mapSqlTypeToFormio(sqlType) {
     return 'textfield';
 }
 
-async function copyJson() {
-    try {
+async function copyJson()
+{
+    try
+    {
         await navigator.clipboard.writeText(JSON.stringify(formioJson, null, 2));
+
         const btn = document.getElementById('copyJsonBtn');
         btn.textContent = 'Copied!';
         btn.classList.add('btn-success');
+
         setTimeout(() => {
             btn.textContent = 'Copy JSON';
             btn.classList.remove('btn-success');
         }, 2000);
-    } catch (err) {
+    } 
+    catch (err) 
+    {
         console.error('Failed to copy:', err);
     }
 }
 
-function downloadJson() {
+function downloadJson() 
+{
     if (!formioJson) return;
 
     const fileName = `${formioJson.DepartmentName}_${formioJson.FormName}-FORM.json`;
     const blob = new Blob([JSON.stringify(formioJson, null, 2)], {type: 'application/json'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
+
     a.href = url;
     a.download = fileName.replace(/\s+/g, '-');
     document.body.appendChild(a);
@@ -208,18 +234,22 @@ function downloadJson() {
     URL.revokeObjectURL(url);
 }
 
-function mapSqlTypeToFormio(sqlType, columnName) {
+function mapSqlTypeToFormio(sqlType, columnName) 
+{
     sqlType = sqlType.toUpperCase();
     
     // Special handling for VARCHAR fields
-    if (sqlType.includes('VARCHAR')) {
+    if (sqlType.includes('VARCHAR')) 
+    {
         // Check column naming convention
-        if (columnName.toLowerCase().startsWith('txta')) {
+        if (columnName.toLowerCase().startsWith('txta'))
+        {
             return 'textarea';
         }
         
         // Check for VARCHAR(MAX)
-        if (sqlType.includes('(MAX)')) {
+        if (sqlType.includes('(MAX)'))
+        {
             return 'textarea';
         }
         

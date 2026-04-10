@@ -162,14 +162,14 @@ UniTools is a browser-based toolkit designed to help developers work with Form.i
 - **CDN Base**: `https://unpkg.com/prettier@2.8.8/`
 - **Source**: [https://prettier.io/](https://prettier.io/)
 - **License**: MIT
-- **Purpose**: Code formatting and beautification
+- **Purpose**: Code formatting and beautification (HTML, CSS, JSON, TypeScript, JSX)
 
 **Components Used:**
 | Component | CDN Path | Purpose |
 |-----------|----------|---------|
 | Standalone | `standalone.js` | Core Prettier engine |
 | HTML Parser | `parser-html.js` | HTML formatting |
-| Babel Parser | `parser-babel.js` | JavaScript/JSX formatting |
+| Babel Parser | `parser-babel.js` | JSX formatting |
 | TypeScript Parser | `parser-typescript.js` | TypeScript formatting |
 | PostCSS Parser | `parser-postcss.js` | CSS/SCSS/Less formatting |
 
@@ -179,7 +179,11 @@ UniTools is a browser-based toolkit designed to help developers work with Form.i
 - **CDN Base**: `https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.9/`
 - **Source**: [https://beautifier.io/](https://beautifier.io/)
 - **License**: MIT
-- **Purpose**: Alternative code beautification
+- **Purpose**: JavaScript beautification with Allman-style brace placement
+
+**Code Formatter Usage:**
+- JavaScript in the Code Formatter tool uses `js_beautify(...)` with `brace_style: "expand"` so opening braces appear on the next line.
+- If JS Beautify is unavailable at runtime, the tool falls back to Prettier for JavaScript.
 
 **Components Used:**
 | Component | CDN Path | Purpose |

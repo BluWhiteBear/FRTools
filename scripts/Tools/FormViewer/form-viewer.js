@@ -1,5 +1,6 @@
 // Render Form.io form inside an isolated iframe (only Bootstrap CSS applies)
-function renderFormInIframe(formDefinition) {
+function renderFormInIframe(formDefinition)
+{
     const iframe = document.getElementById('formio-frame');
     const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
     
@@ -55,24 +56,31 @@ function renderFormInIframe(formDefinition) {
 }
 
 // Listen for iframe resize messages
-window.addEventListener('message', function(event) {
-    if (event.data && event.data.type === 'resize') {
+window.addEventListener('message', function(event)
+{
+    if (event.data && event.data.type === 'resize')
+    {
         const iframe = document.getElementById('formio-frame');
-        if (iframe) {
+
+        if (iframe) 
+        {
             iframe.style.height = (event.data.height + 20) + 'px';
         }
     }
 });
 
 // Handle file upload and tab population
-document.getElementById('fileUpload').addEventListener('change', function(event) {
+document.getElementById('fileUpload').addEventListener('change', function(event)
+{
     const file = event.target.files[0];
     if (!file) return;
     
     const reader = new FileReader();
 
-    reader.onload = function(e) {
-        try {
+    reader.onload = function(e)
+    {
+        try
+        {
             const formioData = JSON.parse(e.target.result);
             
             // Load client and server scripts
@@ -86,31 +94,41 @@ document.getElementById('fileUpload').addEventListener('change', function(event)
 
             // Clean up problematic conditional logic
             const cleanComponent = (comp) => {
-                if (comp.conditional) {
+                if (comp.conditional)
+                {
                     delete comp.conditional;
                 }
-                if (comp.customConditional) {
+
+                if (comp.customConditional)
+                {
                     delete comp.customConditional;
                 }
-                if (comp.components) {
+
+                if (comp.components)
+                {
                     comp.components = comp.components.map(c => cleanComponent(c));
                 }
+
                 return comp;
             };
 
             // Clean up form definition
-            if (formDefinition.components) {
+            if (formDefinition.components)
+            {
                 formDefinition.components = formDefinition.components.map(c => cleanComponent(c));
             }
 
             // Extract embedded scripts if they're not provided directly
-            if (!clientScript && !serverScript) {
+            if (!clientScript && !serverScript)
+            {
                 const { extractedClientScript, extractedServerScript } = extractScriptsFromForm(formDefinition);
                 
                 // Update script editors with either provided or extracted scripts
                 document.getElementById('clientScriptEditor').textContent = extractedClientScript;
                 document.getElementById('serverScriptEditor').textContent = extractedServerScript;
-            } else {
+            } 
+            else
+            {
                 // Use provided scripts
                 document.getElementById('clientScriptEditor').textContent = clientScript;
                 document.getElementById('serverScriptEditor').textContent = serverScript;
@@ -135,78 +153,110 @@ document.getElementById('fileUpload').addEventListener('change', function(event)
             // Switch to viewer tab
             document.getElementById('viewer-tab').click();
 
-        } catch (error) {
+        } 
+        catch (error) 
+        {
             console.error('Error parsing form definition:', error);
+
             formContainer.innerHTML = `
                 <div class="alert alert-danger">
                     Error parsing form: ${error.message}
                 </div>`;
         }
     };
+
     reader.readAsText(file);
 });
 
-function extractScriptsFromForm(formDefinition) {
+// Function to extract embedded client and server scripts from form definition
+function extractScriptsFromForm(formDefinition)
+{
     let clientScript = '';
     let serverScript = '';
 
-    function processComponent(component) {
-        // Client-side scripts
-        if (component.customConditional) {
+    // Helper function to process a single component for embedded scripts
+    function processComponent(component)
+    {
+        if (component.customConditional)
+        {
             clientScript += `// ${component.label || component.key} - Custom Condition\n${component.customConditional}\n\n`;
         }
-        if (component.calculateValue) {
+
+        if (component.calculateValue)
+        {
             clientScript += `// ${component.label || component.key} - Calculate Value\n${component.calculateValue}\n\n`;
         }
-        if (component.customDefaultValue) {
+
+        if (component.customDefaultValue)
+        {
             clientScript += `// ${component.label || component.key} - Default Value\n${component.customDefaultValue}\n\n`;
         }
-        if (component.customValidation) {
+
+        if (component.customValidation)
+        {
             clientScript += `// ${component.label || component.key} - Custom Validation\n${component.customValidation}\n\n`;
         }
-        if (component.customCode) {
+
+        if (component.customCode)
+        {
             clientScript += `// ${component.label || component.key} - Custom Code\n${component.customCode}\n\n`;
         }
-        if (component.validate?.custom) {
+
+        if (component.validate?.custom)
+        {
             clientScript += `// ${component.label || component.key} - Custom Validation\n${component.validate.custom}\n\n`;
         }
 
-        // Server-side scripts
-        if (component.validate?.json) {
+        if (component.validate?.json)
+        {
             serverScript += `' ${component.label || component.key} - JSON Validation\n${component.validate.json}\n\n`;
         }
     }
 
-    function walkComponents(components) {
+    // Recursive function to walk through all components and extract scripts
+    function walkComponents(components)
+    {
         if (!components) return;
         
         components.forEach(component => {
             processComponent(component);
 
             // Recursively process nested components
-            if (component.components) {
+            if (component.components)
+            {
                 walkComponents(component.components);
             }
-            if (component.columns) {
+
+            // Handle columns
+            if (component.columns)
+            {
                 component.columns.forEach(col => {
-                    if (col.components) {
+                    if (col.components)
+                    {
                         walkComponents(col.components);
                     }
                 });
             }
-            if (component.rows) {
+
+            // Handle rows
+            if (component.rows)
+            {
                 component.rows.forEach(row => {
                     row.forEach(col => {
-                        if (col.components) {
+                        if (col.components)
+                        {
                             walkComponents(col.components);
                         }
                     });
                 });
             }
+
             // Handle tabs
-            if (component.tabs) {
+            if (component.tabs)
+            {
                 component.tabs.forEach(tab => {
-                    if (tab.components) {
+                    if (tab.components)
+                    {
                         walkComponents(tab.components);
                     }
                 });
@@ -224,7 +274,8 @@ function extractScriptsFromForm(formDefinition) {
 }
 
 // Setup copy button functionality
-function setupCopyButtons() {
+function setupCopyButtons()
+{
     const copyButtons = {
         'copyClientScriptBtn': 'clientScriptEditor',
         'copyServerScriptBtn': 'serverScriptEditor',
@@ -233,17 +284,21 @@ function setupCopyButtons() {
 
     Object.entries(copyButtons).forEach(([buttonId, editorId]) => {
         document.getElementById(buttonId).onclick = async () => {
-            try {
+            try
+            {
                 const content = document.getElementById(editorId).textContent;
                 await navigator.clipboard.writeText(content);
                 const btn = document.getElementById(buttonId);
                 btn.textContent = 'Copied!';
                 btn.classList.add('btn-success');
+
                 setTimeout(() => {
                     btn.textContent = buttonId.includes('Template') ? 'Copy JSON' : 'Copy Script';
                     btn.classList.remove('btn-success');
                 }, 2000);
-            } catch (err) {
+            }
+            catch (err)
+            {
                 console.error('Failed to copy:', err);
             }
         };

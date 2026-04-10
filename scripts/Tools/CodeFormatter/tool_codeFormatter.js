@@ -2,10 +2,12 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('formatBtn').addEventListener('click', formatCode);
     document.getElementById('copyBtn').addEventListener('click', copyFormattedCode);
     document.getElementById('inputCode').addEventListener('input', detectLanguage);
-    hideAlert(); // Hide any existing alerts on page load
+
+    hideAlert();
 });
 
-function showAlert(message, type = 'danger') {
+function showAlert(message, type = 'danger')
+{
     const alertContainer = document.getElementById('alert-container');
     const alertContent = alertContainer.querySelector('.alert-content');
     
@@ -14,36 +16,42 @@ function showAlert(message, type = 'danger') {
     alertContainer.style.display = 'block';
 }
 
-function hideAlert() {
+function hideAlert()
+{
     const alertContainer = document.getElementById('alert-container');
     alertContainer.style.display = 'none';
 }
 
-function detectLanguage(event) {
+function detectLanguage(event)
+{
     const input = event.target.value.trim();
     const languageSelect = document.getElementById('languageSelect');
     
-    if (languageSelect.value === 'auto' && input) {
-        try {
+    if (languageSelect.value === 'auto' && input)
+    {
+        try
+        {
             hideAlert();
             
             // First try specific patterns that are more reliable
-            if (input.startsWith('<?xml')) {
+            if (input.startsWith('<?xml'))
+            {
                 languageSelect.value = 'xml';
                 return;
             }
             
             // More lenient HTML detection
-            if (input.includes('<!DOCTYPE html') || 
-                input.includes('<html') || 
-                (input.match(/<[a-z][^>]*>/i) && input.match(/<\/[a-z][^>]*>/i))) {
+            if (input.includes('<!DOCTYPE html') || input.includes('<html') || (input.match(/<[a-z][^>]*>/i) && input.match(/<\/[a-z][^>]*>/i)))
+            {
                 languageSelect.value = 'html';
                 return;
             }
             
             // Try parsing as JSON
-            if (input.startsWith('{') || input.startsWith('[')) {
-                try {
+            if (input.startsWith('{') || input.startsWith('['))
+            {
+                try
+                {
                     JSON.parse(input);
                     languageSelect.value = 'json';
                     return;
@@ -59,21 +67,27 @@ function detectLanguage(event) {
                 /CREATE TABLE/i,
                 /ALTER TABLE/i
             ];
-            if (sqlPatterns.some(pattern => pattern.test(input))) {
+
+            if (sqlPatterns.some(pattern => pattern.test(input)))
+            {
                 languageSelect.value = 'sql';
                 return;
             }
             
             // Check for CSS patterns
-            if (input.includes('{') && input.includes('}') && /[a-z-]+\s*:\s*[^;]+;/.test(input)) {
+            if (input.includes('{') && input.includes('}') && /[a-z-]+\s*:\s*[^;]+;/.test(input))
+            {
                 languageSelect.value = 'css';
                 return;
             }
             
             // Use language detector for JavaScript/TypeScript/JSX/TSX
             const detectedLang = langDetector.detectOne(input);
-            if (detectedLang) {
-                switch (detectedLang.toLowerCase()) {
+
+            if (detectedLang)
+            {
+                switch (detectedLang.toLowerCase())
+                {
                     case 'jsx':
                     case 'tsx':
                     case 'typescript':
@@ -83,10 +97,14 @@ function detectLanguage(event) {
                 }
             }
             
-            if (input.length > 30) { // Only show alert if there's enough content to detect
+            // If we reach here, we couldn't confidently detect the language
+            if (input.length > 30)
+            {
                 showAlert('Unable to auto-detect language. Please select a language manually.', 'warning');
             }
-        } catch (err) {
+        } 
+        catch (err)
+        {
             console.warn('Language detection error:', err);
         }
     }
@@ -116,6 +134,17 @@ function formatCode() {
             trailingComma: 'es5',
             bracketSpacing: true,
             plugins: prettierPlugins,
+        };
+
+        const jsBeautifyOptions = {
+            indent_size: 4,
+            preserve_newlines: true,
+            max_preserve_newlines: 2,
+            end_with_newline: false,
+            space_in_paren: false,
+            brace_style: 'expand',
+            e4x: true,
+            unescape_strings: false,
         };
         
         switch (language) {
@@ -208,7 +237,20 @@ function formatCode() {
                 languageClass = 'language-jsx';
                 break;
                 
-            default: // javascript
+            case 'javascript':
+                if (typeof js_beautify === 'function') {
+                    formatted = js_beautify(input, jsBeautifyOptions);
+                } else {
+                    console.warn('js-beautify is unavailable; falling back to Prettier for JavaScript formatting.');
+                    formatted = prettier.format(input, {
+                        ...prettierOptions,
+                        parser: 'babel'
+                    });
+                }
+                languageClass = 'language-javascript';
+                break;
+
+            default:
                 formatted = prettier.format(input, {
                     ...prettierOptions,
                     parser: 'babel'

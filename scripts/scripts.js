@@ -14,6 +14,5 @@ function loadComponents() {
 document.addEventListener('DOMContentLoaded', () => {
     loadComponents();
     
-    // Add observer for navbar loading completion
-    const navbarPlaceholder = document.getElementById('navbar-placeholder');
+    //const navbarPlaceholder = document.getElementById('navbar-placeholder');
 });
