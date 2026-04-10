@@ -179,7 +179,7 @@ function generateSQL() {
                     if (statementType === 'create') {
                         columns.push(`${INDENT}[${component.key}] ${sqlType} NULL`);
                     } else {
-                        columns.push(`${INDENT}ADD [${component.key}] ${sqlType} NULL`);
+                        columns.push(`${INDENT}[${component.key}] ${sqlType} NULL`);
                     }
                 }
             }
@@ -227,7 +227,7 @@ function generateSQL() {
         if (statementType === 'create') {
             sql = `CREATE TABLE ${tableName} (\n${columns.join(',\n')}\n);\nGO\n\n`;
         } else {
-            sql = `ALTER TABLE ${tableName}\n${columns.join(',\n')};\nGO\n\n`;
+            sql = `ALTER TABLE ${tableName}\nADD\n${columns.join(',\n')};\nGO\n\n`;
         }
     }
 
