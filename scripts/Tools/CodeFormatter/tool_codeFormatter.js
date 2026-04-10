@@ -143,7 +143,7 @@ function formatCode() {
             end_with_newline: false,
             space_in_paren: false,
             brace_style: 'expand',
-            e4x: true,
+            e4x: false,
             unescape_strings: false,
         };
         
@@ -239,7 +239,25 @@ function formatCode() {
                 
             case 'javascript':
                 if (typeof js_beautify === 'function') {
-                    formatted = js_beautify(input, jsBeautifyOptions);
+                    try {
+                        const beautified = js_beautify(input, jsBeautifyOptions);
+
+                        // Validate the beautified result using Prettier's JS parser.
+                        // If parsing fails (often with complex regex literals), fall back safely.
+                        prettier.format(beautified, {
+                            ...prettierOptions,
+                            parser: 'babel'
+                        });
+
+                        formatted = beautified;
+                    } catch (beautifyErr) {
+                        console.warn('js-beautify could not safely format this JavaScript input; falling back to Prettier.', beautifyErr);
+                        formatted = prettier.format(input, {
+                            ...prettierOptions,
+                            parser: 'babel'
+                        });
+                        showAlert('Used safe fallback for JavaScript formatting because the input contains syntax that js-beautify could not process reliably.', 'warning');
+                    }
                 } else {
                     console.warn('js-beautify is unavailable; falling back to Prettier for JavaScript formatting.');
                     formatted = prettier.format(input, {
