@@ -22,6 +22,18 @@ function hideAlert()
     alertContainer.style.display = 'none';
 }
 
+// js-beautify can mis-handle some JavaScript that mixes XML-like markers and regex literals.
+// In those cases, prefer Prettier to preserve semantics.
+function isRiskyForJsBeautify(jsCode)
+{
+    if (!jsCode) return false;
+
+    const hasXmlLikeMarkers = /<\?xml|<\/[a-z][^>]*>/i.test(jsCode);
+    const hasRegexLikeLiteral = /(^|[^\w$\)])\/(?![/*])(?:[^\/\n\\]|\\.)+\/[gimsuyd]*/m.test(jsCode);
+
+    return hasXmlLikeMarkers && hasRegexLikeLiteral;
+}
+
 function detectLanguage(event)
 {
     const input = event.target.value.trim();
@@ -238,7 +250,7 @@ function formatCode() {
                 break;
                 
             case 'javascript':
-                if (typeof js_beautify === 'function') {
+                if (typeof js_beautify === 'function' && !isRiskyForJsBeautify(input)) {
                     try {
                         const beautified = js_beautify(input, jsBeautifyOptions);
 
@@ -259,7 +271,12 @@ function formatCode() {
                         showAlert('Used safe fallback for JavaScript formatting because the input contains syntax that js-beautify could not process reliably.', 'warning');
                     }
                 } else {
-                    console.warn('js-beautify is unavailable; falling back to Prettier for JavaScript formatting.');
+                    if (typeof js_beautify !== 'function') {
+                        console.warn('js-beautify is unavailable; falling back to Prettier for JavaScript formatting.');
+                    } else {
+                        console.warn('Using Prettier for JavaScript to avoid known js-beautify edge cases with XML-like markers and regex literals.');
+                        showAlert('Used safe JavaScript formatting mode for regex/XML-like input to avoid semantic changes.', 'warning');
+                    }
                     formatted = prettier.format(input, {
                         ...prettierOptions,
                         parser: 'babel'
