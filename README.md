@@ -30,7 +30,9 @@ UniTools is a browser-based toolkit designed to help developers work with Form.i
 ### Generators
 - **Printout From Form** - Generate DevExpress printouts from Form.io JSON files
 - **Table From Form** - Generate SQL table creation statements from Form.io JSON
+- **TableUpdaterTool** - Generate ALTER statements to sync two table definitions
 - **Form From Table** - Generate Form.io JSON from SQL table definitions
+- **Mini Printout Module** - Embeddable one-click Form.io to DevExpress report converter
 
 ### Utilities
 - **Code Formatter** - Format and beautify code in multiple languages
@@ -47,6 +49,54 @@ UniTools is a browser-based toolkit designed to help developers work with Form.i
 | HTML5 | - | Page structure and markup |
 | CSS3 | - | Styling and layouts |
 | JavaScript (ES6+) | - | Application logic and interactivity |
+
+---
+
+## Mini Printout Module
+
+`Mini Printout Module` is a reusable version of the Printout From Form conversion engine designed for embedding into other websites.
+
+### Location
+
+- Module entry: `scripts/Tools/MiniPrintoutModule/mini_printout_module.js`
+- Copied conversion core: `scripts/Tools/MiniPrintoutModule/core/`
+
+### What It Does
+
+- Opens a file picker when your button is clicked
+- Accepts a Form.io JSON payload
+- Converts it to DevExpress report JSON
+- Automatically downloads the generated report JSON file
+- Automatically downloads the generated SQL file
+
+### Minimal Integration
+
+```html
+<button id="generatePrintoutBtn">Generate Printout</button>
+
+<script type="module">
+	import { attachMiniPrintoutModule } from './scripts/Tools/MiniPrintoutModule/mini_printout_module.js';
+
+	attachMiniPrintoutModule({
+		buttonId: 'generatePrintoutBtn'
+	});
+</script>
+```
+
+By default, the module auto-loads `./printout-config.dxs` (JSON format) from the same folder as the module entry script.
+
+### Optional Hooks
+
+- `onSuccess(result)` - Called after successful conversion/download
+- `onError(error)` - Called if conversion fails
+- `outputFileName` - Override output file name
+- `sqlFileName` - Override generated SQL file name
+- `downloadSql` - Set to `false` to disable SQL auto-download
+- `pakoCdnUrl` - Override the pako CDN URL used for compression
+- `configUrl` - Override settings file path (default: `./printout-config.dxs`)
+- `config` - Provide settings object directly instead of loading a file
+- `useConfigFile` - Set to `false` to skip loading `.dxs` file
+- `forceReloadConfig` - Set to `true` to reload config file each conversion
 
 ---
 

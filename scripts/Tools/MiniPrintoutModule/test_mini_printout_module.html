@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Printout Module Test</title>
+</head>
+<body>
+    <button id="generatePrintoutBtn" type="button">Generate Printout</button>
+
+    <div style="margin-top: 16px;">
+        <label for="reportJsonOut" style="display:block; margin-bottom: 4px;">Report JSON Output (onSuccess example)</label>
+        <textarea id="reportJsonOut" rows="10" style="width: 100%; box-sizing: border-box;"></textarea>
+    </div>
+
+    <div style="margin-top: 16px;">
+        <label for="sqlOut" style="display:block; margin-bottom: 4px;">SQL Output (onSuccess example)</label>
+        <textarea id="sqlOut" rows="10" style="width: 100%; box-sizing: border-box;"></textarea>
+    </div>
+
+    <div id="errorOut" style="margin-top: 16px; color: #b00020; white-space: pre-wrap;"></div>
+
+    <script type="module">
+        import { attachMiniPrintoutModule } from './mini_printout_module.js';
+
+        const reportOut = document.getElementById('reportJsonOut');
+        const sqlOut = document.getElementById('sqlOut');
+        const errorOut = document.getElementById('errorOut');
+
+        attachMiniPrintoutModule({
+            buttonId: 'generatePrintoutBtn',
+            configUrl: './printout-config.dxs',
+
+            // Example callback: show friendly error text in-page
+            onError: (error) => {
+                errorOut.textContent = `Conversion failed: ${error?.message || String(error)}`;
+            },
+
+            // Example callback: output generated content into text fields
+            onSuccess: ({ reportJson, sqlText, fileName, sqlFileName }) => {
+                errorOut.textContent = '';
+                reportOut.value = JSON.stringify(reportJson, null, 2);
+                sqlOut.value = sqlText || '';
+
+                // Optional status indicator
+                console.log(`Downloaded ${fileName} and ${sqlFileName}`);
+            }
+        });
+    </script>
+</body>
+</html>
