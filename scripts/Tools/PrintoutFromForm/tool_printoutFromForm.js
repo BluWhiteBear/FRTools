@@ -1260,8 +1260,10 @@ const UIHandlers = {
         warningsSection.innerHTML = `
       <hr>
       <h6 class="text-warning"><i class="bi bi-exclamation-triangle"></i> Conversion Warnings</h6>
-      <ul class="list-unstyled mb-0"></ul>
     `;
+        const warningsList = document.createElement('ul');
+        warningsList.className = 'list-unstyled mb-0';
+        warningsSection.appendChild(warningsList);
 
         // ? Add elements to conversion info
         conversionInfo.appendChild(timestamp);

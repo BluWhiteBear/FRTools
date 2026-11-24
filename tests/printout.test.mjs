@@ -246,6 +246,42 @@ test('checkbox labels are escaped once during serialization', () => {
     assert.doesNotMatch(output, /&amp;amp;/);
 });
 
+test('success summary displays warnings safely without losing the converted report', async () => {
+    const { UIHandlers, DevExpressConverter } = await import('../scripts/Tools/PrintoutFromForm/tool_printoutFromForm.js');
+    const originalDocument = globalThis.document;
+    const originalWarnings = DevExpressConverter.state.warnings;
+    const originalReport = DevExpressConverter.state.devExpressJson;
+    function element() {
+        return { style: {}, children: [], textContent: '',
+            set innerHTML(value) { this.html = value; this.children = []; },
+            get innerHTML() { return this.html || ''; },
+            appendChild(child) { this.children.push(child); } };
+    }
+    const summary = element();
+    globalThis.document = { createElement: element, getElementById: () => summary };
+    const report = [{ ReportTemplate: 'converted-report' }];
+    try {
+        DevExpressConverter.state.devExpressJson = report;
+        for (const warnings of [[], [{ message: 'Nested grid warning' }], [{ message: '<script>alert(1)</script>', component: { label: '<b>Panel</b>', type: 'panel', key: 'panel' } }]]) {
+            DevExpressConverter.state.warnings = warnings;
+            UIHandlers.updateConversionInfo(new Date('2026-11-24T01:35:32Z'), 'EST', 123.45);
+            assert.equal(summary.className, 'alert alert-success mb-4');
+            assert.equal(summary.style.display, 'block');
+            const section = summary.children[2];
+            assert.equal(section.style.display, warnings.length ? 'block' : 'none');
+            assert.equal(section.children[0].className, 'list-unstyled mb-0');
+            if (warnings.length) assert.ok(section.children[0].innerHTML.includes(UtilsSafe(warnings[0].message)));
+            assert.doesNotMatch(section.children[0].innerHTML, /<script>|<b>Panel/);
+            assert.equal(DevExpressConverter.state.devExpressJson, report);
+        }
+    } finally {
+        globalThis.document = originalDocument;
+        DevExpressConverter.state.warnings = originalWarnings;
+        DevExpressConverter.state.devExpressJson = originalReport;
+    }
+    function UtilsSafe(text) { return text.replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+});
+
 test('complete conversion preserves text, produces parseable XML, and round-trips the compressed report', { skip: process.platform !== 'win32' }, async () => {
     const { LAYOUT } = await import('../scripts/Tools/PrintoutFromForm/layoutConfig.js');
     window.LAYOUT = LAYOUT;
