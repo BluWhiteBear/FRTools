@@ -240,11 +240,7 @@ export class ReportViewer {
                 for (const { node, y, height } of bands) {
                     const band = this.createBandElement(node.element);
                     band.style.top = y + 'px';
-                    band.dataset.xml = bandXml.outerHTML;
-        band.dataset.viewerId = this.model?.byElement.get(bandXml)?.id || '';
-        this.markIssues(band);
-        band.addEventListener('click', event => { event.stopPropagation(); this.selectComponent(band); });
-        band.style.height = height + 'px';
+                    band.style.height = height + 'px';
                     this.processComponents(node.element, band, this.currentMargins.left);
                     page.appendChild(band);
                 }
@@ -282,6 +278,13 @@ export class ReportViewer {
         const name = bandXml.getAttribute('Name');
         if (name) band.dataset.name = name;
 
+        band.dataset.xml = bandXml.outerHTML;
+        band.dataset.viewerId = this.model?.byElement.get(bandXml)?.id || '';
+        this.markIssues(band);
+        band.addEventListener('click', event => {
+            event.stopPropagation();
+            this.selectComponent(band);
+        });
         band.style.height = `${parseFloat(bandXml.getAttribute('HeightF')) || 0}px`;
         this.applyVisualStyles(band, bandXml);
         return band;

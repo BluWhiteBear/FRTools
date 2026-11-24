@@ -4,6 +4,7 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync, readdirSync } from 'node:fs';
 import { parseReportXml, analyzeReport } from '../scripts/Tools/ReportViewer/reportModel.js';
 import { analyzeDataSources } from '../scripts/Tools/ReportViewer/reportDataValidation.js';
+import { ReportViewer } from '../scripts/Tools/ReportViewer/tool_reportViewer.js';
 
 // XML integration without a production dependency: System.Xml parses the real
 // XML, then an element adapter exposes the DOM methods used by the model layer.
@@ -21,12 +22,12 @@ class SystemXmlParser {
                 $attrs=[ordered]@{}
                 foreach($attr in $element.Attributes) { $attrs[$attr.Name]=$attr.Value }
                 $children=@(foreach($child in $element.ChildNodes) { if($child.NodeType -eq 'Element') { Convert-Element $child } })
-                return @{ tagName=$element.get_Name(); attrs=$attrs; children=$children; textContent=$element.InnerText }
+                return @{ tagName=$element.get_Name(); attrs=$attrs; children=$children; textContent=$element.InnerText; outerHTML=$element.OuterXml }
             }
             Convert-Element $doc.DocumentElement | ConvertTo-Json -Compress -Depth 100
         `], { input: source, encoding: 'utf8', windowsHide: true });
         function element(raw, parentElement = null) {
-            const result = { tagName: raw.tagName, textContent: raw.textContent, parentElement,
+            const result = { tagName: raw.tagName, textContent: raw.textContent, outerHTML: raw.outerHTML, parentElement,
                 attributes: Object.entries(raw.attrs).map(([name, value]) => ({ name, value })),
                 getAttribute: name => raw.attrs[name] ?? null,
                 getElementsByTagName(name) {
@@ -36,9 +37,49 @@ class SystemXmlParser {
             return result;
         }
         const documentElement = element(JSON.parse(serialized.replace(/^\uFEFF/, '')));
-        return { documentElement, getElementsByTagName: name => [ ...(documentElement.tagName === name ? [documentElement] : []), ...documentElement.getElementsByTagName(name) ] };
+        return { documentElement,
+            querySelectorAll: selector => selector === 'StyleSheet > *' ? documentElement.getElementsByTagName('StyleSheet').flatMap(style => style.children) : [],
+            getElementsByTagName: name => [ ...(documentElement.tagName === name ? [documentElement] : []), ...documentElement.getElementsByTagName(name) ] };
     }
 }
+
+test('renderReport builds a page and inspectable bands without undefined XML references', { skip: process.platform !== 'win32' }, () => {
+    // The native XML parser feeds the actual renderReport/createBandElement path.
+    // This minimal output surface tests orchestration, not browser paint metrics.
+    function element() {
+        return { children: [], style: {}, dataset: {}, classList: { add() {} },
+            addEventListener() {},
+            appendChild(child) { child.parentElement = this; this.children.push(child); },
+            replaceChildren() { this.children = []; },
+            querySelectorAll(selector) {
+                return this.children.flatMap(child => [ ...(selector === '.report-page' && child.className === 'report-page' ? [child] : []), ...child.querySelectorAll(selector) ]);
+            } };
+    }
+    const originalDocument = globalThis.document, originalParser = globalThis.DOMParser;
+    globalThis.document = { createElement: element, getElementById: () => null };
+    globalThis.DOMParser = SystemXmlParser;
+    const viewer = Object.create(ReportViewer.prototype);
+    viewer.container = element();
+    viewer.scale = 1;
+    viewer.showDiagnostics = issues => { viewer.diagnostics = issues; };
+    viewer.updateInspector = () => {};
+    viewer.reportFailure = error => { viewer.failure = error; };
+    try {
+        const xml = '<XtraReportsLayoutSerializer PageWidth="850" PageHeight="1100" Margins="50,50,50,50"><Bands><Item1 ControlType="DetailBand" Name="Detail" HeightF="50"><Controls/></Item1></Bands></XtraReportsLayoutSerializer>';
+        assert.equal(viewer.renderReport(xml), true, viewer.failure?.message);
+        const page = viewer.container.children[0].children[0];
+        const band = page.children[0];
+        assert.equal(band.dataset.name, 'Detail');
+        assert.equal(band.dataset.bandType, 'DetailBand');
+        assert.ok(band.dataset.viewerId);
+        assert.ok(band.dataset.xml.includes('ControlType="DetailBand"'));
+        assert.equal(band.style.height, '50px');
+        assert.equal(page.style.transform, 'scale(0.96)');
+    } finally {
+        globalThis.document = originalDocument;
+        globalThis.DOMParser = originalParser;
+    }
+});
 
 test('real XML parser preserves escaped Unicode, validates field schemas, and reports missing query bindings', { skip: process.platform !== 'win32' }, () => {
     const schema = Buffer.from('<SqlDataSource><ResultSchema><DataSet><View Name="rows"><Field Name="known"/></View></DataSet></ResultSchema></SqlDataSource>').toString('base64');
