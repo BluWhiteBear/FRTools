@@ -66,7 +66,7 @@ class XMLProcessor
         this.validateOnGenerate = true;     // ? Should we validate on generate
         this.hasBeenValidated = false;      // ? Track if we've already validated
 
-        console.log('[XMLProcessor] Initialized with currentRef:', this.currentRef);
+
     }
 
     // ? Escapes special XML characters in text content
@@ -218,7 +218,7 @@ class XMLProcessor
     // ? Resets the internal state for processing a new XML structure
     reset()
     {
-        console.log('Resetting XMLProcessor state');
+
         this.currentRef = 0;
         this.currentItemNum = 0;
     }
@@ -350,48 +350,11 @@ class XMLProcessor
             return '';
         }
 
-        // ? Validate and repair before generating if enabled and only at the root level
-        if (isRoot && this.validateOnGenerate && !this.hasBeenValidated)
-        {
-            const repairResult = XMLValidator.validateAndRepair(node);
-            this.hasBeenValidated = true; // ? Mark as validated to prevent recursive validation
-            
-            // ? Log original issues if any were found
-            if (repairResult.originalIssues.hasIssues)
-            {
-                // ? Log XML structure issues that were found and repaired
-                if (repairResult.changes.length > 0)
-                {
-                    console.warn('Found XML structure issues!');
-                    console.warn('Applied fixes:');
-                    repairResult.changes.forEach(change =>
-                        console.warn(`- In ${change.context}: Renamed ${change.oldValue} to ${change.newValue} (${change.itemType} "${change.itemName}")`)
-                    );
-                }
-                
-                // ? Log any remaining unfixed issues
-                const hasUnfixedSequential = repairResult.remainingIssues.sequentialIssues.length > 0;
-                const hasUnfixedContainer = repairResult.remainingIssues.containerIssues.length > 0;
-                
-                if (hasUnfixedSequential || hasUnfixedContainer)
-                {
-                    console.error('\nSome issues could not be fixed:');
-                    if (hasUnfixedSequential)
-                    {
-                        console.error('Remaining sequential numbering issues:');
-                        repairResult.remainingIssues.sequentialIssues.forEach(issue => console.error('- ' + issue));
-                    }
-
-                    if (hasUnfixedContainer)
-                    {
-                        console.error('Remaining container numbering issues:');
-                        repairResult.remainingIssues.containerIssues.forEach(issue => console.error('- ' + issue));
-                    }
-                } 
-                else if (!repairResult.success)
-                {
-                    console.info('\nAll detected issues were fixed successfully.');
-                }
+        if (isRoot && this.validateOnGenerate) {
+            const result = XMLValidator.validateAndRepair(node);
+            if (!result.success) {
+                const issues = result.remainingIssues;
+                throw new Error('Invalid report structure: ' + [...issues.sequentialIssues, ...issues.containerIssues, ...issues.refIssues].join('; '));
             }
         }
 

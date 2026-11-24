@@ -1,4 +1,10 @@
-﻿//#region Imports
+import { collectGrids, reportProcedureName, quoteSqlIdentifier } from './gridModel.js';
+import { encodeReportTemplate, decodeReportTemplate } from './reportCodec.js';
+import { placeControlGroup } from './reportLayout.js';
+import { normalizeFormExport, childComponents, gridColumns } from './formSchema.js';
+import { buildComponentStorage } from './dataSource.js';
+import { ComponentCleaner } from './componentCleaner.js';
+//#region Imports
 import { LAYOUT } from './layoutConfig.js';
 
 import { XMLProcessor } from './xmlProcessor.js';
@@ -35,277 +41,6 @@ function debugWarn(level, ...args)
         console.warn(...args);
     }
 }
-
-//#region ComponentStorage Helpers
-
-// Base64 encoding/decoding utilities for UTF-8 strings
-function utf8ToBase64(str)
-{
-    const bytes = new TextEncoder().encode(str);
-    const binString = Array.from(bytes, b => String.fromCodePoint(b)).join('');
-    return btoa(binString);
-}
-
-// Convert Form.io component types to DevExpress field types for SQL datasource schema
-function formioTypeToDevExpressType(component)
-{
-    switch (component.type) {
-        case 'checkbox': return 'Boolean';
-        case 'datetime': 
-        case 'day': return 'DateTime';
-        case 'number': 
-        case 'currency': return 'Decimal';
-        default: return 'String';
-    }
-}
-
-// Recursively traverse Form.io components to collect all leaf input fields (excluding container components and optionally grids)
-function collectLeafInputFields(components, excludeGrids = true) 
-{
-    const fields = [];
-    const seen = new Set();
-    const skippedTypes = new Set([
-        'button', 'submit', 'content', 'htmlelement', 'html',
-        'columns', 'column', 'panel', 'fieldset', 'tabs', 'tab',
-        'well', 'table', 'container', 'form', 'nestedform',
-        'datagrid', 'grid'
-    ]);
-    
-    // Helper function to recursively traverse components
-    function traverse(comps) 
-    {
-        if (!Array.isArray(comps)) return;
-        
-        comps.forEach(comp => {
-            // Skip grid-like components for main datasource collection.
-            if (excludeGrids && (comp.type === 'grid' || comp.type === 'datagrid' || comp.IsFormGrid === true))
-            {
-                return;
-            }
-
-            // Always recurse through nested components first, but do not treat container nodes as data fields.
-            if (Array.isArray(comp.components) && comp.components.length > 0)
-            {
-                traverse(comp.components);
-            }
-
-            // Only include data-input components with a key.
-            if (!comp.key || comp.input !== true)
-            {
-                return;
-            }
-
-            // Skip any components that are in the skippedTypes list, which includes all known non-input container types and other non-data components.
-            if (skippedTypes.has(comp.type))
-            {
-                return;
-            }
-
-            // Avoid duplicate fields if the same component appears multiple times in the form (e.g., in multiple tabs or sections).
-            if (seen.has(comp.key))
-            {
-                return;
-            }
-
-            // Mark this component as seen to prevent duplicates
-            seen.add(comp.key);
-            
-            // Add this component as a field with its name and type (converted to DevExpress type)
-            fields.push({
-                name: comp.key,
-                type: formioTypeToDevExpressType(comp)
-            });
-        });
-    }
-    
-    traverse(components);
-    return fields;
-}
-
-// Builds the XML string for a SQL datasource based on the provided name, stored procedure name, and fields.
-function buildSqlDataSourceXml(dsName, procName, fields)
-{
-    let xml = `<SqlDataSource Name="${dsName}">`;
-    xml += `<Connection Name="UniData" ConnectionString="" />`;
-    xml += `<Query Type="StoredProcQuery" Name="${procName}">`;
-    xml += `<Parameter Name="@FormDataGUID" Type="DevExpress.DataAccess.Expression">(System.Guid)(?FormDataGUID )</Parameter>`;
-    xml += `<Parameter Name="@OwnerObjectGUID" Type="DevExpress.DataAccess.Expression">(System.Guid)(?ObjectGUID )</Parameter>`;
-    xml += `<ProcName>${procName}</ProcName>`;
-    xml += `</Query>`;
-    xml += `<ResultSchema>`;
-    xml += `<DataSet Name="${dsName}">`;
-    xml += `<View Name="${procName}">`;
-    xml += `<Field Name="first" Type="String" />`;
-    xml += `<Field Name="last" Type="String" />`;
-    
-    // System fields (always present)
-    const systemFields = [
-        { name: '__ID', type: 'Int32' },
-        { name: '__OwnerObjectGuid', type: 'Guid' },
-        { name: '__FormInstanceGUID', type: 'Guid' },
-        { name: '__FormGUID', type: 'Guid' },
-        { name: '__FormGroupName', type: 'String' },
-        { name: '__FormGroupFolder', type: 'Guid' },
-        { name: '__InstanceName', type: 'String' },
-        { name: '__Created', type: 'DateTime' },
-        { name: '__Modified', type: 'DateTime' },
-        { name: '__Locked', type: 'Boolean' },
-        { name: '__LockLevel', type: 'Int32' },
-        { name: '__LockedBy', type: 'Guid' },
-        { name: '__LockedTime', type: 'DateTime' },
-        { name: '__Referrer', type: 'Guid' },
-        { name: '__FormVersion', type: 'Int32' },
-        { name: '__CreatedBy', type: 'Guid' },
-        { name: '__ModifiedBy', type: 'Guid' }
-    ];
-    
-    // Add system fields
-    systemFields.forEach(field => {
-        xml += `<Field Name="${field.name}" Type="${field.type}" />`;
-    });
-    
-    // Add form fields
-    fields.forEach(field => {
-        xml += `<Field Name="${field.name}" Type="${field.type}" />`;
-    });
-    
-    xml += `</View>`;
-    xml += `</DataSet>`;
-    xml += `</ResultSchema>`;
-    xml += `<ConnectionOptions CloseConnection="true" />`;
-    xml += `</SqlDataSource>`;
-    
-    return xml;
-}
-
-// Builds the ComponentStorage XML node with one main datasource (Item1) and additional datasources for each grid component found in the form.
-function buildComponentStorage(formioData, processor)
-{
-    const deptName = formioData?.DepartmentName || 'Unknown';
-    const formName = formioData?.FormName || 'Unknown';
-    
-    // Collect fields from main form (excluding grids)
-    const mainFields = collectLeafInputFields(formioData?.FormioTemplate?.components || [], true);
-    
-    // Build main datasource (Item1)
-    const mainProcName = `cstm_${deptName}_${formName}_Printout`;
-    const mainSqlXml = buildSqlDataSourceXml('sqlDataSource1', mainProcName, mainFields);
-    const mainBase64 = utf8ToBase64(mainSqlXml);
-    
-    // Initialize items array with main datasource as Item1
-    const items = [
-        processor.createItemNode(1, undefined, {
-            Ref: "0",
-            ObjectType: "DevExpress.DataAccess.Sql.SqlDataSource,DevExpress.DataAccess.v23.2",
-            Name: "sqlDataSource1",
-            Base64: mainBase64
-        })
-    ];
-    
-    // Find and process grid components (DataGrid + FormGrid) for Item2+
-    // Grids are defined under FormioTemplate in the uploaded payload.
-    const gridSource = formioData?.FormioTemplate || formioData;
-    const grids = DevExpressConverter.findAllGridComponents(gridSource);
-    
-    grids.forEach((grid, idx) => {
-        const gridKey = grid.key || `grid${idx}`;
-        const gridProcName = `cstm_${deptName}_${formName}_${gridKey}`;
-        
-        // Add grid-specific extra system fields
-        const gridExtraSystemFields = [
-            { name: 'FormInstanceGUID', type: 'Guid' },
-            { name: 'GridEntryUID', type: 'Guid' },
-            { name: 'ParentEntryUID', type: 'Guid' },
-            { name: 'RowGUID', type: 'Guid' },
-            { name: 'Active', type: 'String' }
-        ];
-        
-        // Add grid component fields
-        const gridComponents = grid.components || [];
-        const gridSpecificFields = collectLeafInputFields(gridComponents, false);
-        
-        const gridSqlXml = buildSqlDataSourceXmlForGrid('sqlDataSource' + (idx + 2), gridProcName, mainFields, gridExtraSystemFields, gridSpecificFields);
-        const gridBase64 = utf8ToBase64(gridSqlXml);
-        
-        items.push(processor.createItemNode(idx + 2, undefined, {
-            Ref: `${idx + 325}`, // Ref values: Item2 has Ref="325", Item3 has Ref="?", etc.
-            ObjectType: "DevExpress.DataAccess.Sql.SqlDataSource,DevExpress.DataAccess.v23.2",
-            Name: `sqlDataSource${idx + 2}`,
-            Base64: gridBase64
-        }));
-    });
-    
-    // Build the ComponentStorage node
-    const componentStorage = processor.buildNode('ComponentStorage', {}, items);
-    
-    return componentStorage;
-}
-
-// Builds the inner SqlDataSource XML string for a grid datasource, including main form fields, grid-specific fields, and extra system fields for grids.
-function buildSqlDataSourceXmlForGrid(dsName, procName, mainFields, gridSystemFields, gridFields)
-{
-    let xml = `<SqlDataSource Name="${dsName}">`;
-    xml += `<Connection Name="UniData" ConnectionString="" />`;
-    xml += `<Query Type="StoredProcQuery" Name="${procName}">`;
-    xml += `<Parameter Name="@FormDataGUID" Type="DevExpress.DataAccess.Expression">(System.Guid)(?FormDataGUID )</Parameter>`;
-    xml += `<Parameter Name="@OwnerObjectGUID" Type="DevExpress.DataAccess.Expression">(System.Guid)(?ObjectGUID )</Parameter>`;
-    xml += `<ProcName>${procName}</ProcName>`;
-    xml += `</Query>`;
-    xml += `<ResultSchema>`;
-    xml += `<DataSet Name="${dsName}">`;
-    xml += `<View Name="${procName}">`;
-    
-    // System fields (always present)
-    const systemFields = [
-        { name: '__ID', type: 'Int32' },
-        { name: '__OwnerObjectGuid', type: 'Guid' },
-        { name: '__FormInstanceGUID', type: 'Guid' },
-        { name: '__FormGUID', type: 'Guid' },
-        { name: '__FormGroupName', type: 'String' },
-        { name: '__FormGroupFolder', type: 'Guid' },
-        { name: '__InstanceName', type: 'String' },
-        { name: '__Created', type: 'DateTime' },
-        { name: '__Modified', type: 'DateTime' },
-        { name: '__Locked', type: 'Boolean' },
-        { name: '__LockLevel', type: 'Int32' },
-        { name: '__LockedBy', type: 'Guid' },
-        { name: '__LockedTime', type: 'DateTime' },
-        { name: '__Referrer', type: 'Guid' },
-        { name: '__FormVersion', type: 'Int32' },
-        { name: '__CreatedBy', type: 'Guid' },
-        { name: '__ModifiedBy', type: 'Guid' }
-    ];
-    
-    // Add system fields
-    systemFields.forEach(field => {
-        xml += `<Field Name="${field.name}" Type="${field.type}" />`;
-    });
-    
-    // Add main form fields
-    mainFields.forEach(field => {
-        xml += `<Field Name="${field.name}" Type="${field.type}" />`;
-    });
-    
-    // Add grid extra system fields
-    gridSystemFields.forEach(field => {
-        xml += `<Field Name="${field.name}" Type="${field.type}" />`;
-    });
-    
-    // Add grid-specific fields
-    gridFields.forEach(field => {
-        xml += `<Field Name="${field.name}" Type="${field.type}" />`;
-    });
-    
-    xml += `</View>`;
-    xml += `</DataSet>`;
-    xml += `</ResultSchema>`;
-    xml += `<ConnectionOptions CloseConnection="true" />`;
-    xml += `</SqlDataSource>`;
-    
-    return xml;
-}
-
-//#endregion
 
 const ConversionSettings = {
     alignToGrid: false,
@@ -458,7 +193,8 @@ const SettingsManager = {
                     alert('Invalid settings file. Please select a valid JSON settings file.');
                 }
             });
-            reader.readAsText(file);
+            reader.onerror = () => UIHandlers.handleError(new Error('Unable to read the selected file.'));
+        reader.readAsText(file);
         });
         input.click();
     },
@@ -608,6 +344,7 @@ window.addEventListener('DOMContentLoaded', () => {
 // Apply settings to the converter and regenerate the printout preview. This function is called after validating settings and confirming with the user if there are any conflicts. It updates the converter's state, regenerates the DevExpress JSON, updates the preview, and shows any overlap warnings.
 function doApplySettings()
 {
+    try {
     SettingsManager.saveSettings();
     applyLayoutSettingsFromUI();
 
@@ -622,7 +359,8 @@ function doApplySettings()
         const devExpressJsonContainer = document.getElementById('devexpress-json');
         if (devExpressJsonContainer)
         {
-            devExpressJsonContainer.innerHTML = `<code class="language-json">${JSON.stringify(devExpressJson, null, 2)}</code>`;
+            devExpressJsonContainer.textContent = JSON.stringify(devExpressJson, null, 2);
+            devExpressJsonContainer.classList.add('language-json');
             Prism.highlightAll();
         }
 
@@ -667,6 +405,7 @@ function doApplySettings()
             window.showToast('No form uploaded. Cannot regenerate printout.', 'warning');
         }
     }
+    } catch (error) { UIHandlers.handleError(error); }
 }
 
 // Check for any warnings about overlapping fields that were detected during the conversion process. If there are any, populate the warnings modal with the details and display it to the user. This helps users identify potential layout issues in their printout design.
@@ -685,7 +424,7 @@ function showOverlapWarnings()
         return;
     }
 
-    list.innerHTML = overlaps.map(overlap => `<li>${overlap}</li>`).join('');
+    list.innerHTML = overlaps.map(overlap => `<li>${Utils.escapeXml(overlap)}</li>`).join('');
     bootstrap.Modal.getOrCreateInstance(modalEl).show();
 }
 
@@ -726,6 +465,7 @@ function applyLayoutSettingsFromUI()
 {
     // Get the Page Width field value
     const pageWidthInput = document.getElementById('settings_pageWidth');
+    if (!pageWidthInput) return;
     const marginLeftInput = document.getElementById('settings_marginsLeft');
     const marginRightInput = document.getElementById('settings_marginsRight');
     const marginTopInput = document.getElementById('settings_marginsTop');
@@ -764,17 +504,23 @@ function applyLayoutSettingsFromUI()
     const fontFieldOutputUnderlineInput = document.getElementById('font_fieldOutput_underline');
     const fontFieldOutputStrikethroughInput = document.getElementById('font_fieldOutput_strikethrough');
 
-    // Update LAYOUT constants
-    LAYOUT.PAGE_WIDTH = parseFloat(pageWidthInput.value);
-    LAYOUT.MARGIN_LEFT = parseFloat(marginLeftInput.value);
-    LAYOUT.MARGIN_RIGHT = parseFloat(marginRightInput.value);
-    LAYOUT.MARGIN_TOP = parseFloat(marginTopInput.value);
-    LAYOUT.MARGIN_BOTTOM = parseFloat(marginBottomInput.value);
-    LAYOUT.LABEL_HEIGHT = parseFloat(labelHeightInput.value);
-    window.LAYOUT.INPUT_HEIGHT = parseFloat(outputHeightInput.value);
-    LAYOUT.VERTICAL_SPACING = parseFloat(verticalSpacingInput.value);
+    const numericSettings = {
+        PAGE_WIDTH: Number(pageWidthInput.value), MARGIN_LEFT: Number(marginLeftInput.value),
+        MARGIN_RIGHT: Number(marginRightInput.value), MARGIN_TOP: Number(marginTopInput.value),
+        MARGIN_BOTTOM: Number(marginBottomInput.value), LABEL_HEIGHT: Number(labelHeightInput.value),
+        INPUT_HEIGHT: Number(outputHeightInput.value), VERTICAL_SPACING: Number(verticalSpacingInput.value)
+    };
+    for (const [key, value] of Object.entries(numericSettings)) {
+        if (!Number.isFinite(value) || value < 0 || (['PAGE_WIDTH', 'LABEL_HEIGHT', 'INPUT_HEIGHT'].includes(key) && value === 0)) {
+            throw new Error('Invalid layout setting: ' + key);
+        }
+    }
+    if (numericSettings.MARGIN_LEFT + numericSettings.MARGIN_RIGHT >= numericSettings.PAGE_WIDTH) {
+        throw new Error('Left and right margins must leave space for report content.');
+    }
+    Object.assign(LAYOUT, numericSettings);
     ConversionSettings.alignToGrid = !!alignToGridInput?.checked;
-    ConversionSettings.snapGridSize = parseFloat(snapGridSizeInput?.value) || 10;
+    ConversionSettings.snapGridSize = Math.max(1, Number(snapGridSizeInput?.value) || 10);
 
     // Build style string for header font
     let headerStyles = [];
@@ -847,341 +593,28 @@ class DevExpressConverter
         // ! If components is null or undefined, fall back to a count of 0
         if (!components) return 0;
 
-        let count = components.length;
-        for (const component of components)
-        {
-            if (component.components)
-            {
-                count += this.countComponents(component.components);
-            }
-
-            if (component.columns)
-            {
-                for (const col of component.columns)
-                {
-                    if (col.components)
-                    {
-                        count += this.countComponents(col.components);
-                    }
-                }
-            }
-        }
+        const count = components.reduce((total, component) =>
+            total + 1 + this.countComponents(childComponents(component)), 0);
 
         return count;
     }
 
     // ? Counts all data sources. This includes the main form, DataGrids, FormGrids, and any Nested Forms
     // ? Returns an integer
-    static countDataSources(formioData)
-    {
-        let dataSources = ['Main Form Table'];
-
-        // ! /// EARLY EXIT ///
-        // ! If there is no form data, fall back to assuming just the main form
-        if (!formioData) return dataSources.length;
-
-        const checkComponent = (component) =>
-        {
-            // ! /// EARLY EXIT ///
-            // ! If the component is null or undefined, just skip it
-            if (!component) return;
-
-            const key = component.key || 'unnamed'; // ! Fallback for missing keys
-
-            // ? Count DataGrid components that are NOT marked as FormGrid
-            if (component.type === 'datagrid' && !component.IsFormGrid)
-            {
-                dataSources.push(`Datagrid: ${key} (${component.DBName})`);
-
-                // ? Debug Logging - DataGrid Found
-                if (debugLevel >= 2) {
-                    debugLog(1, 'FOUND DataGrid Component:',
-                    {
-                        key,
-                        dbName: component.DBName
-                    });
-                }
-            }
-
-            // ? Count FormGrid components that ARE marked as FormGrid
-            if (component.type === 'datagrid' && component.IsFormGrid) // ! For some reason Form.io types FormGrids as 'datagrid'
-            {
-                dataSources.push(`Formgrid: ${key} (${component.DBName})`);
-
-                // ? Debug Logging - FormGrid Found
-                if (debugLevel >= 2) {
-                    debugLog(1, 'FOUND FormGrid Component:',
-                    {
-                        key,
-                        dbName: component.DBName
-                    });
-                }
-            }
-
-            // ? Count Nested Form components
-            if (component.type === 'nestedsubform')
-            {
-                dataSources.push(`Nested Form: ${key} (${component.DBName})`);
-
-                // ? Debug Logging - Nested Form Found
-                if (debugLevel >= 2) {
-                    debugLog(1, 'FOUND Nested Form Component:',
-                    {
-                        key,
-                        dbName: component.DBName
-                    });
-                }
-            }
-
-            // ? Recursively check nested components
-            if (component.components)
-            {
-                component.components.forEach(checkComponent);
-            }
-
-            // ? Check components in columns
-            if (component.columns)
-            {
-                component.columns.forEach(col =>
-                {
-                    if (col.components)
-                    {
-                        col.components.forEach(checkComponent);
-                    }
-                });
-            }
-        };
-
-        // ? Process all components
-        if (formioData.components)
-        {
-            formioData.components.forEach(checkComponent);
-        }
-
-        // ? Debug log all found data sources
-        if (debugLevel >= 1) {
-            debugLog(1, 'All Data Sources:', dataSources);
-        }
-
-        return dataSources.length;
+    static countDataSources(form) {
+        return 1 + collectGrids(form).length;
     }
 
-    // ? Recursively finds all DataGrid components in the form definition
-    // ? Returns an array of component objects
-    static findDataGridComponents(formioData, results = [])
-    {
-        // ! /// EARLY EXIT ///
-        // ! If there is no form data, just return the empty results array
-        if (!formioData) return results;
-
-        // ? Adds root-level DataGrids to results
-        if (formioData.Grid?.dataGrid?.DBTableName && !formioData.Grid?.formGrid)
-        {
-            results.push({
-                DBName: formioData.Grid.dataGrid.DBTableName,
-                type: 'datagrid',
-                key: formioData.Grid.dataGrid.key || 'mainGrid'
-            });
-        }
-
-        // ? Adds nested DataGrids to results
-        const components = formioData.components;
-
-        // ! /// EARLY EXIT ///
-        // ! If there are no components, just return the current results array
-        if (!components) return results;
-
-        for (const component of components)
-        {
-            // ? Make sure it's a datagrid and not a formgrid
-            const isDataGrid = component.type === 'datagrid' && component.DBName && !component.IsFormGrid; // ! They're both typed as 'datagrid' in Form.io for some reason...
-
-            if (isDataGrid)
-            {
-                // ? Make sure we always have a valid key
-                // ! If the key is missing, generate a fallback key based on the component's index
-                const safeKey = component.key || `grid_${results.length + 1}`;
-                results.push({
-                    ...component,
-                    key: safeKey
-                });
-            }
-
-            // ? Recursively check nested components
-            if (component.components)
-            {
-                this.findDataGridComponents(
-                {
-                    components: component.components
-                }, results);
-            }
-        }
-
-        return results;
+    static findDataGridComponents(form, results = []) {
+        return results.concat(collectGrids(form).filter(grid => grid.type === 'datagrid' && grid.DBName));
+    }
+    static findFormGridComponents(form, results = []) {
+        return results.concat(collectGrids(form).filter(grid => grid.type === 'formgrid' && grid.DBName));
+    }
+    static findAllGridComponents(form, results = []) {
+        return results.concat(collectGrids(form));
     }
 
-    // ? Recursively finds all grid components (DataGrid + FormGrid) in source order
-    // ? Returns an array of component objects
-    static findAllGridComponents(formioData, results = [])
-    {
-        // ! /// EARLY EXIT ///
-        if (!formioData) return results;
-
-        // ? Adds root-level DataGrid/FormGrid if present
-        if (formioData.Grid?.dataGrid?.DBTableName)
-        {
-            results.push({
-                DBName: formioData.Grid.dataGrid.DBTableName,
-                type: 'datagrid',
-                key: formioData.Grid.dataGrid.key || 'mainGrid'
-            });
-        }
-        if (formioData.Grid?.formGrid?.DBTableName)
-        {
-            results.push({
-                DBName: formioData.Grid.formGrid.DBTableName,
-                type: 'formgrid',
-                IsFormGrid: true,
-                key: formioData.Grid.formGrid.key || 'mainFormGrid'
-            });
-        }
-
-        const components = formioData.components;
-        if (!components) return results;
-
-        for (const component of components)
-        {
-            const isGridType = component.type === 'datagrid' || component.type === 'formgrid';
-            const isFormGridFlagged = component.type === 'datagrid' && component.IsFormGrid;
-
-            if ((isGridType || isFormGridFlagged) && component.DBName)
-            {
-                const safeKey = component.key || `grid_${results.length + 1}`;
-                results.push({
-                    ...component,
-                    key: safeKey
-                });
-            }
-
-            if (component.components)
-            {
-                this.findAllGridComponents(
-                {
-                    components: component.components
-                }, results);
-            }
-        }
-
-        return results;
-    }
-
-    // ? Recursively finds all FormGrid components in the form definition
-    // ? Returns an array of component objects
-    static findFormGridComponents(formioData, results = [])
-    {
-        // ! /// EARLY EXIT ///
-        // ! If there is no form data, just return the empty results array
-        if (!formioData) return results;
-
-        // ? Adds root-level FormGrids to results
-        if (formioData.Grid?.formGrid?.DBTableName)
-        {
-            results.push({
-                DBName: formioData.Grid.formGrid.DBTableName,
-                type: 'formgrid',
-                key: formioData.Grid.formGrid.key || 'mainFormGrid'
-            });
-        }
-
-        // ? Adds nested FormGrids to results
-        const components = formioData.components;
-
-        // ! /// EARLY EXIT ///
-        // ! If there are no components, just return the current results array
-        if (!components) return results;
-
-        for (const component of components)
-        {
-            // ? Make sure it's a formgrid and not a datagrid
-            const isFormGrid = component.DBName && component.IsFormGrid; // ! They're both typed as 'datagrid' in Form.io for some reason...
-            
-            if (isFormGrid) {
-                // ? Look for the View button in the components to get the dialog form table
-                let dialogFormTable = null;
-                if (component.components) {
-                    const viewButton = component.components.find(c => 
-                        c.type === 'button' && 
-                        c.key === 'btn_view' && 
-                        c.Form_DBTable
-                    );
-
-                    if (viewButton) {
-                        dialogFormTable = viewButton.Form_DBTable;
-                    }
-                }
-
-                // ? Include the dialogFormTable in the component data
-                const gridData = {
-                    ...component,
-                    dialogFormTable: dialogFormTable
-                };
-
-                results.push(gridData);
-                continue;
-            }
-
-            if (isFormGrid)
-            {
-                // ? Make sure we always have a valid key
-                // ! If the key is missing, generate a fallback key based on the component's index
-                const safeKey = component.key || `fg_${results.length + 1}`;
-                results.push({
-                    ...component,
-                    key: safeKey
-                });
-            }
-
-            // ? Recursively check nested components
-            if (component.components)
-            {
-                this.findFormGridComponents(
-                {
-                    components: component.components
-                }, results);
-            }
-        }
-
-        return results;
-    }
-
-    // ? Generates XML Expression Bindings for a given component field based on its type
-    // ? Returns a string
-    // ! I believe this is deprecated now, since we pass in the full expression in the component definitions.
-    // TODO: Investigate this! If it's not needed, remove it. Maybe it's used as a fallback?
-    static getTypeCastedFieldExpression(component)
-    {
-        const key = Utils.escapeXml(component.key);
-        switch (component.type)
-        {
-            case 'datetime':
-                return `Iif(IsNullOrEmpty([${key}]), '', FormatString('{0:g}', [${key}]))`;
-            case 'number':
-                if (component.decimalLimit)
-                {
-                    return `Iif(IsNullOrEmpty([${key}]), '', FormatString('{0:N${component.decimalLimit}}', [${key}]))`;
-                }
-                return `Iif(IsNullOrEmpty([${key}]), '', [${key}])`;
-            case 'checkbox':
-                return `Iif(IsNullOrEmpty([${key}]), False, ToBoolean([${key}]))`;
-            case 'select':
-            case 'radio':
-                return `Iif(IsNullOrEmpty([${key}]), '', ToString([${key}]))`;
-            default:
-                return `Iif(IsNullOrEmpty([${key}]), '', ToString([${key}]))`;
-        }
-    }
-
-    // ? Determines if a component is visible based on its own properties and its parent's visibility
     static isComponentVisible(component, parentVisible = true)
     {
         // ? If parent is hidden, this component is hidden regardless of its own visibility
@@ -1197,387 +630,6 @@ class DevExpressConverter
         return true;
     }
 
-    static handlers = {
-        panel: (component, itemNum, ref, componentWidth, xOffset, currentY, context) =>
-        {
-            // Check both the panel's visibility and parent's visibility
-            const isVisible = DevExpressConverter.isComponentVisible(component, context.parentVisible);
-            if (!isVisible)
-            {
-                debugLog(1, `Skipping hidden panel/fieldset: ${component.key}`);
-                return '';
-            }
-
-            debugLog(1, `Processing panel/fieldset: ${component.key}`,
-            {
-                type: component.type,
-                hasComponents: Boolean(component.components),
-                componentCount: component.components?.length,
-                currentContext:
-                {
-                    ...context,
-                    parentVisible: isVisible
-                }
-            });
-
-            const panelItemNum = context.itemCounter++;
-            const headerHeight = component.label ? context.LAYOUT.LABEL_HEIGHT : 0;
-
-            // Create a nested context that inherits visibility from this panel
-            const nestedContext = {
-                ...context,
-                parentVisible: isVisible,
-                getNextRef: XMLProcessor.currentRef,
-                itemCounter: 1  // Reset item counter for panel children
-            };
-
-            const contentHeight = component.components?.length ?
-                context.calculateNestedHeight(component.components, nestedContext) : 0;
-            const totalHeight = headerHeight + contentHeight + (context.LAYOUT.VERTICAL_SPACING * 2);
-
-            return DevExpressDefinitions.templates.panel.template(
-                component,
-                nestedContext,
-                {
-                    panelItemNum,
-                    componentWidth,
-                    totalHeight,
-                    xOffset,
-                    currentY,
-                    nestedContext
-                }
-            );
-        },
-
-        fieldset: (component, itemNum, ref, componentWidth, xOffset, currentY, context) =>
-        {
-            return DevExpressConverter.handlers.panel(component, itemNum, ref, componentWidth, xOffset, currentY, context);
-        },
-
-        table: (component, itemNum, ref, componentWidth, xOffset, currentY, context) =>
-        {
-            // Use the passed itemNum parameter instead of redeclaring it
-            const newContext = {
-                ...context,
-                itemCounter: context.itemCounter++,
-                escapeXml: Utils.escapeXml
-            };
-
-            return DevExpressDefinitions.templates.table.template(
-                component,
-                newContext,
-                {
-                    itemNum,
-                    componentWidth,
-                    xOffset,
-                    currentY
-                }
-            );
-        },
-
-        XRTable: (component, itemNum, ref, componentWidth, xOffset, currentY, context) =>
-        {
-            // Use the passed itemNum parameter instead of redeclaring it
-            const newContext = {
-                ...context,
-                itemCounter: context.itemCounter++,
-                getNextRef: XMLProcessor.currentRef
-            };
-
-            return DevExpressDefinitions.templates.table.template(
-                component,
-                newContext,
-                {
-                    itemNum,
-                    componentWidth,
-                    xOffset,
-                    currentY
-                }
-            );
-        },
-
-        columns: (component, itemNum, ref, componentWidth, xOffset, currentY, context) =>
-        {
-            // Check visibility of the columns container
-            if (!DevExpressConverter.isComponentVisible(component)) return '';
-
-            // Get visible columns only
-            const visibleColumns = component.columns.filter(col =>
-                DevExpressConverter.isComponentVisible(col));
-
-            if (visibleColumns.length === 0) return '';
-
-            // Calculate height based on visible columns only
-            const columnsHeight = Math.max(...visibleColumns.map(col =>
-                col.components ? context.calculateNestedHeight(col.components.filter(c =>
-                    DevExpressConverter.isComponentVisible(c))) : 0
-            )) || context.window.LAYOUT.INPUT_HEIGHT;
-
-            const tableItemNum = context.itemCounter++;
-
-            // Use full available width or specified component width
-            const containerWidth = componentWidth || context.LAYOUT.PAGE_WIDTH - (context.LAYOUT.MARGIN * 2);
-
-            // Calculate column weights based on Form.io width property or equal distribution
-            const columnWeights = [];
-            const totalDefinedWidth = visibleColumns.reduce((sum, col) => sum + (col.width || 0), 0);
-
-            if (totalDefinedWidth > 0)
-            {
-                visibleColumns.forEach((col, index) =>
-                {
-                    columnWeights[index] = col.width || (100 / visibleColumns.length);
-                });
-            }
-            else
-            {
-                const equalWeight = 100 / visibleColumns.length;
-                visibleColumns.forEach((_, index) =>
-                {
-                    columnWeights[index] = equalWeight;
-                });
-            }
-
-            // Calculate column widths based on weights
-            const columnWidths = columnWeights.map(weight => containerWidth * (weight / 100));
-
-            const newContext = {
-                ...context,
-                getNextRef: XMLProcessor.currentRef,
-                columnsHeight,
-                isComponentVisible: DevExpressConverter.isComponentVisible
-            };
-
-            return DevExpressDefinitions.templates.columns.template(
-                component,
-                newContext,
-                {
-                    itemNum: tableItemNum,
-                    componentWidth: containerWidth,
-                    xOffset,
-                    currentY,
-                    visibleColumns,
-                    columnWeights,
-                    columnWidths
-                }
-            );
-        },
-
-        datagrid: (component, itemNum, ref, componentWidth, xOffset, currentY, context) =>
-        {
-            // Use the passed itemNum parameter instead of redeclaring it
-            const newContext = {
-                ...context,
-                itemCounter: context.itemCounter++,
-                getNextRef: XMLProcessor.currentRef
-            };
-
-            return DevExpressDefinitions.templates.datagrid.template(
-                component,
-                newContext,
-                {
-                    itemNum,
-                    componentWidth,
-                    xOffset,
-                    currentY
-                }
-            );
-        }, 
-        
-        // Input Components      
-        textfield: (component, itemNum, ref, componentWidth, xOffset, currentY, context) =>
-        {
-            // Use the passed itemNum parameter instead of redeclaring it
-            const newContext = {
-                ...context,
-                itemCounter: context.itemCounter++,
-                getNextRef: XMLProcessor.currentRef,
-                getTypeCastedFieldExpression: DevExpressConverter.getTypeCastedFieldExpression
-            };
-
-            return DevExpressDefinitions.templates.textfield.template(
-                component,
-                newContext,
-                {
-                    itemNum,
-                    componentWidth,
-                    xOffset,
-                    currentY
-                }
-            );
-        },
-
-        number: (component, itemNum, ref, componentWidth, xOffset, currentY, context) =>
-        {
-            // Set type explicitly and pass to textfield handler
-            component.fieldType = 'number';
-            return DevExpressConverter.handlers.textfield(component, itemNum, ref, componentWidth, xOffset, currentY, context);
-        },
-
-        textarea: (component, itemNum, ref, componentWidth, xOffset, currentY, context) =>
-        {
-            // Set type explicitly and pass to textfield handler
-            component.fieldType = 'textarea';
-            return DevExpressConverter.handlers.textfield(component, itemNum, ref, componentWidth, xOffset, currentY, context);
-        },
-
-        email: (component, itemNum, ref, componentWidth, xOffset, currentY, context) =>
-        {
-            // Set type explicitly and pass to textfield handler
-            component.fieldType = 'email';
-            return DevExpressConverter.handlers.textfield(component, itemNum, ref, componentWidth, xOffset, currentY, context);
-        },
-        checkbox: (component, itemNum, ref, componentWidth, xOffset, currentY, context) =>
-        {
-            // Use the passed itemNum parameter instead of redeclaring it
-            const newContext = {
-                ...context,
-                itemCounter: context.itemCounter++,
-                getNextRef: XMLProcessor.currentRef
-            };
-
-            return DevExpressDefinitions.templates.checkbox.template(
-                component,
-                newContext,
-                {
-                    itemNum,
-                    componentWidth,
-                    xOffset,
-                    currentY
-                }
-            );
-        },
-
-        select: (component, itemNum, ref, componentWidth, xOffset, currentY, context) =>
-        {
-            return DevExpressConverter.handlers.textfield(component, itemNum, ref, componentWidth, xOffset, currentY, context);
-        },
-
-        datetime: (component, itemNum, ref, componentWidth, xOffset, currentY, context) =>
-        {
-            // Use the passed itemNum parameter instead of redeclaring it
-            const newContext = {
-                ...context,
-                itemCounter: context.itemCounter++,
-                getNextRef: XMLProcessor.currentRef
-            };
-
-            return DevExpressDefinitions.templates.datetime.template(
-                component,
-                newContext,
-                {
-                    itemNum,
-                    componentWidth,
-                    xOffset,
-                    currentY
-                }
-            );
-        },
-
-        // Misc Components
-        htmlelement: (component, itemNum, ref, componentWidth, xOffset, currentY, context) =>
-        {
-            const newContext = {
-                ...context,
-                getNextRef: XMLProcessor.currentRef
-            };
-
-            return DevExpressDefinitions.templates.htmlelement.template(
-                component,
-                newContext,
-                {
-                    itemNum,
-                    componentWidth,
-                    xOffset,
-                    currentY
-                }
-            );
-        },
-
-        XRPictureBox: (component, itemNum, ref, componentWidth, xOffset, currentY, context) =>
-        {
-            // Use the passed itemNum parameter instead of redeclaring it
-            const newContext = {
-                ...context,
-                itemCounter: context.itemCounter++,
-                getNextRef: XMLProcessor.currentRef
-            };
-
-            return DevExpressDefinitions.templates.picturebox.template(
-                component,
-                newContext,
-                {
-                    itemNum,
-                    componentWidth,
-                    xOffset,
-                    currentY
-                }
-            );
-        },
-
-        XRPageBreak: (component, itemNum, ref, componentWidth, xOffset, currentY, context) =>
-        {
-            // Use the passed itemNum parameter instead of redeclaring it
-            const newContext = {
-                ...context,
-                itemCounter: context.itemCounter++,
-                getNextRef: XMLProcessor.currentRef
-            };
-
-            return DevExpressDefinitions.templates.pagebreak.template(
-                component,
-                newContext,
-                {
-                    itemNum,
-                    xOffset,
-                    currentY
-                }
-            );
-        },
-
-        XRRichText: (component, itemNum, ref, componentWidth, xOffset, currentY, context) =>
-        {
-            // Use the passed itemNum parameter instead of redeclaring it
-            const newContext = {
-                ...context,
-                getNextRef: XMLProcessor.currentRef
-            };
-
-            return DevExpressDefinitions.templates.richtext.template(
-                component,
-                newContext,
-                {
-                    itemNum,
-                    componentWidth,
-                    xOffset,
-                    currentY
-                }
-            );
-        },
-
-        XRBarCode: (component, itemNum, ref, componentWidth, xOffset, currentY, context) =>
-        {
-            // Use the passed itemNum parameter instead of redeclaring it
-            const newContext = {
-                ...context,
-                itemCounter: context.itemCounter++,
-                getNextRef: XMLProcessor.currentRef
-            };
-
-            return DevExpressDefinitions.templates.barcode.template(
-                component,
-                newContext,
-                {
-                    itemNum,
-                    componentWidth,
-                    xOffset,
-                    currentY
-                }
-            );
-        },
-
-    };
-
     // ? Main transformation function
     // ? Takes Form.io JSON and returns compressed base64 DevExpress report template
     // ! Throws errors on critical failures, logs warnings for non-critical issues
@@ -1585,10 +637,22 @@ class DevExpressConverter
     {
         try
         {
+            formioData = normalizeFormExport(formioData);
+            formioData.FormioTemplate = ComponentCleaner.cleanComponent(formioData.FormioTemplate);
+
             // ? Apply settings from UI before initializing
             DevExpressConverter.applySettings();
             // ? Initialize counters
             DevExpressConverter.initialize();
+            ComponentCleaner.hoistGridsAndSubforms(formioData.FormioTemplate, DevExpressConverter.state.warnings);
+            // Validate grid identities and flag missing custom FormGrid join metadata.
+            for (const grid of collectGrids(formioData.FormioTemplate)) {
+                if (grid.type === 'formgrid' && grid.DBName && !grid.dialogFormTable) {
+                    DevExpressConverter.state.warnings.push({ type: 'formgrid_missing_dialog',
+                        message: 'FormGrid has no dialog table mapping. Generated SQL reads the link table; referenced form fields may need a join.',
+                        component: { type: grid.type, key: grid.key, label: grid.label || grid.key } });
+                }
+            }
 
             // ? Validate input
             if (!formioData)
@@ -1609,139 +673,18 @@ class DevExpressConverter
 
             // ? Get a minimal valid XML template with the report name
             const xmlTemplateFunc = generateMinimalXmlTemplate();
-            let xmlTemplate = xmlTemplateFunc(formioData);
+            const xmlTemplate = xmlTemplateFunc(formioData);
 
-            // ? Log initial XML template size and preview
-            if (debugLevel >= 2)
-            {
-                debugLog(1, "XML template generated, length:", xmlTemplate.length);
-                debugLog(1, "XML preview:", xmlTemplate.substring(0, 200) + "...");
-            }
-
-            // ? Clean XML - remove unnecessary whitespace but preserve structure
-            // ? Clean and validate XML before compressing
-            xmlTemplate = xmlTemplate.replace(/>\s+</g, '><')
-                .replace(/\s+>/g, '>')
-                .replace(/<\s+/g, '<')
-                .replace(/\s{2,}/g, ' ')
-                .trim();
-
-            const initialValidation = Utils.validateXmlOutput(xmlTemplate);
-
-            // ? Log initial validation results
-            if (debugLevel >= 1)
-            {
-                debugLog(1, "Initial XML validation results:", initialValidation);
-            }
-
-            // ? Check for critical errors in initial validation
-            if (initialValidation.some(result => result.startsWith("ERROR")))
-            {
-                const criticalErrors = initialValidation.filter(result => result.startsWith("ERROR"));
-                const error = new Error('XML validation failed with critical errors.');
-                error.validationErrors = criticalErrors;
-                throw error;
-            }
-
-            // ? Compress and encode the XML
-            let base64Template;
-            try
-            {
-                // ? Convert XML to bytes
-                const encoder = new TextEncoder();
-                const xmlBytes = encoder.encode(xmlTemplate);
-
-                // ? Compress the XML bytes
-                const compressed = pako.gzip(xmlBytes,
-                {
-                    level: 9
-                });
-
-                // ?Convert to base64 string
-                const compressedArray = new Uint8Array(compressed);
-                let binaryString = '';
-                compressedArray.forEach(byte =>
-                {
-                    binaryString += String.fromCharCode(byte);
-                });
-
-                base64Template = btoa(binaryString);
-
-                // ? Log compression results
-                if (debugLevel >= 2)
-                {
-                    debugLog(1, 'XML compressed successfully, base64 length:', base64Template.length);
-                }
-
-                // ? Attempt to decode the template as a final validation
-                try
-                {
-                    const decodedTemplate = Utils.decodeReportTemplate(base64Template);
-
-                    if (!decodedTemplate || !decodedTemplate.content)
-                    {
-                        debugWarn(1, 'Warning: Template decoded to empty content - this may cause issues');
-                    }
-                    else
-                    {
-                        // ? Log decoded content length
-                        if (debugLevel >= 2)
-                        {
-                            debugLog(1, 'Template validation successful - decoded content length:', decodedTemplate.content.length);
-                        }
-
-                        // ? Look for specific field bindings in the decoded XML to verify fields are present
-                        const fieldBindings = decodedTemplate.content.match(/Expression="\[(.*?)\]"/g) || [];
-
-                        if (fieldBindings.length === 0)
-                        {
-                            debugWarn(1, 'Warning: No field bindings found in the decoded template');
-                        }
-                        else
-                        {
-                            // ? Log number of field bindings found
-                            if (debugLevel >= 2)
-                            {
-                                debugLog(1, `Found ${fieldBindings.length} field bindings in the decoded template`);
-                            }
-                        }
-                    }
-                }
-                catch (decodeError)
-                {
-                    console.error('Warning: Could not validate template by decoding:', decodeError);
-                    throw new Error('Template decoding validation failed');
-                }
-            }
-            catch (compressionError)
-            {
-                console.error('Template compression error:', compressionError);
-                throw new Error('Failed to compress template');
-            } 
-            
-            // ? Validate the XML before finalizing
+            // Validate the exact XML that will be exported; never normalize text
+            // inside attributes or markup while compressing it.
             const validationResults = Utils.validateXmlOutput(xmlTemplate);
-
-            // ? Log validation results
-            if (debugLevel >= 1)
-            {
-                debugLog(1, "XML validation results:", validationResults);
-            }
-
-            // ? Check for critical errors (not just warnings)
-            const hasCriticalErrors = validationResults.some(result =>
-                result.startsWith("ERROR") && !result.includes("WARNING")
-            );
-
-            // ? If critical errors are present, throw with details
-            if (hasCriticalErrors)
-            {
-                const criticalErrors = validationResults.filter(msg => msg.startsWith("ERROR"));
-                console.error('Critical XML validation errors found:', criticalErrors);
-                const error = new Error('XML validation failed with critical errors.');
-                error.validationErrors = criticalErrors;
+            const errors = validationResults.filter(message => message.startsWith('ERROR'));
+            if (errors.length) {
+                const error = new Error('XML validation failed.');
+                error.validationErrors = errors;
                 throw error;
             }
+            const base64Template = encodeReportTemplate(xmlTemplate);
 
             // ? Create minimal DevExpress JSON structure
             const departmentName = formioData.DepartmentName || 'FormIO';
@@ -1756,7 +699,7 @@ class DevExpressConverter
                 isCreateUpdate: null,
                 ReportGuid: formioData.FormDefinitionGuid || "00000000-0000-0000-0000-000000000000",
                 UserGuid: formioData.UserGuid || "00000000-0000-0000-0000-000000000000",
-                DepartmentGuid: formioData.DeparmentGuid || "00000000-0000-0000-0000-000000000000",
+                DepartmentGuid: formioData.DepartmentGuid || "00000000-0000-0000-0000-000000000000",
                 IsPrivate: true,
                 Parameters: "",
                 ReportTemplate: base64Template,
@@ -1809,12 +752,6 @@ const Utils = {
             {
                 return ["ERROR: XML is empty"];
             }
-
-            // ? Clean up any potential formatting issues
-            xml = xml.replace(/>\s+</g, '><')   // ? Remove whitespace between tags
-                .replace(/\s+>/g, '>')          // ? Remove whitespace before closing bracket
-                .replace(/<\s+/g, '<')          // ? Remove whitespace after opening bracket
-                .replace(/\s{2,}/g, ' ');       // ? Collapse multiple spaces
 
             // ? Check basic XML structure
             if (!xml.startsWith('<?xml'))
@@ -1880,96 +817,20 @@ const Utils = {
         }
         catch (error)
         {
-            return [`Exception during validation: ${error.message}`];
+            return [`ERROR: Exception during validation: ${error.message}`];
         }
     },
 
     // ? Decode and decompress a base64 DevExpress report template
     // ? Returns an object with type, content, and format
-    decodeReportTemplate(base64Template)
-    {
-        try
-        {
-            // ? Validates that input is a non-empty string
-            if (!base64Template)
-            {
-                console.error('Empty template provided');
-                return {
-                    type: 'xml',
-                    content: '<?xml version="1.0" encoding="utf-8"?><XtraReportsLayoutSerializer/>',
-                    format: 'DevExpress XML Report'
-                };
-            }
-
-            // ? Debug base64 input
-            if (debugLevel >= 2)
-            {
-                debugLog(1, 'Base64 template length:', base64Template.length);
-                debugLog(1, 'Base64 template start:', base64Template.substring(0, 50));
-            }
-
-            // ? Convert base64 to binary array
-            const binaryStr = atob(base64Template);
-            const bytes = new Uint8Array(binaryStr.length);
-            for (let i = 0; i < binaryStr.length; i++)
-            {
-                bytes[i] = binaryStr.charCodeAt(i);
-            }
-
-            // ? Debug compressed bytes
-            if (debugLevel >= 2)
-            {
-                debugLog(1, 'Compressed bytes length:', bytes.length);
-                debugLog(1, 'First few bytes:', Array.from(bytes.slice(0, 10)));
-            }
-
-            // ? Decompress with error handling
-            let decompressed;
-            try
-            {
-                decompressed = pako.inflate(bytes,
-                {
-                    to: 'string'
-                });
-            }
-            catch (error)
-            {
-                console.error('Decompression failed:', error);
-                throw error;
-            }
-
-            // ? Debug decompressed content
-            if (debugLevel >= 2)
-            {
-                debugLog(1, 'Decompressed length:', decompressed?.length);
-                debugLog(1, 'Decompressed start:', decompressed?.substring(0, 100));
-            }
-
-            // ? Validate XML structure 
-            if (!decompressed?.startsWith('<?xml'))
-            {
-                throw new Error('Invalid XML content');
-            }
-
-            return {
-                type: 'xml',
-                content: decompressed,
-                format: 'DevExpress XML Report'
-            };
-
-        }
-        catch (error)
-        {
-            console.error('Error decoding template:', error);
-            throw error;
-        }
-    },
+    decodeReportTemplate,
 
     // ? Generate SQL query string for printout procedures
     // ? Returns a string
     // ! This generates basic SQL Stored Procedure create or alter statements for the main form, DataGrids, and FormGrids
     generateSqlQuery(formioData)
     {
+        formioData = normalizeFormExport(formioData);
         // ? Query Header
         const generateDate = new Date().toLocaleDateString();
         const generateTime = new Date().toLocaleTimeString();
@@ -2002,8 +863,6 @@ const Utils = {
 
         // ? Get the table name without [dbo]. or ct_ prefixes
         const fullTableName = formioData.TableName || '[dbo].[DefaultTable]';
-        const tableName = fullTableName.replace(/^\[dbo\]\./i, '').replace(/^\[?ct_/i, '');
-        const procedureName = `cstm_${tableName.replace(/[\[\]]/g, '')}`;
 
         // ? Build the SQL string in parts
         let sqlParts = [];
@@ -2012,7 +871,7 @@ const Utils = {
         // TODO: Add additional handling for joining Nested Form relation tables and adding their FIGUID and OwnerObjectGUID to the select
         sqlParts.push(`
 /* MAIN FORM PROCEDURE */
-create or alter procedure [${procedureName}_Printout]
+create or alter procedure ${quoteSqlIdentifier(reportProcedureName(formioData))}
   @FormDataGUID varchar(36) = null,
   @OwnerObjectGUID varchar(36) = null
 as
@@ -2039,7 +898,7 @@ GO`);
                 const safeKey = grid.key.replace(/[^a-zA-Z0-9_]/g, '_');
                 sqlParts.push(`
 /* DATA GRID PROCEDURE: ${grid.key} */
-create or alter procedure [${procedureName}_${safeKey}]
+create or alter procedure ${quoteSqlIdentifier(reportProcedureName(formioData, grid.key))}
   @FormDataGUID varchar(36) = null,
   @OwnerObjectGUID varchar(36) = null
 as
@@ -2065,7 +924,7 @@ GO`);
                 const safeKey = grid.key.replace(/[^a-zA-Z0-9_]/g, '_');
                 sqlParts.push(`
 /* FORM GRID PROCEDURE: ${grid.key} */
-create or alter procedure [${procedureName}_${safeKey}]
+create or alter procedure ${quoteSqlIdentifier(reportProcedureName(formioData, grid.key))}
   @FormDataGUID varchar(36) = null,
   @OwnerObjectGUID varchar(36) = null
 as
@@ -2076,7 +935,7 @@ as
 
   set nocount on;
   select
-    ${grid.dialogFormTable ? 'dialog.*' : ''}
+    ${grid.dialogFormTable ? 'dialog.*' : `${safeKey}.*`}
   from ${grid.DBName} ${safeKey}
   ${grid.dialogFormTable ? `left join ${grid.dialogFormTable} dialog with(NOLOCK) on dialog.__forminstanceguid = ${safeKey}.[view]` : ''}
   where ${safeKey}.__forminstanceguid = @FormDataGUID
@@ -2090,33 +949,22 @@ GO`);
 
         // ? Update SQL preview
         const previewContainer = document.getElementById('sql-rendered');
-        previewContainer.innerHTML = `<code class="language-sql">${sql}</code>`;
+        if (previewContainer) {
+            previewContainer.textContent = sql;
+            previewContainer.classList.add('language-sql');
+        }
 
         // ? Show output container
-        document.getElementById('outputSql').style.display = 'block';
+        const sqlOutput = document.getElementById('outputSql');
+        if (sqlOutput) sqlOutput.style.display = 'block';
 
-        Prism.highlightAll();
+        globalThis.Prism?.highlightAll();
 
         return sql;
     }
 };
 
 const UIHandlers = {
-    // ? Initialize "Upload Another" button functionality
-    // ! This button simply reloads the page to reset the tool's state
-    setupUploadHandlers()
-    {
-        // ? Setup the "Upload Another" button handler
-        const uploadAnotherBtn = document.getElementById('uploadAnotherBtn');
-        if (uploadAnotherBtn)
-        {
-            uploadAnotherBtn.addEventListener('click', () =>
-            {
-                window.location.reload();
-            });
-        }
-    },
-
     // ? Handle file upload, parse JSON, and generate previews
     // ! This is the main entry point after a user uploads a JSON file
     handleFileUpload(event, createDevExpressPreview)
@@ -2129,7 +977,6 @@ const UIHandlers = {
         // ? On upload we swap the file upload and the upload another button's visibility
         document.getElementById('initial-upload').style.display = 'none';
         document.getElementById('upload-another').style.display = 'block';
-        Init.setupUploadAnotherHandler();
 
         // ? Reset conversion info display
         const conversionInfo = document.getElementById('conversion-info');
@@ -2162,26 +1009,7 @@ const UIHandlers = {
         {
             try
             {
-                let jsonData = JSON.parse(e.target.result);
-
-                // Validate file format: the first top-level property must be "Name".
-                const firstProperty = Object.keys(jsonData || {})[0];
-                if (firstProperty !== 'Name')
-                {
-                    const formatError = new Error('Uploaded file is not a supported Form.io form format.');
-                    formatError.validationErrors = [
-                        `Expected first property: Name`,
-                        `Found first property: ${firstProperty || '[none]'}`
-                    ];
-                    throw formatError;
-                }
-
-                if (!jsonData.FormioTemplate)
-                {
-                    const templateError = new Error('Conversion failed: missing required FormioTemplate data.');
-                    templateError.validationErrors = ['FormioTemplate property is required for conversion.'];
-                    throw templateError;
-                }
+                const jsonData = normalizeFormExport(JSON.parse(e.target.result));
 
                 // Store the uploaded form globally for regeneration
                 window.lastUploadedForm = jsonData;
@@ -2204,48 +1032,7 @@ const UIHandlers = {
                     document.querySelector('#settings-tab')?.classList.remove('disabled');
                     document.getElementById('output-wrapper').style.display = 'block';
 
-                    // ? Parse FormioTemplate if needed
-                    let formioTemplate;
-                    if (typeof jsonData.FormioTemplate === 'string')
-                    {
-                        try
-                        {
-                            formioTemplate = JSON.parse(jsonData.FormioTemplate);
-
-                            // ? Debug logging
-                            if (debugLevel >= 1)
-                            {
-                                debugLog(1, "Successfully parsed FormioTemplate:",
-                                {
-                                    hasComponents: Boolean(formioTemplate.components),
-                                    componentCount: formioTemplate.components?.length || 0
-                                });
-                            }
-
-                            // ? Update the original object with the parsed version
-                            jsonData.FormioTemplate = formioTemplate;
-                        }
-                        catch (error)
-                        {
-                            console.error("Failed to parse FormioTemplate:", error);
-                            formioTemplate = {
-                                components: []
-                            };
-                        }
-                    }
-                    else
-                    {
-                        formioTemplate = jsonData.FormioTemplate;
-                    }
-
-                    // ? Pre-process: Hoist grids and subforms out of containers
-                    ComponentCleaner.hoistGridsAndSubforms(formioTemplate);
-                    
-                    // ? Clean form definition
-                    if (formioTemplate.components)
-                    {
-                        formioTemplate.components = formioTemplate.components.map(c => ComponentCleaner.cleanComponent(c));
-                    }
+                    const formioTemplate = jsonData.FormioTemplate;
 
                     // ? Update Form Information section
                     document.getElementById('formTitle').textContent = jsonData.FormName || 'N/A';
@@ -2276,7 +1063,7 @@ const UIHandlers = {
                             console.error('Error creating Form.io preview:', err);
                             formContainer.innerHTML = `
                 <div class="alert alert-danger">
-                  Error loading form: ${err.message}
+                  Error loading form: ${Utils.escapeXml(err.message)}
                 </div>`;
                         });
                     }
@@ -2290,7 +1077,8 @@ const UIHandlers = {
                         const devExpressJsonContainer = document.getElementById('devexpress-json');
                         if (devExpressJsonContainer)
                         {
-                            devExpressJsonContainer.innerHTML = `<code class="language-json">${JSON.stringify(DevExpressConverter.state.devExpressJson, null, 2)}</code>`;
+                            devExpressJsonContainer.textContent = JSON.stringify(DevExpressConverter.state.devExpressJson, null, 2);
+                            devExpressJsonContainer.classList.add('language-json');
                             Prism.highlightAll();
                         }
 
@@ -2329,31 +1117,7 @@ const UIHandlers = {
                                 }
                                 else
                                 {
-                                    // ? Format the XML with proper indentation
-                                    const formatXml = (xml) =>
-                                    {
-                                        let formatted = '';
-                                        let indent = '';
-                                        const tab = '  '; // ! We define indentation tabs here as 2 spaces
-
-                                        xml.split(/>\s*</).forEach(node =>
-                                        {
-                                            if (node.match(/^\/\w/))
-                                            { // ? Closing tag
-                                                indent = indent.substring(tab.length);
-                                            }
-                                            formatted += indent + '<' + node + '>\r\n';
-                                            if (node.match(/^<?\w[^>]*[^\/]$/))
-                                            { // ? Opening tag
-                                                indent += tab;
-                                            }
-                                        });
-
-                                        return formatted.substring(1, formatted.length - 2);
-                                    };
-
-                                    // ? Set the formatted XML content
-                                    xmlContainer.textContent = formatXml(decodedTemplate.content);
+                                    xmlContainer.textContent = decodedTemplate.content;
 
                                     // ? Trigger Prism.js highlighting
                                     Prism.highlightElement(xmlContainer);
@@ -2521,7 +1285,7 @@ const UIHandlers = {
                 }
                 return `<li class="mb-2">
                 <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>
-                ${warning.message}${details}
+                ${Utils.escapeXml(warning.message)}${Utils.escapeXml(details)}
             </li>`;
             }).join('');
             warningsSection.style.display = 'block';
@@ -2538,6 +1302,8 @@ const UIHandlers = {
     // ! This is called when an error occurs during processing
     handleError(error)
     {
+        DevExpressConverter.state.devExpressJson = null;
+        document.getElementById('output-wrapper').style.display = 'none';
         const conversionInfo = document.getElementById('conversion-info');
 
         // ? Clear any existing content first
@@ -2590,7 +1356,7 @@ const UIHandlers = {
           <div class="conversion-error-details mt-2 small">
             <hr>
             <ul class="mb-0 ps-3">
-              ${errorDetails.map(detail => `<li>${detail}</li>`).join('')}
+              ${errorDetails.map(detail => `<li>${Utils.escapeXml(String(detail))}</li>`).join('')}
             </ul>
           </div>
         ` : ''}
@@ -2619,107 +1385,6 @@ const UIHandlers = {
 // ? Strips components and their children of unnecessary properties
 // ? Returns cleaned component object
 // ! This simplifies the form definition for easier processing and debugging
-const ComponentCleaner = {
-    cleanComponent(comp)
-    {
-        // ? Conditional property cleanup
-        if (comp.conditional)
-        {
-            delete comp.conditional;
-        }
-
-        // ? Custom conditional cleanup
-        if (comp.customConditional)
-        {
-            delete comp.customConditional;
-        }
-
-        // ? If our component has children, clean them too
-        // ! This is done recursively to handle nested structures
-        if (comp.components)
-        {
-            comp.components = comp.components.map(c => ComponentCleaner.cleanComponent(c));
-        }
-
-        return comp;
-    },
-
-    // ? Hoists DataGrids, EditGrids, Subforms, and Forms out of container components
-    // ! This is done to prevent a common issue with the band splitting process we do later
-    hoistGridsAndSubforms(formJson) {
-        // ! EARLY EXIT
-        // ? Validate input
-        if (!formJson || !Array.isArray(formJson.components)) return formJson;
-
-        //debugWarn(1, '[hoistGridsAndSubforms] Starting hoisting process');
-        //debugWarn(1, '[hoistGridsAndSubforms] Original JSON:', JSON.stringify(formJson, null, 2));
-
-        // ? Containers to handle
-        // ! Do not flatten tabs here. Their child entries are tab panes, not normal components,
-        // ! and flattening them causes the pane keys to render as ordinary data-bound labels.
-        const containerTypes = ['panel', 'fieldset', 'well', 'columns'];
-        // ? Element types to hoist
-        const hoistTypes = ['datagrid', 'nestedsubform'];
-
-        function containsHoistableDescendant(comp) {
-            if (!comp || typeof comp !== 'object') return false;
-
-            if (hoistTypes.includes((comp.type || '').toLowerCase())) {
-                return true;
-            }
-
-            if (Array.isArray(comp.components) && comp.components.some(child => containsHoistableDescendant(child))) {
-                return true;
-            }
-
-            if (Array.isArray(comp.columns) && comp.columns.some(column =>
-                Array.isArray(column.components) && column.components.some(child => containsHoistableDescendant(child)))) {
-                return true;
-            }
-
-            return false;
-        }
-
-
-        // Helper: recursively flatten containers, hoisting grids/subforms to root and preserving order
-        function flattenComponents(arr, rootArr) {
-            if (!Array.isArray(arr)) return [];
-            let result = [];
-            for (let comp of arr) {
-                if (hoistTypes.includes((comp.type || '').toLowerCase())) {
-                    // Hoist to root
-                    result.push({ hoist: true, comp });
-                } else if (containerTypes.includes((comp.type || '').toLowerCase()) && Array.isArray(comp.components) && containsHoistableDescendant(comp)) {
-                    // Only flatten containers that actually contain hoistable descendants.
-                    // Preserving unrelated containers keeps panel/fieldset headers intact.
-                    const flattened = flattenComponents(comp.components, rootArr);
-                    result = result.concat(flattened);
-                } else {
-                    // Keep as-is
-                    result.push({ hoist: false, comp });
-                }
-            }
-            return result;
-        }
-
-        // Flatten the top-level components array
-        const flattened = flattenComponents(formJson.components, formJson.components);
-        // Rebuild root array: non-hoisted in order, then hoisted in order at their original positions
-        const newRoot = [];
-        flattened.forEach(item => {
-            if (item.hoist) {
-                //debugWarn(1, `[hoistGridsAndSubforms] Hoisting '${getLabelOrKey(item.comp)}' (type: ${item.comp.type}) to root level.`);
-                newRoot.push(item.comp);
-            } else {
-                newRoot.push(item.comp);
-            }
-        });
-        formJson.components = newRoot;
-
-        //debugWarn(1, '[hoistGridsAndSubforms] Hoisting complete. Hoisted JSON:', JSON.stringify(formJson, null, 2));
-        return formJson;
-    }
-};
 
 //#endregion
 
@@ -2929,9 +1594,9 @@ function generateMinimalXmlTemplate()
         // ? Report metadata
         const name = formioData?.FormName || 'Simple Report';
         const deptName = formioData?.DepartmentName || 'Unknown';
-        const reportGuid = formioData?.ReportGuid || '00000000-0000-0000-0000-000000000000';
+        const reportGuid = formioData?.ReportGuid || formioData?.FormDefinitionGuid || '00000000-0000-0000-0000-000000000000';
         const departmentGuid = formioData?.DepartmentGuid || '00000000-0000-0000-0000-000000000000';
-        const displayName = Utils.escapeXml(`${name};${name};false;false;${departmentGuid};${reportGuid}`);
+        const displayName = `${name};${name};false;false;${departmentGuid};${reportGuid}`;
 
         // ? Create root node
         const root = processor.buildNode('XtraReportsLayoutSerializer',
@@ -2946,7 +1611,7 @@ function generateMinimalXmlTemplate()
             PageWidth: `${LAYOUT.PAGE_WIDTH}`,
             PageHeight: `${LAYOUT.PAGE_HEIGHT}`,
             Version: "23.2",
-            DataMember: `cstm_${deptName}_${name}_Printout`,
+            DataMember: reportProcedureName(formioData),
             DataSource: "#Ref-0"
         });
 
@@ -2977,8 +1642,8 @@ function generateMinimalXmlTemplate()
         ]);
 
         // ? Process form components using the ComponentProcessor
-        const componentProcessor = new ComponentProcessor(processor);
-        componentProcessor.currentY = 10; // ! Start Y position for components. This is essentially the space between the top of the Detail Band and the first element
+        const componentProcessor = new ComponentProcessor(processor, DevExpressConverter.state.warnings);
+        componentProcessor.currentY = LAYOUT.BAND_PADDING; // ! Start Y position for components. This is essentially the space between the top of the Detail Band and the first element
 
         const controls = [];
         // Initialize component groups array at a higher scope
@@ -2988,11 +1653,12 @@ function generateMinimalXmlTemplate()
         if (formioData?.FormioTemplate?.components)
         {
             // Process components and collect grid markers
-            const processedNodes = componentProcessor.processComponents(
+            let processedNodes;
+            try { processedNodes = componentProcessor.processComponents(
                 formioData.FormioTemplate.components,
                 LAYOUT.DEFAULT_WIDTH,   // ? Default width for components
                 0                       // ? Starting X offset
-            );
+            ); } finally { componentProcessor.dispose(); }
 
             if (debugLevel >= 2) {
                 debugLog(1, 'Processed components:', processedNodes);
@@ -3060,20 +1726,7 @@ function generateMinimalXmlTemplate()
 
             // Add initial components to the main detail band
             if (componentGroups.length > 0 && componentGroups[0].type === 'components') {
-                // Reset Y positions for main detail band components
-                let detailBandY = LAYOUT.VERTICAL_SPACING;
-                componentGroups[0].components.forEach(component => {
-                    const locationStr = component.attributes?.LocationFloat;
-                    if (locationStr) {
-                        const [x, _] = locationStr.split(',').map(Number);
-                        const sizeStr = component.attributes?.SizeF;
-                        const componentHeight = sizeStr ? 
-                            parseInt(sizeStr.split(',')[1]) || window.LAYOUT.INPUT_HEIGHT :
-                            window.LAYOUT.INPUT_HEIGHT;
-                        component.attributes.LocationFloat = `${x},${detailBandY}`;
-                        detailBandY += componentHeight + LAYOUT.VERTICAL_SPACING;
-                    }
-                });
+                placeControlGroup(componentGroups[0].components, LAYOUT.BAND_PADDING);
                 controls.push(...componentGroups[0].components);
             } else {
                 debugLog(1, 'No initial components for main detail band');
@@ -3125,7 +1778,7 @@ function generateMinimalXmlTemplate()
                 HeightF: controls.length > 0 ? 
                     (() => {
                         // Calculate max Y extent of all components
-                        let maxY = LAYOUT.VERTICAL_SPACING;
+                        let maxY = LAYOUT.BAND_PADDING;
                         controls.forEach(component => {
                             const sizeStr = component.attributes?.SizeF;
                             const locationStr = component.attributes?.LocationFloat;
@@ -3135,195 +1788,55 @@ function generateMinimalXmlTemplate()
                                 maxY = Math.max(maxY, y + height);
                             }
                         });
-                        return (maxY + LAYOUT.VERTICAL_SPACING).toString();
+                        return (maxY + LAYOUT.BAND_PADDING).toString();
                     })() :
-                    LAYOUT.VERTICAL_SPACING.toString()
+                    LAYOUT.BAND_PADDING.toString()
             })
         ];
 
-        // Iterate through componentGroups in order, creating bands for each grid/nestedform and using the next components group for spacer
-        for (let i = 0; i < componentGroups.length; i++) {
-
-            const group = componentGroups[i];
-
-            if (group.type === 'grid') 
-            {
+        // Each flow group owns its band and binding. No look-ahead or spacer
+        // reports: fields after a grid belong to the main form, not grid rows.
+        let flowLevel = 0;
+        for (const [index, group] of componentGroups.entries()) {
+            if (index === 0 && group.type === 'components') continue;
+            let section;
+            const sectionTop = LAYOUT.BAND_PADDING + (index > 0 ? LAYOUT.VERTICAL_SPACING : 0);
+            if (group.type === 'grid') {
                 const grid = gridComponents[group.gridIndex];
-                const gridBaseName = grid.key || `Grid${group.gridIndex + 1}`;
-
-                // Create header band with nested DetailBand
-                const headerReport = processor.createItemNode(undefined, "DetailReportBand", {
-                    Name: `DetailReport_${gridBaseName}_header`,
-                    HeightF: LAYOUT.LABEL_HEIGHT.toString()
+                const key = grid.key;
+                section = processor.createItemNode(undefined, 'DetailReportBand', {
+                    Name: 'DetailReport_' + key,
+                    Level: flowLevel++,
+                    DataSource: '#Ref-' + (325 + group.gridIndex),
+                    DataMember: reportProcedureName(formioData, key)
                 });
-                const headerBands = processor.buildNode('Bands', {}, [
-                    processor.createItemNode(1, "DetailBand", {
-                        Name: `Detail_${gridBaseName}_header`,
-                        HeightF: LAYOUT.LABEL_HEIGHT.toString()
-                    })
-                ]);
-                if (grid.headerContent && grid.headerContent.length > 0) {
-                    const headerControls = processor.buildNode('Controls', {});
-                    grid.headerContent.forEach(component => {
-                        if (typeof component === 'string') {
-                            headerControls.addChild(processor.parseXml(component));
-                        } else {
-                            headerControls.addChild(component);
-                        }
-                    });
-                    headerBands.children[0].addChild(headerControls);
-                }
-                headerReport.addChild(headerBands);
-                bandsArray.push(headerReport);
-
-                // Create keys band with nested DetailBand
-                const keysReport = processor.createItemNode(undefined, "DetailReportBand", {
-                    Name: `DetailReport_${gridBaseName}_keys`,
-                    HeightF: window.LAYOUT.INPUT_HEIGHT.toString(),
-                    DataSource: `#Ref-${325 + group.gridIndex}`,
-                    DataMember: `cstm_${deptName}_${name}_${gridBaseName}`
+                const headerHeight = placeControlGroup(grid.headerContent, sectionTop);
+                const header = processor.createItemNode(1, 'GroupHeaderBand', {
+                    Name: 'Header_' + key, HeightF: headerHeight,
+                    RepeatEveryPage: true, GroupUnion: 'WithFirstDetail'
                 });
-                const keysBands = processor.buildNode('Bands', {}, [
-                    processor.createItemNode(1, "DetailBand", {
-                        Name: `Detail_${gridBaseName}_keys`,
-                        HeightF: window.LAYOUT.INPUT_HEIGHT.toString()
-                    })
-                ]);
-                if (grid.dataContent && grid.dataContent.length > 0) {
-                    const keysControls = processor.buildNode('Controls', {});
-                    grid.dataContent.forEach(component => {
-                        if (typeof component === 'string') {
-                            keysControls.addChild(processor.parseXml(component));
-                        } else {
-                            keysControls.addChild(component);
-                        }
-                    });
-                    keysBands.children[0].addChild(keysControls);
-                }
-                keysReport.addChild(keysBands);
-                bandsArray.push(keysReport);
-
-                // Create spacer band with nested DetailBand
-                const spacerReport = processor.createItemNode(undefined, "DetailReportBand", {
-                    Name: `DetailReport_${gridBaseName}_spacer`,
-                    HeightF: LAYOUT.LABEL_HEIGHT.toString()
+                header.addChild(processor.buildNode('Controls', {}, grid.headerContent));
+                const detail = processor.createItemNode(2, 'DetailBand', {
+                    Name: 'Rows_' + key, HeightF: LAYOUT.INPUT_HEIGHT
                 });
-                // Use the next components group for spacer
-                let nextComponents = [];
-                if (i + 1 < componentGroups.length && componentGroups[i + 1].type === 'components') {
-                    nextComponents = componentGroups[i + 1].components;
-                }
-                let maxBandHeight = LAYOUT.VERTICAL_SPACING;
-                nextComponents.forEach(component => {
-                    const sizeStr = component.attributes?.SizeF;
-                    const locationStr = component.attributes?.LocationFloat;
-                    if (sizeStr && locationStr) {
-                        const height = parseInt(sizeStr.split(',')[1]) || 0;
-                        const y = parseInt(locationStr.split(',')[1]) || 0;
-                        maxBandHeight = Math.max(maxBandHeight, y + height + LAYOUT.VERTICAL_SPACING);
-                    }
+                detail.addChild(processor.buildNode('Controls', {}, grid.dataContent));
+                section.addChild(processor.buildNode('Bands', {}, [header, detail]));
+            } else {
+                const content = group.type === 'components' ? group.components : [
+                    componentProcessor.createSubReportNode(group.component, LAYOUT.PAGE_WIDTH - LAYOUT.MARGIN_LEFT - LAYOUT.MARGIN_RIGHT, 0)
+                ];
+                const height = placeControlGroup(content, sectionTop) + LAYOUT.BAND_PADDING;
+                section = processor.createItemNode(undefined, 'DetailReportBand', {
+                    Name: 'ContentSection_' + index, Level: flowLevel++,
+                    DataSource: '#Ref-0', DataMember: reportProcedureName(formioData)
                 });
-                const spacerHeight = nextComponents.length > 0 ? maxBandHeight : 15;
-                const spacerBands = processor.buildNode('Bands', {}, [
-                    processor.createItemNode(1, "DetailBand", {
-                        Name: `Detail_${gridBaseName}_spacer`,
-                        HeightF: spacerHeight.toString()
-                    })
-                ]);
-                if (nextComponents.length > 0) {
-                    const spacerControls = processor.buildNode('Controls', {});
-                    let bandY = LAYOUT.VERTICAL_SPACING;
-                    let maxY = LAYOUT.VERTICAL_SPACING;
-                    nextComponents.forEach(component => {
-                        const locationStr = component.attributes?.LocationFloat;
-                        if (locationStr) {
-                            const [x, _] = locationStr.split(',').map(Number);
-                            const sizeStr = component.attributes?.SizeF;
-                            const componentHeight = sizeStr ?
-                                parseInt(sizeStr.split(',')[1]) || window.LAYOUT.INPUT_HEIGHT :
-                                window.LAYOUT.INPUT_HEIGHT;
-                            component.attributes.LocationFloat = `${x},${bandY}`;
-                            maxY = Math.max(maxY, bandY + componentHeight);
-                            bandY += componentHeight + LAYOUT.VERTICAL_SPACING;
-                        }
-                        spacerControls.addChild(component);
-                    });
-                    spacerBands.children[0].addChild(spacerControls);
-                    const finalSpacerHeight = maxY + LAYOUT.VERTICAL_SPACING;
-                    spacerBands.children[0].attributes.HeightF = finalSpacerHeight.toString();
-                    spacerReport.attributes.HeightF = finalSpacerHeight.toString();
-                }
-                spacerReport.addChild(spacerBands);
-                bandsArray.push(spacerReport);
+                const detail = processor.createItemNode(1, 'DetailBand', {
+                    Name: 'ContentDetail_' + index, HeightF: height
+                });
+                detail.addChild(processor.buildNode('Controls', {}, content));
+                section.addChild(processor.buildNode('Bands', {}, [detail]));
             }
-            else if (group.type === 'nestedForm') {
-                const nestedForm = group.component;
-                const nestedFormBaseName = nestedForm.key || `NestedForm${i + 1}`;
-
-                debugLog(1, `Processing Nested Form: ${nestedFormBaseName}`);
-
-                // Create nested form band
-                const nestedFormReport = processor.createItemNode(undefined, "DetailReportBand", {
-                    Name: `DetailReport_${nestedFormBaseName}`,
-                    HeightF: (nestedForm.height || LAYOUT.INPUT_HEIGHT).toString() // Fallback to INPUT_HEIGHT if height is undefined
-                });
-                debugLog(1, `Creating nested form band for: ${nestedFormBaseName}`, nestedForm); // Log nestedForm for debugging
-
-                const nestedFormBands = processor.buildNode('Bands', {}, [
-                    processor.createItemNode(1, "DetailBand", {
-                        Name: `Detail_${nestedFormBaseName}`,
-                        HeightF: (nestedForm.height || LAYOUT.INPUT_HEIGHT).toString() // Fallback to INPUT_HEIGHT if height is undefined
-                    })
-                ]);
-                const nestedFormControls = processor.buildNode('Controls', {});
-
-                // Add the subreport element to the nested form band
-                const savedBandItemNum = processor.currentItemNum;
-                processor.currentItemNum = 0;
-                const subreportNode = componentProcessor.createSubReportNode(nestedForm, (LAYOUT.PAGE_WIDTH - LAYOUT.MARGIN_LEFT - LAYOUT.MARGIN_RIGHT), 0);
-                processor.currentItemNum = savedBandItemNum;
-                nestedFormControls.addChild(subreportNode);
-                nestedFormBands.children[0].addChild(nestedFormControls);
-                nestedFormReport.addChild(nestedFormBands);
-                bandsArray.push(nestedFormReport);
-
-                // Create post-nested form band
-                const postNestedFormReport = processor.createItemNode(undefined, "DetailReportBand", {
-                    Name: `DetailReport_${nestedFormBaseName}_postContent`,
-                    HeightF: LAYOUT.LABEL_HEIGHT.toString()
-                });
-                debugLog(1, `Creating post-nested form band for: ${nestedFormBaseName}`);
-
-                // Add post-content components if available
-                if (i + 1 < componentGroups.length && componentGroups[i + 1].type === 'components') {
-                    const postContentControls = processor.buildNode('Controls', {});
-                    const postContentElements = componentGroups[i + 1].components;
-                    let currentYOffset = LAYOUT.VERTICAL_SPACING;
-                    postContentElements.forEach(component => {
-                        if (typeof component !== 'string' && component.attributes) {
-                            // Reset Y offset for each component in the new band
-                            const height = component.attributes.SizeF ? parseFloat(component.attributes.SizeF.split(',')[1]) : LAYOUT.INPUT_HEIGHT;
-                            component.attributes.LocationFloat = `0,${currentYOffset}`;
-                            currentYOffset += height + LAYOUT.VERTICAL_SPACING;
-                            postContentControls.addChild(component);
-                        } else if (typeof component === 'string') {
-                            // If string, parse as XML and add (no offset logic)
-                            postContentControls.addChild(processor.parseXml(component));
-                        }
-                    });
-                    const postBands = processor.buildNode('Bands', {}, [
-                        processor.createItemNode(1, "DetailBand", {
-                            Name: `Detail_${nestedFormBaseName}_postContent`,
-                            HeightF: LAYOUT.LABEL_HEIGHT.toString()
-                        })
-                    ]);
-                    postBands.children[0].attributes.HeightF = currentYOffset.toString();
-                    postNestedFormReport.attributes.HeightF = currentYOffset.toString();
-                    postBands.children[0].addChild(postContentControls);
-                    postNestedFormReport.addChild(postBands);
-                }
-                bandsArray.push(postNestedFormReport);
-            }
+            bandsArray.push(section);
         }
 
         // ? Add PageFooterBand
@@ -3388,7 +1901,7 @@ function generateMinimalXmlTemplate()
         root.addChild(parameterPanel);
 
         // ? Add ComponentStorage for datasource definitions
-        const componentStorage = buildComponentStorage(formioData, processor);
+        const componentStorage = buildComponentStorage(formioData, processor, gridComponents.map(grid => grid.component));
         root.addChild(componentStorage);
 
         if (ConversionSettings.alignToGrid)
@@ -3421,7 +1934,7 @@ function generateMinimalXmlTemplate()
         // ? Final pass: Generate XML string with proper formatting and cleanup
         const xmlContent = processor.generateXML(root);
         const finalXml = '<?xml version="1.0" encoding="utf-8"?>\n' + xmlContent;
-        return finalXml.replace(/>>+/g, '>').replace(/\s+$/gm, '');
+        return finalXml;
 
     };
 }
@@ -3445,21 +1958,14 @@ const Init = {
         }
     },
 
-    // ? Setup handler for "Upload Another" button to reset the form
-    // ! This reloads the page to clear all state and allow a new upload
-    setupUploadAnotherHandler()
-    {
-        const uploadAnotherBtn = document.getElementById('uploadAnotherBtn');
-
-        if (uploadAnotherBtn)
-        {
-            uploadAnotherBtn.addEventListener('click', () =>
-            {
-            debugLog(1, 'Upload another clicked, reloading page');
-
-            window.location.reload();
-            });
-        } else { debugWarn(1, 'Upload another button not found'); }
+    // Reuse the file picker without reloading the page or discarding settings.
+    setupUploadAnotherHandler() {
+        const button = document.getElementById('uploadAnotherBtn');
+        if (button) button.onclick = () => {
+            const input = document.getElementById('fileUpload');
+            input.value = '';
+            input.click();
+        };
     },
 
     // ? Attach event listeners to UI elements

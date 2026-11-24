@@ -479,3 +479,25 @@
     font-size: 0.875rem;
     word-break: break-all;
 }
+.report-diagnostics {
+    background: #1d2631;
+    color: #eef3fa;
+    border: 1px solid #637488;
+    border-radius: 6px;
+    padding: 14px;
+    margin-bottom: 16px;
+}
+.report-diagnostics select { margin-left: 12px; }
+.report-diagnostics ul { max-height: 260px; overflow: auto; padding-left: 20px; margin: 10px 0 0; }
+.report-diagnostics button { color: inherit; background: none; border: 0; text-align: left; padding: 4px; white-space: normal; }
+.report-diagnostics button:hover { text-decoration: underline; }
+.report-diagnostics .diagnostic-error { color: #ff9e9e; }
+.report-diagnostics .diagnostic-warning { color: #ffd58a; }
+.report-diagnostics .diagnostic-info { color: #bfcee0; }
+.report-page-frame { position: relative; margin: 0 auto 24px; }
+.report-page-frame > .report-page { margin: 0; overflow: hidden; }
+.report-page .report-component { font: inherit; color: inherit; }
+.report-page .report-band { min-height: 0; }
+.report-validation-error { outline: 2px solid #d32235; outline-offset: -2px; }
+.report-validation-warning { outline: 1px dashed #b97700; outline-offset: -1px; }
+.report-page .unsupported-control { border: 1px dashed #a56b00; background: #fff5da; color: #704500; white-space: normal; }

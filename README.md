@@ -27,12 +27,86 @@ UniTools is a browser-based toolkit designed to help developers work with Form.i
 - **Form Viewer** - Preview Form.io JSON configurations and extract client/server scripts
 - **Report Viewer** - Preview DevExpress Report configurations with zoom controls
 
+The [Report Viewer implementation notes](scripts/Tools/ReportViewer/README.md)
+describe its static validation rules, rendering coverage, test commands, and
+the DevExpress runtime checks that cannot be verified by this client-side tool.
+
 ### Generators
 - **Printout From Form** - Generate DevExpress printouts from Form.io JSON files
 - **Table From Form** - Generate SQL table creation statements from Form.io JSON
 - **TableUpdaterTool** - Generate ALTER statements to sync two table definitions
 - **Form From Table** - Generate Form.io JSON from SQL table definitions
 - **Mini Printout Module** - Embeddable one-click Form.io to DevExpress report converter
+
+### Printout From Form maintenance
+
+The main converter accepts a standard Form.io schema with a `components` array,
+or the existing application export with an object/string `FormioTemplate`.
+Input property order is irrelevant. Conversion works on a copy of the schema.
+
+The conversion modules live in `scripts/Tools/PrintoutFromForm/`:
+
+| Module | Responsibility |
+|---|---|
+| `componentMappings.js` | Form.io mapping registry: renderer, target profile, bindings, and datasource types |
+| `definitions/fieldControls.js`, `definitions/layoutControls.js` | DevExpress presentation profiles |
+| `formSchema.js` | Input validation, normalization, child traversal, datasource field discovery |
+| `componentCleaner.js` | Recursive cleanup and repeating-section hoisting |
+| `componentProcessor.js` | Control generation and layout, sized from rendered children |
+| `reportLayout.js` | Moving control groups between bands while preserving relative coordinates |
+| `gridModel.js` | Shared grid discovery, custom FormGrid classification, and procedure naming |
+| `dataSource.js` | Embedded SQL datasource schemas |
+| `reportCodec.js` | UTF-8, gzip, and base64 template encoding |
+| `xmlProcessor.js`, `xmlValidator.js` | XML serialization, collection numbering, reference integrity |
+| `tool_printoutFromForm.js` | Page settings, upload/download handlers, report bands, SQL generation |
+
+See the [component mapping guide](scripts/Tools/PrintoutFromForm/MAPPINGS.md) for extension examples and the registry contract.
+
+The downloaded JSON preserves this application's existing import envelope:
+`ReportTemplate` contains gzip/base64 XML targeting DevExpress 23.2.5. It is
+different from the JSON returned by DevExpress's `IReportJsonSerializer`.
+SQL connections, table names, and stored procedures remain specific to the
+existing backend; a native Form.io schema does not supply that database mapping.
+
+Grid report flow uses one bound `DetailReportBand` per grid, containing a repeating
+`GroupHeaderBand` and a row `DetailBand`. Following non-grid content is explicitly
+bound back to the main form. Datasource entries are allocated from the actual
+rendered grid markers, in order. Panels are split around grids with their heading
+and before/after fields retained; grids are never serialized as panel controls.
+
+Both `type: "formgrid"` and `type: "datagrid", IsFormGrid: true` use the custom
+FormGrid path. `btn_view.Form_DBTable` identifies its dialog-table join. Without
+that metadata, SQL selects the link table and conversion warns that referenced
+fields may require a join. Procedure names now consistently follow
+`cstm_<DepartmentName>_<FormName>_<gridKey>` (main form: `_Printout`) in the SQL,
+datasource schema, and report binding. Regenerate/review the companion SQL when
+updating reports; the converter does not install procedures in a database.
+
+Repeating sections inside layouts are moved into separate report bands, with a
+conversion warning. Panel content is split around grids while preserving field order; other affected layouts may change. Repeating grids inside
+other grids, nested data paths in Container components, and arbitrary Form.io
+JavaScript/conditional behavior are not translated into equivalent report logic.
+The HTML preview is an approximation; verify final pagination and data binding
+in the target DevExpress runtime. The embeddable Mini Printout Module still has
+its own separate conversion core.
+
+Run regression tests with Node.js 22 or newer:
+
+```powershell
+node --experimental-default-type=module --test tests/printout.test.mjs
+```
+
+The Windows integration test converts both a native schema and the supplied
+example export, checks compression round trips, and parses the outer/embedded
+XML with `System.Xml`. Unit tests use a minimal DOM substitute and do not check
+browser typography or DevExpress rendering. The integration test is skipped on
+other operating systems.
+
+References: [Form.io form JSON](https://help.form.io/form-building/form-json),
+[Form.io conditions](https://help.form.io/form-building/logic-and-conditions),
+[DevExpress report units](https://docs.devexpress.com/XtraReports/DevExpress.XtraReports.UI.XtraReport.ReportUnit),
+[DevExpress tables](https://docs.devexpress.com/XtraReports/DevExpress.XtraReports.UI.XRTable),
+and [DevExpress JSON serialization](https://docs.devexpress.com/XtraReports/DevExpress.XtraReports.Web.ReportDesigner.Services.IReportJsonSerializer).
 
 ### Utilities
 - **Code Formatter** - Format and beautify code in multiple languages

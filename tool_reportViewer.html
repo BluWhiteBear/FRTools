@@ -48,12 +48,13 @@
 
             <!-- Tab Content -->
             <div class="card-body p-4">
+                <section id="reportDiagnostics" class="report-diagnostics" aria-label="Report validation" aria-live="polite" hidden></section>
                 <div class="tab-content">
                     <!-- Upload Tab -->
                     <div class="tab-pane fade show active" id="upload">
                         <div class="upload-area d-flex flex-column align-items-center justify-content-center p-5 rounded-3 text-center mb-4">
-                            <label for="reportUpload" class="form-label h5 mb-3 text-light">Upload DevExpress JSON File</label>
-                            <input type="file" id="reportUpload" class="form-control form-control-lg" accept=".json" style="max-width: 400px;">
+                            <label for="reportUpload" class="form-label h5 mb-3 text-light">Upload DevExpress JSON or XML Layout</label>
+                            <input type="file" id="reportUpload" class="form-control form-control-lg" accept=".json,.xml,.repx,application/json,application/xml" style="max-width: 400px;">
                         </div>
 
                         <!-- Output Section -->
@@ -121,6 +122,8 @@
                             </div>
                         </div>
 
+                        <label for="reportSelection" class="visually-hidden">Choose a report from the uploaded file</label>
+                        <select id="reportSelection" class="form-select mb-3" hidden></select>
                         <!-- Report Preview Section -->
                         <div class="preview-area">
                             <!-- Report Container -->

@@ -1,0 +1,98 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Report viewer browser regression tests</title>
+<link rel="stylesheet" href="../styles/reportViewer.css">
+<div id="fixture"><div id="host"><div id="preview"></div></div></div>
+<div id="propertyInspector"></div><pre id="xmlViewer"></pre><span id="zoomLevel"></span>
+<pre id="results">RUNNING</pre>
+<script type="module">
+import { ReportViewer } from '../scripts/Tools/ReportViewer/tool_reportViewer.js';
+import { parseReportXml, analyzeReport } from '../scripts/Tools/ReportViewer/reportModel.js';
+import { analyzeDataSources } from '../scripts/Tools/ReportViewer/reportDataValidation.js';
+const results = [];
+function assert(value, message) { if (!value) throw new Error(message); }
+function run(name, fn) { try { fn(); results.push({ name, pass: true }); } catch (error) { results.push({ name, pass: false, error: error.message }); } }
+const viewer = new ReportViewer(document.getElementById('preview'));
+const report = (controls, extra = '', bands = '') => `<?xml version="1.0"?><XtraReportsLayoutSerializer PageWidth="850" PageHeight="1100" Margins="50,50,50,50" Font="Arial, 10pt" ${extra}><Bands><Item1 ControlType="DetailBand" HeightF="100"><Controls>${controls}</Controls></Item1>${bands}</Bands></XtraReportsLayoutSerializer>`;
+const label = (text, attrs = '') => `<Item1 ControlType="XRLabel" Name="label" SizeF="100,25" LocationFloat="0,0" Text="${text}" ${attrs}/>`;
+run('XML entities and whitespace remain unchanged', () => {
+    const xml = report(label('A &amp; B  &lt;C&gt;'));
+    assert(viewer.prettyPrintXml(xml) === xml, 'Source XML changed');
+    assert(viewer.renderReport(xml), 'Render failed');
+    assert(document.querySelector('.component-label').textContent === 'A & B  <C>', 'Label text was corrupted');
+});
+run('physical geometry and zoom size the whole page', () => {
+    const page = document.querySelector('.report-page');
+    assert(page.style.height === '1100px', 'Page is not fixed height');
+    assert(page.style.transform === 'scale(0.96)', 'Inch scale is incorrect');
+    viewer.setZoom(2);
+    assert(parseFloat(page.parentElement.style.width) === 1632, 'Scroll bounds did not scale');
+    viewer.setZoom(1);
+});
+run('assembly-qualified controls and hidden controls', () => {
+    const xml = report(label('visible').replace('ControlType="XRLabel"', 'ControlType="DevExpress.XtraReports.UI.XRLabel, DevExpress.XtraReports.v23.2"') + '<Item2 ControlType="XRLabel" Visible="false" Text="hidden" SizeF="100,25"/>');
+    assert(viewer.renderReport(xml), 'Render failed');
+    assert(document.querySelectorAll('.component-label').length === 1, 'Type normalization or visibility failed');
+});
+run('markup rebuilding strips handlers and accepts DevExpress size/color tags', () => {
+    window.reportXss = false;
+    const safe = viewer.sanitizeMarkup('<span onclick="window.reportXss=true" style="background:url(https://invalid.example)">safe<img src=x onerror="window.reportXss=true"></span><script>window.reportXss=true</script><size=14><b>bold</b></size><color=#ff0000>red</color>');
+    assert(!/onclick|onerror|<img|<script|url\(/i.test(safe), 'Unsafe markup survived');
+    assert(safe.includes('font-size') && safe.includes('color'), 'Markup formatting lost');
+    assert(!window.reportXss, 'Uploaded script ran');
+});
+run('inspector displays hostile strings as text', () => {
+    assert(viewer.renderReport(report(label('&lt;img src=x onerror=alert(1)&gt;'))), 'Render failed');
+    viewer.updateInspector(document.querySelector('.component-label'));
+    assert(!document.querySelector('#propertyInspector img'), 'Inspector injected uploaded HTML');
+    assert(document.getElementById('propertyInspector').textContent.includes('<img'), 'Inspector text is missing');
+});
+run('fatal parse errors clear stale preview and remain visible', () => {
+    assert(!viewer.renderReport('<broken>'), 'Bad XML was accepted');
+    assert(!document.querySelector('.report-page'), 'Stale page remains');
+    assert(document.querySelector('.report-diagnostics').textContent.includes('LOAD_FAILED'), 'No visible error');
+});
+run('embedded datasource queries and fields are checked', () => {
+    const schema = btoa('<SqlDataSource><ResultSchema><DataSet><View Name="rows"><Field Name="known"/></View></DataSet></ResultSchema></SqlDataSource>');
+    const xml = report('<Item1 ControlType="XRLabel" Name="bound" SizeF="100,25"><ExpressionBindings><Item1 EventName="BeforePrint" PropertyName="Text" Expression="[missing]"/></ExpressionBindings></Item1>', 'DataSource="#Ref-7" DataMember="rows"').replace('</XtraReportsLayoutSerializer>', `<ComponentStorage><Item1 Ref="7" ObjectType="DevExpress.DataAccess.Sql.SqlDataSource" Base64="${schema}"/></ComponentStorage></XtraReportsLayoutSerializer>`);
+    const diagnostics = analyzeDataSources(parseReportXml(xml));
+    assert(diagnostics.some(item => item.code === 'UNKNOWN_FIELD'), 'Missing field was not detected');
+    assert(!diagnostics.some(item => item.severity === 'error'), 'Valid datasource was rejected');
+});
+run('checkbox state and style inheritance', () => {
+    const xml = report('<Item1 ControlType="XRPanel" Name="panel" Font="Arial, 14pt" SizeF="200,100"><Controls><Item1 ControlType="XRCheckBox" Name="check" CheckBoxState="Checked" Text="yes" SizeF="150,25"/></Controls></Item1>');
+    assert(viewer.renderReport(xml), 'Render failed');
+    const checkbox = document.querySelector('.component-check-box');
+    assert(checkbox.querySelector('svg'), 'Checked glyph missing');
+    assert(Math.abs(parseFloat(checkbox.style.fontSize) - 14 * 100 / 72) < 0.01, 'Inherited font is wrong');
+});
+run('table row weights, expressions, cell inspector and direct-child ownership', () => {
+    const cell = '<Item1 ControlType="XRTableCell" Weight="1"><ExpressionBindings><Item1 EventName="BeforePrint" PropertyName="Text" Expression="[value]"/></ExpressionBindings></Item1>';
+    const xml = report(`<Item1 ControlType="XRTable" Name="table" SizeF="300,60"><Rows><Item1 ControlType="XRTableRow" Weight="1"><Cells>${cell}</Cells></Item1><Item2 ControlType="XRTableRow" Weight="2"><Cells>${cell}</Cells></Item2></Rows></Item1>`);
+    assert(viewer.renderReport(xml), 'Render failed');
+    const rows = document.querySelectorAll('.report-table-row');
+    assert(rows.length === 2 && rows[0].style.height === '20px' && rows[1].style.height === '40px', 'Row weights are wrong');
+    const first = document.querySelector('.report-table-cell');
+    assert(first.textContent === '[value]', 'Expression placeholder changed');
+    assert(first.dataset.xml, 'Cell cannot be inspected');
+});
+run('pagination creates fixed pages and repeats page bands', () => {
+    const xml = report(label('first'), '', '<Item2 ControlType="DetailReportBand" Level="0"><Bands><Item1 ControlType="DetailBand" HeightF="950"><Controls/></Item1></Bands></Item2><Item3 ControlType="PageFooterBand" HeightF="20"><Controls><Item1 ControlType="XRPageInfo" SizeF="100,20"/></Controls></Item3>');
+    assert(viewer.renderReport(xml), 'Render failed');
+    assert(document.querySelectorAll('.report-page').length === 2, 'Expected two pages');
+    assert(document.querySelectorAll('.page-info-placeholder').length === 2, 'Footer not repeated');
+});
+run('unsupported controls and overlap are visible diagnostics', () => {
+    viewer.renderReport(report(label('a') + '<Item2 ControlType="XRChart" Name="chart" SizeF="100,25" LocationFloat="10,0"/>'));
+    assert(viewer.diagnostics.some(item => item.code === 'UNSUPPORTED_CONTROL'), 'Unsupported control silently ignored');
+    assert(viewer.diagnostics.some(item => item.code === 'OVERLAP'), 'Overlap missed');
+    assert(document.querySelector('.unsupported-control'), 'Placeholder missing');
+});
+run('safe DTD rejection', () => {
+    let rejected = false;
+    try { parseReportXml('<!DOCTYPE x [<!ENTITY x "test">]><XtraReportsLayoutSerializer/>'); } catch { rejected = true; }
+    assert(rejected, 'DTD was accepted');
+});
+document.getElementById('results').textContent = JSON.stringify({ passed: results.filter(result => result.pass).length, failed: results.filter(result => !result.pass).length, results });
+document.title = results.every(result => result.pass) ? 'PASS' : 'FAIL';
+</script>
